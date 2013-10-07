@@ -30,7 +30,8 @@ Volume
 |------|--------------|-------------|---------|
 | Field | Active | Boolean value specifying if the **Field** is still in the sample (1 if the **Field** is in the sample and 0 if it is not). | At the end of the filter, all **Fields** will be "Active" as the "Inactive" **Fields** will have been removed.  |  
 | Field | AvgParentAvgCAxisMisalignments| Float of the microtexture region "grain"-kernel average c-axis misalignment. |  |  
-| Field | ParentDensity | Float of the voxel fraction of "flipped" microtexture against the region searched in Find Neighborhoods filter. | To convert to a **Field**, use Create Field Array From Cell Array Filter. |  
+| Field | ParentDensity | Float of the voxel fraction of "flipped" microtexture against the region searched in Find Neighborhoods filter. | |  
+| Field | NumGrainsPerParent | Int of the number of grains contained in each parent grain. |  |
 
 
 ## Authors ##

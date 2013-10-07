@@ -11,6 +11,7 @@
 
 #include "DREAM3DLib/GenericFilters/RenameCellArray.h"
 #include "DREAM3DLib/GenericFilters/LinkFieldMapToCellArray.h"
+#include "DREAM3DLib/GenericFilters/CreateFieldArrayFromCellArray.h"
 
 #define ERROR_TXT_OUT 1
 #define ERROR_TXT_OUT1 1
@@ -26,6 +27,7 @@ BridgeParentIdsStatisticsToGrainIds::BridgeParentIdsStatisticsToGrainIds() :
   AbstractFilter(),
   m_GrainIdsArrayName(DREAM3D::CellData::GrainIds),
   m_CellParentIdsArrayName(DREAM3D::CellData::ParentIds),
+  m_ParentDensityArrayName(DREAM3D::CellData::ParentDensity),
   m_FieldParentIdsArrayName(DREAM3D::FieldData::ParentIds),
   m_AvgCAxisMisalignmentsArrayName(DREAM3D::FieldData::AvgCAxisMisalignments),
   m_NumGrainsPerParentArrayName(DREAM3D::FieldData::NumGrainsPerParent),
@@ -33,6 +35,7 @@ BridgeParentIdsStatisticsToGrainIds::BridgeParentIdsStatisticsToGrainIds() :
   m_CrystalStructuresArrayName(DREAM3D::EnsembleData::CrystalStructures),
  // m_GrainIds(NULL),
  // m_CellParentIds(NULL),
+  m_ParentDensity(NULL),
   m_FieldParentIds(NULL),
   m_AvgCAxisMisalignments(NULL),
   m_NumGrainsPerParent(NULL),
@@ -155,6 +158,20 @@ void BridgeParentIdsStatisticsToGrainIds::preflight()
     addErrorMessages(link_field_map_to_cell_array->getPipelineMessages());
     return;
   }
+
+  CreateFieldArrayFromCellArray::Pointer create_field_array_from_cell_array = CreateFieldArrayFromCellArray::New();
+  create_field_array_from_cell_array->setObservers(this->getObservers());
+  create_field_array_from_cell_array->setVolumeDataContainer(m);
+  create_field_array_from_cell_array->setMessagePrefix(getMessagePrefix());
+  create_field_array_from_cell_array->setSelectedCellArrayName(m_ParentDensityArrayName);
+  create_field_array_from_cell_array->preflight();
+  int err3 = create_field_array_from_cell_array->getErrorCondition();
+  if (err3 < 0)
+  {
+    setErrorCondition(create_field_array_from_cell_array->getErrorCondition());
+    addErrorMessages(create_field_array_from_cell_array->getPipelineMessages());
+    return;
+  }
 }
 
 // -----------------------------------------------------------------------------
@@ -227,6 +244,21 @@ void BridgeParentIdsStatisticsToGrainIds::execute()
   {
     m_AvgParentAvgCAxisMisalignments[i] /= m_NumGrainsPerParent[i];
   }
+
+  CreateFieldArrayFromCellArray::Pointer create_field_array_from_cell_array = CreateFieldArrayFromCellArray::New();
+  create_field_array_from_cell_array->setObservers(this->getObservers());
+  create_field_array_from_cell_array->setVolumeDataContainer(m);
+  create_field_array_from_cell_array->setMessagePrefix(getMessagePrefix());
+  create_field_array_from_cell_array->setSelectedCellArrayName(m_ParentDensityArrayName);
+  create_field_array_from_cell_array->execute();
+  int err3 = create_field_array_from_cell_array->getErrorCondition();
+  if (err3 < 0)
+  {
+    setErrorCondition(create_field_array_from_cell_array->getErrorCondition());
+    addErrorMessages(create_field_array_from_cell_array->getPipelineMessages());
+    return;
+  }
+
 
   // If there is an error set this to something negative and also set a message
   notifyStatusMessage("BridgeParentIdsStatisticsToGrainIds Completed");
