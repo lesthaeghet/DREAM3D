@@ -45,10 +45,13 @@ class DREAM3DLib_EXPORT FindFieldNeighborCAxisMisalignments : public AbstractFil
     virtual const std::string getSubGroupName() { return DREAM3D::FilterSubGroups::CrystallographicFilters; }
     virtual const std::string getHumanLabel() { return "Find Field Neighbor C-Axis Misalignments"; }
 
+    DREAM3D_INSTANCE_PROPERTY(bool, FindAvgMisals)
+
     /**
     * @brief This method will write the options to a file
     * @param writer The writer that is used to write the options to a file
     */
+    virtual void setupFilterParameters();
     virtual int writeFilterParameters(AbstractFilterParametersWriter* writer, int index);
 
     /**
