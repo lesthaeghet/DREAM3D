@@ -187,7 +187,7 @@ void FindFieldNeighborCAxisMisalignments::execute()
   float c1[3];
   float c2[3];
   float caxis[3] = {0, 0, 1};
-  float neighMisalTot = 0.0f;
+  size_t hexneighborlist = 0;
   QuatF q1;
   QuatF q2;
   QuatF* avgQuats = reinterpret_cast<QuatF*>(m_AvgQuats);
@@ -217,6 +217,7 @@ void FindFieldNeighborCAxisMisalignments::execute()
       w = 10000.0;
       nname = neighborlist[i][j];
       phase2 = m_CrystalStructures[m_FieldPhases[nname]];
+      hexneighborlist = neighborlist[i].size();
       if (phase1 == phase2 && (phase1 == Ebsd::CrystalStructure::Hexagonal_High) )
       {
         QuaternionMathF::Copy(avgQuats[nname], q2);
@@ -232,16 +233,19 @@ void FindFieldNeighborCAxisMisalignments::execute()
         w = MatrixMath::CosThetaBetweenVectors(c1, c2);
         DREAM3DMath::boundF(w, -1, 1);
         w = acosf(w);
-        misalignmentlists[i][j] = w * DREAM3D::Constants::k_180OverPi;
+        if (m_FindAvgMisals == true) m_AvgCAxisMisalignments[i] += w * DREAM3D::Constants::k_180OverPi;;
       }
       else
       {
-        misalignmentlists[i][j] = -100.0f;
+        if (m_FindAvgMisals == true) hexneighborlist -= 1;
       }
-      if (m_FindAvgMisals == true) neighMisalTot += misalignmentlists[i][j];
     }
-    if (m_FindAvgMisals == true) m_AvgCAxisMisalignments[i] = neighMisalTot / neighborlist[i].size();
-    if (m_FindAvgMisals == true) neighMisalTot = 0.0f;
+    if (m_FindAvgMisals == true)
+    {
+      if (hexneighborlist > 0) m_AvgCAxisMisalignments[i] /= hexneighborlist;
+      else m_AvgCAxisMisalignments[i] = -100.0f;
+      hexneighborlist = 0;
+    }
   }
 
   // We do this to create new set of MisalignmentList objects
