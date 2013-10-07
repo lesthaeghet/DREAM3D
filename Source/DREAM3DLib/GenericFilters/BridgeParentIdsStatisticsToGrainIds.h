@@ -36,8 +36,10 @@ class DREAM3DLib_EXPORT BridgeParentIdsStatisticsToGrainIds : public AbstractFil
     //------ Created Cell Data
     //------ Required Field Data
     DREAM3D_INSTANCE_STRING_PROPERTY(FieldParentIdsArrayName)
+    DREAM3D_INSTANCE_STRING_PROPERTY(AvgCAxisMisalignmentsArrayName)
     //------ Created Field Data
     DREAM3D_INSTANCE_STRING_PROPERTY(NumGrainsPerParentArrayName)
+    DREAM3D_INSTANCE_STRING_PROPERTY(AvgParentAvgCAxisMisalignmentsArrayName)
     //------ Required Ensemble Data
     DREAM3D_INSTANCE_STRING_PROPERTY(CrystalStructuresArrayName)
 
@@ -68,6 +70,8 @@ class DREAM3DLib_EXPORT BridgeParentIdsStatisticsToGrainIds : public AbstractFil
     int32_t* m_CellParentIds;
     int32_t* m_FieldParentIds;
     int32_t* m_NumGrainsPerParent;
+    float* m_AvgCAxisMisalignments;
+    float* m_AvgParentAvgCAxisMisalignments;
 
     unsigned int* m_CrystalStructures;
     std::vector<OrientationOps::Pointer> m_OrientationOps;

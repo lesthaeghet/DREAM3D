@@ -15,9 +15,6 @@
 #define ERROR_TXT_OUT 1
 #define ERROR_TXT_OUT1 1
 
-
-
-
 #define NEW_SHARED_ARRAY(var, m_msgType, size)\
   boost::shared_array<m_msgType> var##Array(new m_msgType[size]);\
   m_msgType* var = var##Array.get();
@@ -30,10 +27,16 @@ BridgeParentIdsStatisticsToGrainIds::BridgeParentIdsStatisticsToGrainIds() :
   m_GrainIdsArrayName(DREAM3D::CellData::GrainIds),
   m_CellParentIdsArrayName(DREAM3D::CellData::ParentIds),
   m_FieldParentIdsArrayName(DREAM3D::FieldData::ParentIds),
+  m_AvgCAxisMisalignmentsArrayName(DREAM3D::FieldData::AvgCAxisMisalignments),
+  m_NumGrainsPerParentArrayName(DREAM3D::FieldData::NumGrainsPerParent),
+  m_AvgParentAvgCAxisMisalignmentsArrayName(DREAM3D::FieldData::AvgParentAvgCAxisMisalignments),
   m_CrystalStructuresArrayName(DREAM3D::EnsembleData::CrystalStructures),
-  m_GrainIds(NULL),
-  m_CellParentIds(NULL),
+ // m_GrainIds(NULL),
+ // m_CellParentIds(NULL),
   m_FieldParentIds(NULL),
+  m_AvgCAxisMisalignments(NULL),
+  m_NumGrainsPerParent(NULL),
+  m_AvgParentAvgCAxisMisalignments(NULL),
   m_CrystalStructures(NULL)
 {
   m_OrientationOps = OrientationOps::getOrientationOpsVector();
@@ -86,15 +89,27 @@ void BridgeParentIdsStatisticsToGrainIds::dataCheck(bool preflight, size_t voxel
   std::stringstream ss;
   VolumeDataContainer* m = getVolumeDataContainer();
 
+
+
   // Cell Data
-  GET_PREREQ_DATA(m, DREAM3D, CellData, GrainIds, -301, int32_t, Int32ArrayType, voxels, 1)
-  GET_PREREQ_DATA(m, DREAM3D, CellData, CellParentIds, -304, int32_t, Int32ArrayType, voxels, 1)
+  //GET_PREREQ_DATA(m, DREAM3D, CellData, GrainIds, -301, int32_t, Int32ArrayType, voxels, 1)
+  //GET_PREREQ_DATA(m, DREAM3D, CellData, CellParentIds, -304, int32_t, Int32ArrayType, voxels, 1)
 
   // Field Data
-  GET_PREREQ_DATA(m, DREAM3D, FieldData, FieldParentIds, -302, int32_t, Int32ArrayType, fields, 1)
+  if(afterLink == false)
+  {
+    GET_PREREQ_DATA(m, DREAM3D, FieldData, FieldParentIds, -302, int32_t, Int32ArrayType, fields, 1)
+    GET_PREREQ_DATA(m, DREAM3D, FieldData, AvgCAxisMisalignments, -303, float, FloatArrayType, fields, 1)
+  }
+  if(afterLink == true)
+  {
+    CREATE_NON_PREREQ_DATA(m, DREAM3D, FieldData, NumGrainsPerParent, int32_t, Int32ArrayType, 0, fields, 1)
+    CREATE_NON_PREREQ_DATA(m, DREAM3D, FieldData, AvgParentAvgCAxisMisalignments, float, FloatArrayType, 0, fields, 1)
+  }
 
-  typedef DataArray<unsigned int> XTalStructArrayType;
-  GET_PREREQ_DATA(m, DREAM3D, EnsembleData, CrystalStructures, -305, unsigned int, XTalStructArrayType, ensembles, 1)
+ typedef DataArray<unsigned int> XTalStructArrayType;
+ GET_PREREQ_DATA(m, DREAM3D, EnsembleData, CrystalStructures, -305, unsigned int, XTalStructArrayType, ensembles, 1)
+
 }
 
 // -----------------------------------------------------------------------------
@@ -156,10 +171,19 @@ void BridgeParentIdsStatisticsToGrainIds::execute()
   }
 
   setErrorCondition(0);
-  dataCheck(false, m->getTotalPoints(), m->getNumFieldTuples(), m->getNumEnsembleTuples(), true);
+  dataCheck(false, m->getTotalPoints(), m->getNumFieldTuples(), m->getNumEnsembleTuples(), false);
   if (getErrorCondition() < 0)
   {
     return;
+  }
+
+  int numgrains = m->getNumFieldTuples();
+  std::vector<float> AvgCAxisMisalignments(numgrains,0.0);
+  std::vector<int32_t> fieldParentIds(numgrains,0);
+  for(int i=0;i<numgrains;i++)
+  {
+    AvgCAxisMisalignments[i] = m_AvgCAxisMisalignments[i];
+    fieldParentIds[i] = m_FieldParentIds[i];
   }
 
   RenameCellArray::Pointer rename_cell_array = RenameCellArray::New();
@@ -168,7 +192,7 @@ void BridgeParentIdsStatisticsToGrainIds::execute()
   rename_cell_array->setMessagePrefix(getMessagePrefix());
   rename_cell_array->setSelectedCellArrayName(m_CellParentIdsArrayName);
   rename_cell_array->setNewCellArrayName(m_GrainIdsArrayName);
-  rename_cell_array->preflight();
+  rename_cell_array->execute();
   int err1 = rename_cell_array->getErrorCondition();
   if (err1 < 0)
   {
@@ -182,13 +206,26 @@ void BridgeParentIdsStatisticsToGrainIds::execute()
   link_field_map_to_cell_array->setVolumeDataContainer(m);
   link_field_map_to_cell_array->setMessagePrefix(getMessagePrefix());
   link_field_map_to_cell_array->setSelectedCellDataArrayName(m_GrainIdsArrayName);
-  link_field_map_to_cell_array->preflight();
+  link_field_map_to_cell_array->execute();
   int err2 = link_field_map_to_cell_array->getErrorCondition();
   if (err2 < 0)
   {
     setErrorCondition(link_field_map_to_cell_array->getErrorCondition());
     addErrorMessages(link_field_map_to_cell_array->getPipelineMessages());
     return;
+  }
+
+  dataCheck(false, m->getNumCellTuples(), m->getNumFieldTuples(), m->getNumEnsembleTuples(), true);
+
+  for(int i=0;i<numgrains;i++)
+  {
+    int parentid = fieldParentIds[i];
+    m_NumGrainsPerParent[parentid]++;
+    m_AvgParentAvgCAxisMisalignments[parentid] += AvgCAxisMisalignments[i];
+  }
+  for(int i=0;i<m->getNumFieldTuples();i++)
+  {
+    m_AvgParentAvgCAxisMisalignments[i] /= m_NumGrainsPerParent[i];
   }
 
   // If there is an error set this to something negative and also set a message
