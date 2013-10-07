@@ -15,10 +15,11 @@ NOTE: This filter is intended for use with *Heaxgonal* materials.  While the c-a
 
 | Name | Type |
 |------|------|
-| C-Axis Alignment Tolerance | Double |
+| C-Axis Alignment Tolerance | Double |  
+| Use Non-Contiguous Neighbors | Boolean |
 
 ## Required DataContainers ##
-Voxel
+Volume
 
 ## Required Arrays ##
 
@@ -27,7 +28,9 @@ Voxel
 | Cell | GrainIds | Ids (ints) that specify to which **Field** each **Cell** belongs. | Values should be present from segmentation of experimental data or synthetic generation and cannot be determined by this filter. Not having these values will result in the filter to fail/not execute. | Segment Fields (Misorientation, C-Axis Misorientation, Scalar) (Reconstruction), Read Dx File (IO), Read Ph File (IO), Pack Primary Phases (SyntheticBuilding), Insert Precipitate Phases (SyntheticBuilding), Establish Matrix Phase (SyntheticBuilding) |
 | Field | FieldPhases | Phase Id (int) specifying the phase of the **Field**| | Find Field Phases (Generic), Read Field Info File (IO), Pack Primary Phases (SyntheticBuilding), Insert Precipitate Phases (SyntheticBuilding), Establish Matrix Phase (SyntheticBuilding) |
 | Field | AvgQuats | Five (5) values (floats) defining the average orientation of the **Field** in quaternion representation | Filter will calculate average quaternions for **Fields** if not already calculated. | Find Field Average Orientations (Statistics) |
-| Ensemble | CrystalStructures | Enumeration (int) specifying the crystal structure of each Ensemble/phase (Hexagonal=0, Cubic=1, Orthorhombic=2) | Values should be present from experimental data or synthetic generation and cannot be determined by this filter. Not having these values will result in the filter to fail/not execute. | Read H5Ebsd File (IO), Read Ensemble Info File (IO), Initialize Synthetic Volume (SyntheticBuilding) |
+| Ensemble | CrystalStructures | Enumeration (int) specifying the crystal structure of each Ensemble/phase (Hexagonal=0, Cubic=1, Orthorhombic=2) | Values should be present from experimental data or synthetic generation and cannot be determined by this filter. Not having these values will result in the filter to fail/not execute. | Read H5Ebsd File (IO), Read Ensemble Info File (IO), Initialize Synthetic Volume (SyntheticBuilding) |  
+| Field | ContiguousNeighborList | List of nearest neighbor GrainIds | If "Use Non-Contiguous Neighbors is checked, this list is NOT used" | Find Field Neighbors (Statistics) |  
+| Field | NonContiguousNeighborList |List of neighbor GrainIds within a designated centroid | If "Use Non-Contiguous Neighbors is checked, this list IS used" | Find Field Neighborhoods |  
 
 ## Created Arrays ##
 

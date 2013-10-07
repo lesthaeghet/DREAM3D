@@ -9,8 +9,12 @@ This Filter determines, for each **Field**, the misorientations with the **Field
 
 ## Parameters ##
 
+| Name | Type |
+|-------|------|
+|Find Average Misorientations | Boolean |  
+
 ## Required DataContainers ##
-Voxel
+Volume
 
 ## Required Arrays ##
 
@@ -26,7 +30,7 @@ Voxel
 | Type | Default Name | Description | Comment |
 |------|--------------|-------------|---------|
 | Field | MisorientationLists | List of the misorientation angles with the contiguous neighboring **Fields** for a given **Field** |  |  
-| Field | avgMisorientation | Number weighted average of neighbor misorientations.
+| Field | AvgMisorientations | Number weighted average of neighbor misorientations. | Only created if Find Average Misorientations IS checked
 
 ## Authors ##
 
