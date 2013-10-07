@@ -273,7 +273,7 @@ void GroupMicroTextureRegions::merge_micro_texture_regions()
   int parentcount = 0;
   parentnumbers.resize(numgrains, -1);
   beenChecked.resize(numgrains, false);
-  intensities.resize(numgrains, 0.0);
+  densities.resize(numgrains, 0.0);
   int size1 = 0, size2 = 0, size = 0;
   parentnumbers[0] = 0;
   for (size_t i = 1; i < numgrains; i++)
@@ -355,7 +355,7 @@ void GroupMicroTextureRegions::merge_micro_texture_regions()
         }
       }
       float fraction = microtexturevolume / totalCheckVolume;
-      intensities[parentcount] = fraction;
+      densities[parentcount] = fraction;
       int checkedSize = totalCheckList.size();
       for (size_t j = 0 ; j < checkedSize ; j++)
       {
@@ -374,7 +374,7 @@ void GroupMicroTextureRegions::merge_micro_texture_regions()
     int grainname = m_GrainIds[k];
     m_CellParentIds[k] = parentnumbers[grainname];
     m_FieldParentIds[grainname] = m_CellParentIds[k];
-    m_ParentDensity[k] = intensities[parentnumbers[grainname]];
+    m_ParentDensity[k] = densities[parentnumbers[grainname]];
   }
 
 }
