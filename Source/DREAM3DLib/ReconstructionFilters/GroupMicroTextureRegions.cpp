@@ -62,7 +62,7 @@ GroupMicroTextureRegions::GroupMicroTextureRegions() :
   AbstractFilter(),
   m_GrainIdsArrayName(DREAM3D::CellData::GrainIds),
   m_CellParentIdsArrayName(DREAM3D::CellData::ParentIds),
-  m_MTRdensityArrayName(DREAM3D::CellData::MTRdensity),
+  m_ParentDensityArrayName(DREAM3D::CellData::ParentDensity),
   m_AvgQuatsArrayName(DREAM3D::FieldData::AvgQuats),
   m_FieldPhasesArrayName(DREAM3D::FieldData::Phases),
   m_VolumesArrayName(DREAM3D::FieldData::Volumes),
@@ -75,7 +75,7 @@ GroupMicroTextureRegions::GroupMicroTextureRegions() :
   m_UseNonContiguousNeighbors(false),
   m_GrainIds(NULL),
   m_CellParentIds(NULL),
-  m_MTRdensity(NULL),
+  m_ParentDensity(NULL),
   m_AvgQuats(NULL),
   m_FieldPhases(NULL),
   m_Volumes(NULL),
@@ -163,7 +163,7 @@ void GroupMicroTextureRegions::dataCheck(bool preflight, size_t voxels, size_t f
   // Cell Data
   GET_PREREQ_DATA(m, DREAM3D, CellData, GrainIds, -301, int32_t, Int32ArrayType, voxels, 1)
   CREATE_NON_PREREQ_DATA(m, DREAM3D, CellData, CellParentIds, int32_t, Int32ArrayType, -1, voxels, 1)
-  CREATE_NON_PREREQ_DATA(m, DREAM3D, CellData, MTRdensity, float, FloatArrayType, 0, voxels, 1)
+  CREATE_NON_PREREQ_DATA(m, DREAM3D, CellData, ParentDensity, float, FloatArrayType, 0, voxels, 1)
 
   // Field Data
   GET_PREREQ_DATA(m, DREAM3D, FieldData, AvgQuats, -302, float, FloatArrayType, fields, 4)
@@ -374,7 +374,7 @@ void GroupMicroTextureRegions::merge_micro_texture_regions()
     int grainname = m_GrainIds[k];
     m_CellParentIds[k] = parentnumbers[grainname];
     m_FieldParentIds[grainname] = m_CellParentIds[k];
-    m_MTRdensity[k] = intensities[parentnumbers[grainname]];
+    m_ParentDensity[k] = intensities[parentnumbers[grainname]];
   }
 
 }
