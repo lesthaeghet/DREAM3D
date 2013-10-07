@@ -55,15 +55,18 @@ FindMisorientations::FindMisorientations()  :
   m_CrystalStructuresArrayName(DREAM3D::EnsembleData::CrystalStructures),
   m_NeighborListArrayName(DREAM3D::FieldData::NeighborList),
   m_MisorientationListArrayName(DREAM3D::FieldData::MisorientationList),
-  m_AvgMisorientationArrayName(DREAM3D::FieldData::AvgMisorientation),
+  m_AvgMisorientationsArrayName(DREAM3D::FieldData::AvgMisorientations),
+  m_FindAvgMisors(false),
   m_AvgQuats(NULL),
   m_FieldPhases(NULL),
   m_NeighborList(NULL),
   m_MisorientationList(NULL),
-  m_AvgMisorientation(NULL),
+  m_AvgMisorientations(NULL),
   m_CrystalStructures(NULL)
 {
   m_OrientationOps = OrientationOps::getOrientationOpsVector();
+
+  setupFilterParameters();
 }
 
 // -----------------------------------------------------------------------------
@@ -72,12 +75,35 @@ FindMisorientations::FindMisorientations()  :
 FindMisorientations::~FindMisorientations()
 {
 }
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void FindMisorientations::setupFilterParameters()
+{
+  FilterParameterVector parameters;
+  {
+    FilterParameter::Pointer option = FilterParameter::New();
+    option->setHumanLabel("Find Average Misorientations");
+    option->setPropertyName("FindAvgMisors");
+    option->setWidgetType(FilterParameter::BooleanWidget);
+    option->setValueType("bool");
+    option->setUnits("");
+    parameters.push_back(option);
+  }
+
+  setFilterParameters(parameters);
+}
+
+// -----------------------------------------------------------------------------
+//
 // -----------------------------------------------------------------------------
 void FindMisorientations::readFilterParameters(AbstractFilterParametersReader* reader, int index)
 {
   reader->openFilterGroup(this, index);
   /* Code to read the values goes between these statements */
   /* FILTER_WIDGETCODEGEN_AUTO_GENERATED_CODE BEGIN*/
+  setFindAvgMisors( reader->readValue("UseFindAvgMisors", getFindAvgMisors()) );
   /* FILTER_WIDGETCODEGEN_AUTO_GENERATED_CODE END*/
   reader->closeFilterGroup();
 }
@@ -88,6 +114,7 @@ void FindMisorientations::readFilterParameters(AbstractFilterParametersReader* r
 int FindMisorientations::writeFilterParameters(AbstractFilterParametersWriter* writer, int index)
 {
   writer->openFilterGroup(this, index);
+  writer->writeValue("FindAvgMisors", getFindAvgMisors() );
   writer->closeFilterGroup();
   return ++index; // we want to return the next index that was just written to
 }
@@ -105,8 +132,10 @@ void FindMisorientations::dataCheck(bool preflight, size_t voxels, size_t fields
   GET_PREREQ_DATA(m, DREAM3D, FieldData, AvgQuats, -301, float, FloatArrayType, fields, 4)
   GET_PREREQ_DATA(m, DREAM3D, FieldData, FieldPhases, -303, int32_t, Int32ArrayType, fields, 1)
 
-  CREATE_NON_PREREQ_DATA(m, DREAM3D, FieldData, AvgMisorientation, float, FloatArrayType, 0, fields, 1)
-
+  if(m_FindAvgMisors == true)
+  {
+    CREATE_NON_PREREQ_DATA(m, DREAM3D, FieldData, AvgMisorientations, float, FloatArrayType, 0, fields, 1)
+  }
 
   // Now we are going to get a "Pointer" to the NeighborList object out of the DataContainer
   IDataArray::Pointer neighborListPtr = m->getFieldData(m_NeighborListArrayName);
@@ -220,10 +249,10 @@ void FindMisorientations::execute()
       {
         misorientationlists[i][j] = -100;
       }
-      neighMisoTot += misorientationlists[i][j];
+      if (m_FindAvgMisors == true) neighMisoTot += misorientationlists[i][j];
     }
-    m_AvgMisorientation[i] = neighMisoTot / neighborlist[i].size();
-    neighMisoTot = 0.0f;
+    if (m_FindAvgMisors == true) m_AvgMisorientations[i] = neighMisoTot / neighborlist[i].size();
+    if (m_FindAvgMisors == true) neighMisoTot = 0.0f;
   }
 
   // We do this to create new set of MisorientationList objects

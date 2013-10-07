@@ -75,16 +75,19 @@ class DREAM3DLib_EXPORT FindMisorientations : public AbstractFilter
     DREAM3D_INSTANCE_STRING_PROPERTY(NeighborListArrayName)
     //------ Created Field Data
     DREAM3D_INSTANCE_STRING_PROPERTY(MisorientationListArrayName)
-    DREAM3D_INSTANCE_STRING_PROPERTY(AvgMisorientationArrayName)
+    DREAM3D_INSTANCE_STRING_PROPERTY(AvgMisorientationsArrayName)
 
     virtual const std::string getGroupName() { return DREAM3D::FilterGroups::StatisticsFilters; }
     virtual const std::string getSubGroupName() { return DREAM3D::FilterSubGroups::CrystallographicFilters; }
     virtual const std::string getHumanLabel() { return "Find Field Neighbor Misorientations"; }
 
+    DREAM3D_INSTANCE_PROPERTY(bool, FindAvgMisors)
+
     /**
     * @brief This method will write the options to a file
     * @param writer The writer that is used to write the options to a file
     */
+    virtual void setupFilterParameters();
     virtual int writeFilterParameters(AbstractFilterParametersWriter* writer, int index);
 
     /**
@@ -112,7 +115,7 @@ class DREAM3DLib_EXPORT FindMisorientations : public AbstractFilter
     int32_t* m_FieldPhases;
     NeighborList<int>* m_NeighborList;
     NeighborList<float>* m_MisorientationList;
-    float* m_AvgMisorientation;
+    float* m_AvgMisorientations;
 
     unsigned int* m_CrystalStructures;
 
