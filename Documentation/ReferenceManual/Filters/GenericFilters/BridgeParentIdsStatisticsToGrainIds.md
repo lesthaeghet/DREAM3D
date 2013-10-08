@@ -10,6 +10,11 @@ This Filter makes interior calls to Rename Cell Array and Link Field Data To Cel
 
 ## Parameters ##
 
+
+| Name | Type |
+|------|------|
+| Calculate Average Parent Average C-Axis Misalignment Using Grouped Microtexture Grains Only | Boolean |  
+
 ## Required DataContainers ##
 Volume
 
@@ -22,7 +27,9 @@ Volume
 | Field | AvgQuats | Five (5) values (floats) defining the average orientation of the **Field** in quaternion representation | Filter will calculate average quaternions for **Fields** if not already calculated. | Find Field Average Orientations (Statistics) |
 | Ensemble | CrystalStructures | Enumeration (int) specifying the crystal structure of each Ensemble/phase (Hexagonal=0, Cubic=1, Orthorhombic=2) | Values should be present from experimental data or synthetic generation and cannot be determined by this filter. Not having these values will result in the filter to fail/not execute. | Read H5Ebsd File (IO), Read Ensemble Info File (IO), Initialize Synthetic Volume (SyntheticBuilding) |  
 | Field | ParentIds | List of grouped microtexture region **Fields**. |  | Identify MicroTexture (Reconstruction) |
-| Cell | ParentIds | List of grouped microtexture region **Cells**.  |  |  Identify MicroTexture (Reconstruction) |
+| Cell | ParentIds | List of grouped microtexture region **Cells**.  |  |  Identify MicroTexture (Reconstruction) |  
+| Field | CAxisMisalignmentList | NeighborList of c-axis misalignments. | Only needed if "Calculate Average Parent Average C-Axis Misalignment Using Grouped Microtexture Grains Only" IS checked. | Find Field Neighbor C-Axis Misalignments (Statistics) |  
+| Field | NeighborList | List of grain nearest neighbors. | Only needed if "Calculate Average Parent Average C-Axis Misalignment Using Grouped Microtexture Grains Only" IS checked. | Find Neighbors (Statistics) |
 
 ## Created Arrays ##
 

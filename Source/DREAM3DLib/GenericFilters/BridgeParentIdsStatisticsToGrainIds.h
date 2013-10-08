@@ -38,15 +38,19 @@ class DREAM3DLib_EXPORT BridgeParentIdsStatisticsToGrainIds : public AbstractFil
     //------ Required Field Data
     DREAM3D_INSTANCE_STRING_PROPERTY(FieldParentIdsArrayName)
     DREAM3D_INSTANCE_STRING_PROPERTY(AvgCAxisMisalignmentsArrayName)
+    DREAM3D_INSTANCE_STRING_PROPERTY(CAxisMisalignmentListArrayName)
     //------ Created Field Data
     DREAM3D_INSTANCE_STRING_PROPERTY(NumGrainsPerParentArrayName)
     DREAM3D_INSTANCE_STRING_PROPERTY(AvgParentAvgCAxisMisalignmentsArrayName)
     //------ Required Ensemble Data
     DREAM3D_INSTANCE_STRING_PROPERTY(CrystalStructuresArrayName)
+    DREAM3D_INSTANCE_STRING_PROPERTY(NeighborListArrayName)
 
     virtual const std::string getGroupName() { return DREAM3D::FilterGroups::GenericFilters; }
     virtual const std::string getSubGroupName() {return DREAM3D::FilterSubGroups::MemoryManagementFilters;}
     virtual const std::string getHumanLabel() { return "Bridge ParentIds Statistics To GrainIds"; }
+
+    DREAM3D_INSTANCE_PROPERTY(bool, CalcAvgAvgWMTROnly)
 
     virtual void setupFilterParameters();
     virtual int writeFilterParameters(AbstractFilterParametersWriter* writer, int index);
@@ -74,6 +78,8 @@ class DREAM3DLib_EXPORT BridgeParentIdsStatisticsToGrainIds : public AbstractFil
     int32_t* m_NumGrainsPerParent;
     float* m_AvgCAxisMisalignments;
     float* m_AvgParentAvgCAxisMisalignments;
+    NeighborList<int>* m_NeighborList;
+    NeighborList<float>* m_CAxisMisalignmentList;
 
     unsigned int* m_CrystalStructures;
     std::vector<OrientationOps::Pointer> m_OrientationOps;

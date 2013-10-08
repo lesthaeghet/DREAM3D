@@ -32,14 +32,17 @@ BridgeParentIdsStatisticsToGrainIds::BridgeParentIdsStatisticsToGrainIds() :
   m_AvgCAxisMisalignmentsArrayName(DREAM3D::FieldData::AvgCAxisMisalignments),
   m_NumGrainsPerParentArrayName(DREAM3D::FieldData::NumGrainsPerParent),
   m_AvgParentAvgCAxisMisalignmentsArrayName(DREAM3D::FieldData::AvgParentAvgCAxisMisalignments),
+  m_NeighborListArrayName(DREAM3D::FieldData::NeighborList),
+  m_CAxisMisalignmentListArrayName(DREAM3D::FieldData::CAxisMisalignmentList),
   m_CrystalStructuresArrayName(DREAM3D::EnsembleData::CrystalStructures),
- // m_GrainIds(NULL),
- // m_CellParentIds(NULL),
+  m_CalcAvgAvgWMTROnly(false),
   m_ParentDensity(NULL),
   m_FieldParentIds(NULL),
   m_AvgCAxisMisalignments(NULL),
   m_NumGrainsPerParent(NULL),
   m_AvgParentAvgCAxisMisalignments(NULL),
+  m_NeighborList(NULL),
+  m_CAxisMisalignmentList(NULL),
   m_CrystalStructures(NULL)
 {
   m_OrientationOps = OrientationOps::getOrientationOpsVector();
@@ -59,6 +62,18 @@ BridgeParentIdsStatisticsToGrainIds::~BridgeParentIdsStatisticsToGrainIds()
 // -----------------------------------------------------------------------------
 void BridgeParentIdsStatisticsToGrainIds::setupFilterParameters()
 {
+  FilterParameterVector parameters;
+  {
+    FilterParameter::Pointer option = FilterParameter::New();
+    option->setHumanLabel("Calculate Average Parent Average C-Axis Misalignment Using Grouped Microtexture Grains Only");
+    option->setPropertyName("CalcAvgAvgWMTROnly");
+    option->setWidgetType(FilterParameter::BooleanWidget);
+    option->setValueType("bool");
+    option->setUnits("");
+    parameters.push_back(option);
+  }
+
+  setFilterParameters(parameters);
 }
 
 // -----------------------------------------------------------------------------
@@ -69,6 +84,7 @@ void BridgeParentIdsStatisticsToGrainIds::readFilterParameters(AbstractFilterPar
   reader->openFilterGroup(this, index);
   /* Code to read the values goes between these statements */
   /* FILTER_WIDGETCODEGEN_AUTO_GENERATED_CODE BEGIN*/
+  setCalcAvgAvgWMTROnly( reader->readValue("CalcAvgAvgWMTROnly", getCalcAvgAvgWMTROnly()) );
   /* FILTER_WIDGETCODEGEN_AUTO_GENERATED_CODE END*/
   reader->closeFilterGroup();
 }
@@ -80,6 +96,7 @@ int BridgeParentIdsStatisticsToGrainIds::writeFilterParameters(AbstractFilterPar
 {
   writer->openFilterGroup(this, index);
   writer->closeFilterGroup();
+  writer->writeValue("CalcAvgAvgWMTROnly", getCalcAvgAvgWMTROnly() );
   return ++index; // we want to return the next index that was just written to
 }
 
@@ -95,14 +112,46 @@ void BridgeParentIdsStatisticsToGrainIds::dataCheck(bool preflight, size_t voxel
 
 
   // Cell Data
-  //GET_PREREQ_DATA(m, DREAM3D, CellData, GrainIds, -301, int32_t, Int32ArrayType, voxels, 1)
-  //GET_PREREQ_DATA(m, DREAM3D, CellData, CellParentIds, -304, int32_t, Int32ArrayType, voxels, 1)
 
   // Field Data
   if(afterLink == false)
   {
     GET_PREREQ_DATA(m, DREAM3D, FieldData, FieldParentIds, -302, int32_t, Int32ArrayType, fields, 1)
     GET_PREREQ_DATA(m, DREAM3D, FieldData, AvgCAxisMisalignments, -303, float, FloatArrayType, fields, 1)
+
+    if (m_CalcAvgAvgWMTROnly == true)
+    {
+      // Now we are going to get a "Pointer" to the NeighborList object out of the DataContainer
+      m_NeighborList = NeighborList<int>::SafeObjectDownCast<IDataArray*, NeighborList<int>*>(m->getFieldData(DREAM3D::FieldData::NeighborList).get());
+      if(m_NeighborList == NULL)
+      {
+        ss << "NeighborLists Array Not Initialized correctly" << std::endl;
+        setErrorCondition(-304);
+        addErrorMessage(getHumanLabel(), ss.str(), -1);
+      }
+
+      IDataArray::Pointer misalignmentPtr = m->getFieldData(m_CAxisMisalignmentListArrayName);
+      if(NULL == misalignmentPtr.get())
+      {
+        NeighborList<float>::Pointer misalignmentListPtr = NeighborList<float>::New();
+        misalignmentListPtr->SetName(m_CAxisMisalignmentListArrayName);
+        misalignmentListPtr->Resize(fields);
+        m->addFieldData(m_CAxisMisalignmentListArrayName, misalignmentListPtr);
+        m_CAxisMisalignmentList = misalignmentListPtr.get();
+        if (misalignmentListPtr.get() == NULL)
+        {
+          ss.str("");
+          ss << "MisalignmentLists Array Not Initialized correctly" << std::endl;
+          setErrorCondition(-308);
+          addErrorMessage(getHumanLabel(), ss.str(), -308);
+        }
+      }
+      else
+      {
+        m_CAxisMisalignmentList = NeighborList<float>::SafeObjectDownCast<IDataArray*, NeighborList<float>*>(misalignmentPtr.get());
+        m_CAxisMisalignmentList->Resize(fields);
+      }
+    }
   }
   if(afterLink == true)
   {
@@ -197,10 +246,33 @@ void BridgeParentIdsStatisticsToGrainIds::execute()
   int numgrains = m->getNumFieldTuples();
   std::vector<float> AvgCAxisMisalignments(numgrains,0.0);
   std::vector<int32_t> fieldParentIds(numgrains,0);
-  for(int i=0;i<numgrains;i++)
+
+  std::vector<std::vector<int> > afterNeighborList;
+  std::vector<std::vector<float> > afterCAxisMisalignmentList;
+
+  if (m_CalcAvgAvgWMTROnly == false)
   {
-    AvgCAxisMisalignments[i] = m_AvgCAxisMisalignments[i];
-    fieldParentIds[i] = m_FieldParentIds[i];
+    for(int i=0;i<numgrains;i++)
+    {
+      AvgCAxisMisalignments[i] = m_AvgCAxisMisalignments[i];
+      fieldParentIds[i] = m_FieldParentIds[i];
+    }
+  }
+  else if (m_CalcAvgAvgWMTROnly == true)
+  {
+    NeighborList<int>& neighborlist = *m_NeighborList;
+    NeighborList<float>& caxismisalignmentList = *m_CAxisMisalignmentList;
+
+    for(int i=0;i<numgrains;i++)
+    {
+      AvgCAxisMisalignments[i] = m_AvgCAxisMisalignments[i];
+      fieldParentIds[i] = m_FieldParentIds[i];
+      for (size_t j = 0; j < neighborlist[i].size(); j++)
+      {
+        afterNeighborList[i][j] = neighborlist[i][j];
+        afterCAxisMisalignmentList[i][j] = caxismisalignmentList[i][j];
+      }
+    }
   }
 
   RenameCellArray::Pointer rename_cell_array = RenameCellArray::New();
@@ -234,12 +306,31 @@ void BridgeParentIdsStatisticsToGrainIds::execute()
 
   dataCheck(false, m->getNumCellTuples(), m->getNumFieldTuples(), m->getNumEnsembleTuples(), true);
 
-  for(int i=0;i<numgrains;i++)
+  if (m_CalcAvgAvgWMTROnly == false)
   {
-    int parentid = fieldParentIds[i];
-    m_NumGrainsPerParent[parentid]++;
-    m_AvgParentAvgCAxisMisalignments[parentid] += AvgCAxisMisalignments[i];
+    for(int i=0;i<numgrains;i++)
+    {
+      int parentid = fieldParentIds[i];
+      m_NumGrainsPerParent[parentid]++;
+      m_AvgParentAvgCAxisMisalignments[parentid] += AvgCAxisMisalignments[i];
+    }
   }
+  else if (m_CalcAvgAvgWMTROnly == true)
+  {
+    for(int i=0;i<numgrains;i++)
+    {
+      int parentid = fieldParentIds[i];
+      for (size_t j = 0; j < afterNeighborList[i].size(); j++)
+      {
+        if (fieldParentIds[afterNeighborList[i][j]] == fieldParentIds[i])
+        {
+          m_NumGrainsPerParent[parentid]++;
+          m_AvgParentAvgCAxisMisalignments[parentid] += AvgCAxisMisalignments[i];
+        }
+      }
+    }
+  }
+
   for(int i=0;i<m->getNumFieldTuples();i++)
   {
     m_AvgParentAvgCAxisMisalignments[i] /= m_NumGrainsPerParent[i];
