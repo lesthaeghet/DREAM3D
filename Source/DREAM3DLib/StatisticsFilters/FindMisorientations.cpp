@@ -215,7 +215,7 @@ void FindMisorientations::execute()
   //float r1= 0.0f, r2 = 0.0f, r3 = 0.0f;
   // int mbin = 0;
   float w;
-  float neighMisoTot = 0.0f;
+  size_t tempMisoList = 0;
   QuatF q1;
   QuatF q2;
   QuatF* avgQuats = reinterpret_cast<QuatF*>(m_AvgQuats);
@@ -223,8 +223,6 @@ void FindMisorientations::execute()
 
   size_t numgrains = m->getNumFieldTuples();
   unsigned int phase1, phase2;
-
-  float radToDeg = 180.0 / DREAM3D::Constants::k_Pi;
 
   size_t nname;
   // float nsa;
@@ -240,19 +238,25 @@ void FindMisorientations::execute()
       nname = neighborlist[i][j];
       QuaternionMathF::Copy(avgQuats[nname], q2);
       phase2 = m_CrystalStructures[m_FieldPhases[nname]];
+      tempMisoList = neighborlist[i].size();
       if (phase1 == phase2)
       {
         w = m_OrientationOps[phase1]->getMisoQuat( q1, q2, n1, n2, n3);
-        misorientationlists[i][j] = w * radToDeg;
+        misorientationlists[i][j] = DREAM3D::Constants::k_180OverPi;
+      if (m_FindAvgMisors == true) m_AvgMisorientations[i] += misorientationlists[i][j];
       }
       else
       {
-        misorientationlists[i][j] = -100;
+        if (m_FindAvgMisors == true) tempMisoList--;
+        misorientationlists[i][j] = -100.0f;
       }
-      if (m_FindAvgMisors == true) neighMisoTot += misorientationlists[i][j];
     }
-    if (m_FindAvgMisors == true) m_AvgMisorientations[i] = neighMisoTot / neighborlist[i].size();
-    if (m_FindAvgMisors == true) neighMisoTot = 0.0f;
+    if (m_FindAvgMisors == true)
+    {
+      if (tempMisoList > 0) m_AvgMisorientations[i] /= tempMisoList;
+      else m_AvgMisorientations[i] = -100.0f;
+      tempMisoList = 0;
+    }
   }
 
   // We do this to create new set of MisorientationList objects
