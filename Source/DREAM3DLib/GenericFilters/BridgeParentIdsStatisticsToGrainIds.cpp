@@ -117,7 +117,6 @@ void BridgeParentIdsStatisticsToGrainIds::dataCheck(bool preflight, size_t voxel
   if(afterLink == false)
   {
     GET_PREREQ_DATA(m, DREAM3D, FieldData, FieldParentIds, -302, int32_t, Int32ArrayType, fields, 1)
-    GET_PREREQ_DATA(m, DREAM3D, FieldData, AvgCAxisMisalignments, -303, float, FloatArrayType, fields, 1)
 
     if (m_CalcAvgAvgWMTROnly == true)
     {
@@ -130,33 +129,27 @@ void BridgeParentIdsStatisticsToGrainIds::dataCheck(bool preflight, size_t voxel
         addErrorMessage(getHumanLabel(), ss.str(), -1);
       }
 
-      IDataArray::Pointer misalignmentPtr = m->getFieldData(m_CAxisMisalignmentListArrayName);
-      if(NULL == misalignmentPtr.get())
+      m_CAxisMisalignmentList = NeighborList<float>::SafeObjectDownCast<IDataArray*, NeighborList<float>*>(m->getFieldData(m_CAxisMisalignmentListArrayName).get());
+      if(NULL == m_CAxisMisalignmentList)
       {
-        NeighborList<float>::Pointer misalignmentListPtr = NeighborList<float>::New();
-        misalignmentListPtr->SetName(m_CAxisMisalignmentListArrayName);
-        misalignmentListPtr->Resize(fields);
-        m->addFieldData(m_CAxisMisalignmentListArrayName, misalignmentListPtr);
-        m_CAxisMisalignmentList = misalignmentListPtr.get();
-        if (misalignmentListPtr.get() == NULL)
-        {
-          ss.str("");
-          ss << "MisalignmentLists Array Not Initialized correctly" << std::endl;
-          setErrorCondition(-308);
-          addErrorMessage(getHumanLabel(), ss.str(), -308);
-        }
-      }
-      else
-      {
-        m_CAxisMisalignmentList = NeighborList<float>::SafeObjectDownCast<IDataArray*, NeighborList<float>*>(misalignmentPtr.get());
-        m_CAxisMisalignmentList->Resize(fields);
+        ss.str("");
+        ss << "MisalignmentLists Array Not Initialized correctly" << std::endl;
+        setErrorCondition(-308);
+        addErrorMessage(getHumanLabel(), ss.str(), -308);
       }
     }
+    else if (m_CalcAvgAvgWMTROnly == false)
+    {
+      GET_PREREQ_DATA(m, DREAM3D, FieldData, AvgCAxisMisalignments, -303, float, FloatArrayType, fields, 1)
+    }
+
+
+
   }
   if(afterLink == true)
   {
     CREATE_NON_PREREQ_DATA(m, DREAM3D, FieldData, NumGrainsPerParent, int32_t, Int32ArrayType, 0, fields, 1)
-    CREATE_NON_PREREQ_DATA(m, DREAM3D, FieldData, AvgParentAvgCAxisMisalignments, float, FloatArrayType, 0, fields, 1)
+    CREATE_NON_PREREQ_DATA(m, DREAM3D, FieldData, AvgParentAvgCAxisMisalignments, float, FloatArrayType, 0.0, fields, 1)
   }
 
  typedef DataArray<unsigned int> XTalStructArrayType;
@@ -244,15 +237,15 @@ void BridgeParentIdsStatisticsToGrainIds::execute()
   }
 
   int numgrains = m->getNumFieldTuples();
-  std::vector<float> AvgCAxisMisalignments(numgrains,0.0);
+  std::vector<float> AvgCAxisMisalignments(numgrains,0.0f);
   std::vector<int32_t> fieldParentIds(numgrains,0);
 
-  std::vector<std::vector<int> > afterNeighborList;
-  std::vector<std::vector<float> > afterCAxisMisalignmentList;
+  std::vector<std::vector<int> > afterNeighborList(numgrains);
+  std::vector<std::vector<float> > afterCAxisMisalignmentList(numgrains);
 
   if (m_CalcAvgAvgWMTROnly == false)
   {
-    for(int i=0;i<numgrains;i++)
+    for(int i=1;i<numgrains;i++)
     {
       AvgCAxisMisalignments[i] = m_AvgCAxisMisalignments[i];
       fieldParentIds[i] = m_FieldParentIds[i];
@@ -261,16 +254,20 @@ void BridgeParentIdsStatisticsToGrainIds::execute()
   else if (m_CalcAvgAvgWMTROnly == true)
   {
     NeighborList<int>& neighborlist = *m_NeighborList;
-    NeighborList<float>& caxismisalignmentList = *m_CAxisMisalignmentList;
+    NeighborList<float>& caxismisalignmentlist = *m_CAxisMisalignmentList;
 
-    for(int i=0;i<numgrains;i++)
+    for(int i=1;i<numgrains;i++)
     {
-      AvgCAxisMisalignments[i] = m_AvgCAxisMisalignments[i];
       fieldParentIds[i] = m_FieldParentIds[i];
+      afterNeighborList[i].resize(neighborlist[i].size());
+      afterCAxisMisalignmentList[i].resize(neighborlist[i].size());
       for (size_t j = 0; j < neighborlist[i].size(); j++)
       {
         afterNeighborList[i][j] = neighborlist[i][j];
-        afterCAxisMisalignmentList[i][j] = caxismisalignmentList[i][j];
+        afterCAxisMisalignmentList[i][j] = caxismisalignmentlist[i][j];
+        float checkCA = afterCAxisMisalignmentList[i][j];
+        float checkCA2 = caxismisalignmentlist[i][j];
+
       }
     }
   }
@@ -306,9 +303,12 @@ void BridgeParentIdsStatisticsToGrainIds::execute()
 
   dataCheck(false, m->getNumCellTuples(), m->getNumFieldTuples(), m->getNumEnsembleTuples(), true);
 
+  int numparents = m->getNumFieldTuples();
+  std::vector<int32_t> NumMTRGrainsPerParent(numparents,0);
+
   if (m_CalcAvgAvgWMTROnly == false)
   {
-    for(int i=0;i<numgrains;i++)
+    for(int i=1;i<numgrains;i++)
     {
       int parentid = fieldParentIds[i];
       m_NumGrainsPerParent[parentid]++;
@@ -317,23 +317,31 @@ void BridgeParentIdsStatisticsToGrainIds::execute()
   }
   else if (m_CalcAvgAvgWMTROnly == true)
   {
-    for(int i=0;i<numgrains;i++)
+    for(int i=1;i<numgrains;i++)
     {
       int parentid = fieldParentIds[i];
+      m_NumGrainsPerParent[parentid]++;
       for (size_t j = 0; j < afterNeighborList[i].size(); j++)
       {
-        if (fieldParentIds[afterNeighborList[i][j]] == fieldParentIds[i])
+        if (fieldParentIds[afterNeighborList[i][j]] == parentid)
         {
-          m_NumGrainsPerParent[parentid]++;
-          m_AvgParentAvgCAxisMisalignments[parentid] += AvgCAxisMisalignments[i];
+          NumMTRGrainsPerParent[parentid]++;
+          m_AvgParentAvgCAxisMisalignments[parentid] += afterCAxisMisalignmentList[i][j];
+          float checkCA3 = afterCAxisMisalignmentList[i][j];
+
         }
       }
     }
   }
 
-  for(int i=0;i<m->getNumFieldTuples();i++)
+  for(int i=1;i<numparents;i++)
   {
-    m_AvgParentAvgCAxisMisalignments[i] /= m_NumGrainsPerParent[i];
+    if (m_CalcAvgAvgWMTROnly == false) m_AvgParentAvgCAxisMisalignments[i] /= m_NumGrainsPerParent[i];
+    if (m_CalcAvgAvgWMTROnly == true)
+    {
+      if(NumMTRGrainsPerParent[i] > 0) m_AvgParentAvgCAxisMisalignments[i] /= NumMTRGrainsPerParent[i];
+      else m_AvgParentAvgCAxisMisalignments[i] = 0.0f;
+    }
   }
 
   CreateFieldArrayFromCellArray::Pointer create_field_array_from_cell_array = CreateFieldArrayFromCellArray::New();
