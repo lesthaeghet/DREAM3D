@@ -13,7 +13,7 @@ This Filter makes interior calls to Rename Cell Array and Link Field Data To Cel
 
 | Name | Type |
 |------|------|
-| Calculate Average Parent Average C-Axis Misalignment Using Grouped Microtexture Grains Only | Boolean |  
+| Calculate Local C-Axis Misalignment Using Sub-Boundary Misalignments Only | Boolean |  
 
 ## Required DataContainers ##
 Volume
@@ -36,7 +36,8 @@ Volume
 | Type | Default Name | Description | Comment |
 |------|--------------|-------------|---------|
 | Field | Active | Boolean value specifying if the **Field** is still in the sample (1 if the **Field** is in the sample and 0 if it is not). | At the end of the filter, all **Fields** will be "Active" as the "Inactive" **Fields** will have been removed.  |  
-| Field | AvgParentAvgCAxisMisalignments| Float of the microtexture region "grain"-kernel average c-axis misalignment. |  |  
+| Field | LocalCAxisMisalignments| Float of the microtexture region average "grain"-kernel average c-axis misalignment. | This is only calculated if  "Calculate Local C-Axis Misalignment Using Sub-Boundary Misalignments Only" IS NOT checked|  
+| Field | UnbiasedLocalCAxisMisalignments| Float of the microtexture region average sub-boundary c-axis misalignment. | This is only calculated if  "Calculate Local C-Axis Misalignment Using Sub-Boundary Misalignments Only" IS checked|  
 | Field | ParentDensity | Float of the voxel fraction of "flipped" microtexture against the region searched in Find Neighborhoods filter. | |  
 | Field | NumGrainsPerParent | Int of the number of grains contained in each parent grain. |  |
 
