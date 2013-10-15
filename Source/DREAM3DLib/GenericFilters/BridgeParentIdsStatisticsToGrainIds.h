@@ -38,6 +38,7 @@ class DREAM3DLib_EXPORT BridgeParentIdsStatisticsToGrainIds : public AbstractFil
     //------ Required Field Data
     DREAM3D_INSTANCE_STRING_PROPERTY(FieldParentIdsArrayName)
     DREAM3D_INSTANCE_STRING_PROPERTY(AvgCAxisMisalignmentsArrayName)
+    DREAM3D_INSTANCE_STRING_PROPERTY(NeighborListArrayName)
     DREAM3D_INSTANCE_STRING_PROPERTY(CAxisMisalignmentListArrayName)
     //------ Created Field Data
     DREAM3D_INSTANCE_STRING_PROPERTY(NumGrainsPerParentArrayName)
@@ -45,7 +46,6 @@ class DREAM3DLib_EXPORT BridgeParentIdsStatisticsToGrainIds : public AbstractFil
     DREAM3D_INSTANCE_STRING_PROPERTY(UnbiasedLocalCAxisMisalignmentsArrayName)
     //------ Required Ensemble Data
     DREAM3D_INSTANCE_STRING_PROPERTY(CrystalStructuresArrayName)
-    DREAM3D_INSTANCE_STRING_PROPERTY(NeighborListArrayName)
 
     virtual const std::string getGroupName() { return DREAM3D::FilterGroups::GenericFilters; }
     virtual const std::string getSubGroupName() {return DREAM3D::FilterSubGroups::MemoryManagementFilters;}
@@ -76,8 +76,8 @@ class DREAM3DLib_EXPORT BridgeParentIdsStatisticsToGrainIds : public AbstractFil
     int32_t* m_CellParentIds;
     int32_t* m_ParentDensity;
     int32_t* m_FieldParentIds;
-    int32_t* m_NumGrainsPerParent;
     float* m_AvgCAxisMisalignments;
+    int32_t* m_NumGrainsPerParent;
     float* m_LocalCAxisMisalignments;
     float* m_UnbiasedLocalCAxisMisalignments;
     NeighborList<int>* m_NeighborList;

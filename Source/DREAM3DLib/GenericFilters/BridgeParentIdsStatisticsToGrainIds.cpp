@@ -30,11 +30,11 @@ BridgeParentIdsStatisticsToGrainIds::BridgeParentIdsStatisticsToGrainIds() :
   m_ParentDensityArrayName(DREAM3D::CellData::ParentDensity),
   m_FieldParentIdsArrayName(DREAM3D::FieldData::ParentIds),
   m_AvgCAxisMisalignmentsArrayName(DREAM3D::FieldData::AvgCAxisMisalignments),
+  m_NeighborListArrayName(DREAM3D::FieldData::NeighborList),
+  m_CAxisMisalignmentListArrayName(DREAM3D::FieldData::CAxisMisalignmentList),
   m_NumGrainsPerParentArrayName(DREAM3D::FieldData::NumGrainsPerParent),
   m_LocalCAxisMisalignmentsArrayName(DREAM3D::FieldData::LocalCAxisMisalignments),
   m_UnbiasedLocalCAxisMisalignmentsArrayName(DREAM3D::FieldData::UnbiasedLocalCAxisMisalignments),
-  m_NeighborListArrayName(DREAM3D::FieldData::NeighborList),
-  m_CAxisMisalignmentListArrayName(DREAM3D::FieldData::CAxisMisalignmentList),
   m_CrystalStructuresArrayName(DREAM3D::EnsembleData::CrystalStructures),
   m_CalcAvgAvgWMTROnly(false),
   m_ParentDensity(NULL),
@@ -274,8 +274,6 @@ void BridgeParentIdsStatisticsToGrainIds::execute()
       {
         afterNeighborList[i][j] = neighborlist[i][j];
         afterCAxisMisalignmentList[i][j] = caxismisalignmentlist[i][j];
-        float checkCA = afterCAxisMisalignmentList[i][j];
-        float checkCA2 = caxismisalignmentlist[i][j];
 
       }
     }
@@ -336,7 +334,6 @@ void BridgeParentIdsStatisticsToGrainIds::execute()
         {
           NumMTRGrainsPerParent[parentid]++;
           m_UnbiasedLocalCAxisMisalignments[parentid] += afterCAxisMisalignmentList[i][j];
-          float checkCA3 = afterCAxisMisalignmentList[i][j];
 
         }
       }
