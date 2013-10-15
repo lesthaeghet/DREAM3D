@@ -67,7 +67,7 @@ void BridgeParentIdsStatisticsToGrainIds::setupFilterParameters()
   FilterParameterVector parameters;
   {
     FilterParameter::Pointer option = FilterParameter::New();
-    option->setHumanLabel("Calculate Average Parent Average C-Axis Misalignment Using Grouped Microtexture Grains Only");
+    option->setHumanLabel("Calculate Local C-Axis Misalignment Using Sub-Boundary Misalignments Only");
     option->setPropertyName("CalcAvgAvgWMTROnly");
     option->setWidgetType(FilterParameter::BooleanWidget);
     option->setValueType("bool");
