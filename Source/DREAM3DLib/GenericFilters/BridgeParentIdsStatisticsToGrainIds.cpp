@@ -31,7 +31,8 @@ BridgeParentIdsStatisticsToGrainIds::BridgeParentIdsStatisticsToGrainIds() :
   m_FieldParentIdsArrayName(DREAM3D::FieldData::ParentIds),
   m_AvgCAxisMisalignmentsArrayName(DREAM3D::FieldData::AvgCAxisMisalignments),
   m_NumGrainsPerParentArrayName(DREAM3D::FieldData::NumGrainsPerParent),
-  m_AvgParentAvgCAxisMisalignmentsArrayName(DREAM3D::FieldData::AvgParentAvgCAxisMisalignments),
+  m_LocalCAxisMisalignmentsArrayName(DREAM3D::FieldData::LocalCAxisMisalignments),
+  m_UnbiasedLocalCAxisMisalignmentsArrayName(DREAM3D::FieldData::UnbiasedLocalCAxisMisalignments),
   m_NeighborListArrayName(DREAM3D::FieldData::NeighborList),
   m_CAxisMisalignmentListArrayName(DREAM3D::FieldData::CAxisMisalignmentList),
   m_CrystalStructuresArrayName(DREAM3D::EnsembleData::CrystalStructures),
@@ -40,7 +41,8 @@ BridgeParentIdsStatisticsToGrainIds::BridgeParentIdsStatisticsToGrainIds() :
   m_FieldParentIds(NULL),
   m_AvgCAxisMisalignments(NULL),
   m_NumGrainsPerParent(NULL),
-  m_AvgParentAvgCAxisMisalignments(NULL),
+  m_LocalCAxisMisalignments(NULL),
+  m_UnbiasedLocalCAxisMisalignments(NULL),
   m_NeighborList(NULL),
   m_CAxisMisalignmentList(NULL),
   m_CrystalStructures(NULL)
@@ -149,7 +151,14 @@ void BridgeParentIdsStatisticsToGrainIds::dataCheck(bool preflight, size_t voxel
   if(afterLink == true)
   {
     CREATE_NON_PREREQ_DATA(m, DREAM3D, FieldData, NumGrainsPerParent, int32_t, Int32ArrayType, 0, fields, 1)
-    CREATE_NON_PREREQ_DATA(m, DREAM3D, FieldData, AvgParentAvgCAxisMisalignments, float, FloatArrayType, 0.0, fields, 1)
+    if (m_CalcAvgAvgWMTROnly  == false)
+    {
+      CREATE_NON_PREREQ_DATA(m, DREAM3D, FieldData, LocalCAxisMisalignments, float, FloatArrayType, 0.0, fields, 1)
+    }
+    else if (m_CalcAvgAvgWMTROnly == true)
+    {
+      CREATE_NON_PREREQ_DATA(m, DREAM3D, FieldData, UnbiasedLocalCAxisMisalignments, float, FloatArrayType, 0.0, fields, 1)
+    }
   }
 
  typedef DataArray<unsigned int> XTalStructArrayType;
@@ -312,7 +321,7 @@ void BridgeParentIdsStatisticsToGrainIds::execute()
     {
       int parentid = fieldParentIds[i];
       m_NumGrainsPerParent[parentid]++;
-      m_AvgParentAvgCAxisMisalignments[parentid] += AvgCAxisMisalignments[i];
+      m_LocalCAxisMisalignments[parentid] += AvgCAxisMisalignments[i];
     }
   }
   else if (m_CalcAvgAvgWMTROnly == true)
@@ -326,7 +335,7 @@ void BridgeParentIdsStatisticsToGrainIds::execute()
         if (fieldParentIds[afterNeighborList[i][j]] == parentid)
         {
           NumMTRGrainsPerParent[parentid]++;
-          m_AvgParentAvgCAxisMisalignments[parentid] += afterCAxisMisalignmentList[i][j];
+          m_UnbiasedLocalCAxisMisalignments[parentid] += afterCAxisMisalignmentList[i][j];
           float checkCA3 = afterCAxisMisalignmentList[i][j];
 
         }
@@ -336,11 +345,11 @@ void BridgeParentIdsStatisticsToGrainIds::execute()
 
   for(int i=1;i<numparents;i++)
   {
-    if (m_CalcAvgAvgWMTROnly == false) m_AvgParentAvgCAxisMisalignments[i] /= m_NumGrainsPerParent[i];
+    if (m_CalcAvgAvgWMTROnly == false) m_LocalCAxisMisalignments[i] /= m_NumGrainsPerParent[i];
     if (m_CalcAvgAvgWMTROnly == true)
     {
-      if(NumMTRGrainsPerParent[i] > 0) m_AvgParentAvgCAxisMisalignments[i] /= NumMTRGrainsPerParent[i];
-      else m_AvgParentAvgCAxisMisalignments[i] = 0.0f;
+      if(NumMTRGrainsPerParent[i] > 0) m_UnbiasedLocalCAxisMisalignments[i] /= NumMTRGrainsPerParent[i];
+      else m_UnbiasedLocalCAxisMisalignments[i] = 0.0f;
     }
   }
 

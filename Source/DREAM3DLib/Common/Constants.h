@@ -188,7 +188,8 @@ namespace DREAM3D
     const DREAM3D_STRING ClusteringList("ClusteringList");
     const DREAM3D_STRING CAxisMisalignmentList("CAxisMisalignmentList");
     const DREAM3D_STRING AvgCAxisMisalignments("AvgCAxisMisalignments");
-    const DREAM3D_STRING AvgParentAvgCAxisMisalignments("AvgParentAvgCAxisMisalignments");
+    const DREAM3D_STRING LocalCAxisMisalignments("LocalCAxisMisalignments");
+    const DREAM3D_STRING UnbiasedLocalCAxisMisalignments("UnbiasedLocalCAxisMisalignments");
   }
 
   namespace EnsembleData

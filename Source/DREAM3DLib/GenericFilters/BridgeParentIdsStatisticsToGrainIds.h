@@ -41,7 +41,8 @@ class DREAM3DLib_EXPORT BridgeParentIdsStatisticsToGrainIds : public AbstractFil
     DREAM3D_INSTANCE_STRING_PROPERTY(CAxisMisalignmentListArrayName)
     //------ Created Field Data
     DREAM3D_INSTANCE_STRING_PROPERTY(NumGrainsPerParentArrayName)
-    DREAM3D_INSTANCE_STRING_PROPERTY(AvgParentAvgCAxisMisalignmentsArrayName)
+    DREAM3D_INSTANCE_STRING_PROPERTY(LocalCAxisMisalignmentsArrayName)
+    DREAM3D_INSTANCE_STRING_PROPERTY(UnbiasedLocalCAxisMisalignmentsArrayName)
     //------ Required Ensemble Data
     DREAM3D_INSTANCE_STRING_PROPERTY(CrystalStructuresArrayName)
     DREAM3D_INSTANCE_STRING_PROPERTY(NeighborListArrayName)
@@ -77,7 +78,8 @@ class DREAM3DLib_EXPORT BridgeParentIdsStatisticsToGrainIds : public AbstractFil
     int32_t* m_FieldParentIds;
     int32_t* m_NumGrainsPerParent;
     float* m_AvgCAxisMisalignments;
-    float* m_AvgParentAvgCAxisMisalignments;
+    float* m_LocalCAxisMisalignments;
+    float* m_UnbiasedLocalCAxisMisalignments;
     NeighborList<int>* m_NeighborList;
     NeighborList<float>* m_CAxisMisalignmentList;
 
