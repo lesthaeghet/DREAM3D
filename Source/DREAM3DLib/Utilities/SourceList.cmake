@@ -39,6 +39,7 @@ endif()
 
 
 include(${DREAM3DLib_SOURCE_DIR}/Utilities/IO/SourceList.cmake)
+#include(${DREAM3DLib_SOURCE_DIR}/Utilities/Mesh/SourceList.cmake)
 
 set(DREAM3DLib_Utilities_HDRS ${DREAM3DLib_Utilities_HDRS} ${DREAM3DLib_Utilities_IO_HDRS})
 set(DREAM3DLib_Utilities_SRCS ${DREAM3DLib_Utilities_SRCS} ${DREAM3DLib_Utilities_IO_SRCS})
