@@ -3,10 +3,12 @@
 
 		This class is a wrapper on the triangle package.
  */
+
+#include <new>
 #include <iostream>
 #include "triangle_impl.hpp"
 #include <DREAM3DLib/Utilities/Mesh/del_interface.hpp>
-#include <new>
+
 
 #define REAL double
 
