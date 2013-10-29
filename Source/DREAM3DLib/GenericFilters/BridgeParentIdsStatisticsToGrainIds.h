@@ -51,7 +51,8 @@ class DREAM3DLib_EXPORT BridgeParentIdsStatisticsToGrainIds : public AbstractFil
     virtual const std::string getSubGroupName() {return DREAM3D::FilterSubGroups::MemoryManagementFilters;}
     virtual const std::string getHumanLabel() { return "Bridge Parent Statistics To Grains"; }
 
-    DREAM3D_INSTANCE_PROPERTY(bool, CalcAvgAvgWMTROnly)
+    DREAM3D_INSTANCE_PROPERTY(bool, CalcLocalCAxis)
+    DREAM3D_INSTANCE_PROPERTY(bool, CalcUnbiasedLocalCAxis)
 
     virtual void setupFilterParameters();
     virtual int writeFilterParameters(AbstractFilterParametersWriter* writer, int index);

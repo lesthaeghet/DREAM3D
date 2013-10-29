@@ -36,7 +36,8 @@ BridgeParentIdsStatisticsToGrainIds::BridgeParentIdsStatisticsToGrainIds() :
   m_LocalCAxisMisalignmentsArrayName(DREAM3D::FieldData::LocalCAxisMisalignments),
   m_UnbiasedLocalCAxisMisalignmentsArrayName(DREAM3D::FieldData::UnbiasedLocalCAxisMisalignments),
   m_CrystalStructuresArrayName(DREAM3D::EnsembleData::CrystalStructures),
-  m_CalcAvgAvgWMTROnly(false),
+  m_CalcLocalCAxis(false),
+  m_CalcUnbiasedLocalCAxis(false),
   m_ParentDensity(NULL),
   m_FieldParentIds(NULL),
   m_AvgCAxisMisalignments(NULL),
@@ -67,8 +68,17 @@ void BridgeParentIdsStatisticsToGrainIds::setupFilterParameters()
   FilterParameterVector parameters;
   {
     FilterParameter::Pointer option = FilterParameter::New();
-    option->setHumanLabel("Calculate Local C-Axis Misalignment Using Sub-Boundary Misalignments Only");
-    option->setPropertyName("CalcAvgAvgWMTROnly");
+    option->setHumanLabel("Calculate Local Average C-Axis Misalignment");
+    option->setPropertyName("CalcLocalCAxis");
+    option->setWidgetType(FilterParameter::BooleanWidget);
+    option->setValueType("bool");
+    option->setUnits("");
+    parameters.push_back(option);
+  }
+  {
+    FilterParameter::Pointer option = FilterParameter::New();
+    option->setHumanLabel("Calculate Unbiased Local Average C-Axis Misalignment");
+    option->setPropertyName("CalcUnbiasedLocalCAxis");
     option->setWidgetType(FilterParameter::BooleanWidget);
     option->setValueType("bool");
     option->setUnits("");
@@ -86,7 +96,8 @@ void BridgeParentIdsStatisticsToGrainIds::readFilterParameters(AbstractFilterPar
   reader->openFilterGroup(this, index);
   /* Code to read the values goes between these statements */
   /* FILTER_WIDGETCODEGEN_AUTO_GENERATED_CODE BEGIN*/
-  setCalcAvgAvgWMTROnly( reader->readValue("CalcAvgAvgWMTROnly", getCalcAvgAvgWMTROnly()) );
+  setCalcLocalCAxis( reader->readValue("CalcLocalCAxis", getCalcLocalCAxis()) );
+  setCalcUnbiasedLocalCAxis( reader->readValue("CalcUnbiasedLocalCAxis", getCalcUnbiasedLocalCAxis()) );
   /* FILTER_WIDGETCODEGEN_AUTO_GENERATED_CODE END*/
   reader->closeFilterGroup();
 }
@@ -98,7 +109,8 @@ int BridgeParentIdsStatisticsToGrainIds::writeFilterParameters(AbstractFilterPar
 {
   writer->openFilterGroup(this, index);
   writer->closeFilterGroup();
-  writer->writeValue("CalcAvgAvgWMTROnly", getCalcAvgAvgWMTROnly() );
+  writer->writeValue("CalcLocalCAxis", getCalcLocalCAxis() );
+  writer->writeValue("CalcLocalUnbiasedCAxis", getCalcLocalCAxis() );
   return ++index; // we want to return the next index that was just written to
 }
 
@@ -120,7 +132,7 @@ void BridgeParentIdsStatisticsToGrainIds::dataCheck(bool preflight, size_t voxel
   {
     GET_PREREQ_DATA(m, DREAM3D, FieldData, FieldParentIds, -302, int32_t, Int32ArrayType, fields, 1)
 
-    if (m_CalcAvgAvgWMTROnly == true)
+    if (m_CalcUnbiasedLocalCAxis == true)
     {
       // Now we are going to get a "Pointer" to the NeighborList object out of the DataContainer
       m_NeighborList = NeighborList<int>::SafeObjectDownCast<IDataArray*, NeighborList<int>*>(m->getFieldData(DREAM3D::FieldData::NeighborList).get());
@@ -140,22 +152,21 @@ void BridgeParentIdsStatisticsToGrainIds::dataCheck(bool preflight, size_t voxel
         addErrorMessage(getHumanLabel(), ss.str(), -308);
       }
     }
-    else if (m_CalcAvgAvgWMTROnly == false)
+
+    if (m_CalcLocalCAxis == true)
     {
       GET_PREREQ_DATA(m, DREAM3D, FieldData, AvgCAxisMisalignments, -303, float, FloatArrayType, fields, 1)
     }
-
-
-
   }
+
   if(afterLink == true)
   {
     CREATE_NON_PREREQ_DATA(m, DREAM3D, FieldData, NumGrainsPerParent, int32_t, Int32ArrayType, 0, fields, 1)
-    if (m_CalcAvgAvgWMTROnly  == false)
+    if (m_CalcLocalCAxis  == true)
     {
       CREATE_NON_PREREQ_DATA(m, DREAM3D, FieldData, LocalCAxisMisalignments, float, FloatArrayType, 0.0, fields, 1)
     }
-    else if (m_CalcAvgAvgWMTROnly == true)
+    if (m_CalcUnbiasedLocalCAxis == true)
     {
       CREATE_NON_PREREQ_DATA(m, DREAM3D, FieldData, UnbiasedLocalCAxisMisalignments, float, FloatArrayType, 0.0, fields, 1)
     }
@@ -248,11 +259,12 @@ void BridgeParentIdsStatisticsToGrainIds::execute()
   int numgrains = m->getNumFieldTuples();
   std::vector<float> AvgCAxisMisalignments(numgrains,0.0f);
   std::vector<int32_t> fieldParentIds(numgrains,0);
+  std::vector<int32_t> fieldParentIds2(numgrains,0);
 
   std::vector<std::vector<int> > afterNeighborList(numgrains);
   std::vector<std::vector<float> > afterCAxisMisalignmentList(numgrains);
 
-  if (m_CalcAvgAvgWMTROnly == false)
+  if (m_CalcLocalCAxis == true)
   {
     for(int i=1;i<numgrains;i++)
     {
@@ -260,14 +272,15 @@ void BridgeParentIdsStatisticsToGrainIds::execute()
       fieldParentIds[i] = m_FieldParentIds[i];
     }
   }
-  else if (m_CalcAvgAvgWMTROnly == true)
+
+  if (m_CalcUnbiasedLocalCAxis == true)
   {
     NeighborList<int>& neighborlist = *m_NeighborList;
     NeighborList<float>& caxismisalignmentlist = *m_CAxisMisalignmentList;
 
     for(int i=1;i<numgrains;i++)
     {
-      fieldParentIds[i] = m_FieldParentIds[i];
+      fieldParentIds2[i] = m_FieldParentIds[i];
       afterNeighborList[i].resize(neighborlist[i].size());
       afterCAxisMisalignmentList[i].resize(neighborlist[i].size());
       for (size_t j = 0; j < neighborlist[i].size(); j++)
@@ -313,7 +326,7 @@ void BridgeParentIdsStatisticsToGrainIds::execute()
   int numparents = m->getNumFieldTuples();
   std::vector<int32_t> NumMTRGrainsPerParent(numparents,0);
 
-  if (m_CalcAvgAvgWMTROnly == false)
+  if (m_CalcLocalCAxis == true)
   {
     for(int i=1;i<numgrains;i++)
     {
@@ -322,18 +335,19 @@ void BridgeParentIdsStatisticsToGrainIds::execute()
       m_LocalCAxisMisalignments[parentid] += AvgCAxisMisalignments[i];
     }
   }
-  else if (m_CalcAvgAvgWMTROnly == true)
+
+  if (m_CalcUnbiasedLocalCAxis == true)
   {
     for(int i=1;i<numgrains;i++)
     {
-      int parentid = fieldParentIds[i];
-      m_NumGrainsPerParent[parentid]++;
+      int parentid2 = fieldParentIds2[i];
+      m_NumGrainsPerParent[parentid2]++;
       for (size_t j = 0; j < afterNeighborList[i].size(); j++)
       {
-        if (fieldParentIds[afterNeighborList[i][j]] == parentid)
+        if (fieldParentIds2[afterNeighborList[i][j]] == parentid2)
         {
-          NumMTRGrainsPerParent[parentid]++;
-          m_UnbiasedLocalCAxisMisalignments[parentid] += afterCAxisMisalignmentList[i][j];
+          NumMTRGrainsPerParent[parentid2]++;
+          m_UnbiasedLocalCAxisMisalignments[parentid2] += afterCAxisMisalignmentList[i][j];
 
         }
       }
@@ -342,8 +356,8 @@ void BridgeParentIdsStatisticsToGrainIds::execute()
 
   for(int i=1;i<numparents;i++)
   {
-    if (m_CalcAvgAvgWMTROnly == false) m_LocalCAxisMisalignments[i] /= m_NumGrainsPerParent[i];
-    if (m_CalcAvgAvgWMTROnly == true)
+    if (m_CalcLocalCAxis == true) m_LocalCAxisMisalignments[i] /= m_NumGrainsPerParent[i];
+    if (m_CalcUnbiasedLocalCAxis == true)
     {
       if(NumMTRGrainsPerParent[i] > 0) m_UnbiasedLocalCAxisMisalignments[i] /= NumMTRGrainsPerParent[i];
       else m_UnbiasedLocalCAxisMisalignments[i] = 0.0f;
