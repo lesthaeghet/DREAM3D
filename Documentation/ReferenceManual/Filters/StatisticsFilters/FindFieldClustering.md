@@ -18,7 +18,7 @@ This Filter determines the centroid to centroid distances of **Fields**  from ea
 None
 
 ## Required DataContainers ##
-Voxel
+Volume
 
 ## Required Arrays ##
 
