@@ -65,7 +65,7 @@ using namespace std;
 // -----------------------------------------------------------------------------
 AlignSections::AlignSections() :
   AbstractFilter(),
-  m_WriteAlignmentShifts(true),
+  m_WriteAlignmentShifts(false),
   m_AlignmentShiftFileName("")
 {
 

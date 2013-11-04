@@ -61,7 +61,7 @@ DataContainerReader::DataContainerReader() :
   m_ReadSurfaceData(false),
   m_ReadVertexData(false),
   m_ReadEdgeData(false),
-  m_ReadAllArrays(true)
+  m_ReadAllArrays(false)
 {
   m_PipelineFromFile = FilterPipeline::New();
   setupFilterParameters();

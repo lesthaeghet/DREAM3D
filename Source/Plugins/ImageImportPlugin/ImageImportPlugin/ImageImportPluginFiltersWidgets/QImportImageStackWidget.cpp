@@ -130,9 +130,11 @@ AbstractFilter::Pointer QImportImageStackWidget::getFilter(bool defaultValues)
   int start = m_ZStartIndex->value();
   int end = m_ZEndIndex->value();
   bool hasMissingFiles = false;
+  bool lowToHighCheck = true;
+  if(getRefFrameZDir() == 1) lowToHighCheck = false;
 
   // Now generate all the file names in the "Low to High" order because that is what the importer is expecting
-  std::vector<std::string> fileList = generateFileList(start, end, hasMissingFiles, true, filename);
+  std::vector<std::string> fileList = generateFileList(start, end, hasMissingFiles, lowToHighCheck, filename);
   std::vector<std::string> realFileList;
   for(std::vector<std::string>::size_type i = 0; i < fileList.size(); ++i)
   {
