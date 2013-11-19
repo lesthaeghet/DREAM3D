@@ -26,6 +26,7 @@
 BridgeParentIdsStatisticsToGrainIds::BridgeParentIdsStatisticsToGrainIds() :
   AbstractFilter(),
   m_GrainIdsArrayName(DREAM3D::CellData::GrainIds),
+  m_OldGrainIdsArrayName(DREAM3D::CellData::OldGrainIds),
   m_CellParentIdsArrayName(DREAM3D::CellData::ParentIds),
   m_ParentDensityArrayName(DREAM3D::CellData::ParentDensity),
   m_FieldParentIdsArrayName(DREAM3D::FieldData::ParentIds),
@@ -131,6 +132,7 @@ void BridgeParentIdsStatisticsToGrainIds::dataCheck(bool preflight, size_t voxel
   if(afterLink == false)
   {
     GET_PREREQ_DATA(m, DREAM3D, FieldData, FieldParentIds, -302, int32_t, Int32ArrayType, fields, 1)
+    CREATE_NON_PREREQ_DATA(m, DREAM3D, CellData, OldGrainIds, int32_t, Int32ArrayType, 0, voxels, 1)
 
     if (m_CalcUnbiasedLocalCAxis == true)
     {
@@ -192,18 +194,33 @@ void BridgeParentIdsStatisticsToGrainIds::preflight()
     return;
   }
 
-  RenameCellArray::Pointer rename_cell_array = RenameCellArray::New();
-  rename_cell_array->setObservers(this->getObservers());
-  rename_cell_array->setVolumeDataContainer(m);
-  rename_cell_array->setMessagePrefix(getMessagePrefix());
-  rename_cell_array->setSelectedCellArrayName(m_CellParentIdsArrayName);
-  rename_cell_array->setNewCellArrayName(m_GrainIdsArrayName);
-  rename_cell_array->preflight();
-  int err1 = rename_cell_array->getErrorCondition();
+  RenameCellArray::Pointer rename_cell_array1 = RenameCellArray::New();
+  rename_cell_array1->setObservers(this->getObservers());
+  rename_cell_array1->setVolumeDataContainer(m);
+  rename_cell_array1->setMessagePrefix(getMessagePrefix());
+  rename_cell_array1->setSelectedCellArrayName(m_GrainIdsArrayName);
+  rename_cell_array1->setNewCellArrayName(m_OldGrainIdsArrayName);
+  rename_cell_array1->preflight();
+  int err3 = rename_cell_array1->getErrorCondition();
+  if (err3 < 0)
+  {
+    setErrorCondition(rename_cell_array1->getErrorCondition());
+    addErrorMessages(rename_cell_array1->getPipelineMessages());
+    return;
+  }
+  
+  RenameCellArray::Pointer rename_cell_array2 = RenameCellArray::New();
+  rename_cell_array2->setObservers(this->getObservers());
+  rename_cell_array2->setVolumeDataContainer(m);
+  rename_cell_array2->setMessagePrefix(getMessagePrefix());
+  rename_cell_array2->setSelectedCellArrayName(m_CellParentIdsArrayName);
+  rename_cell_array2->setNewCellArrayName(m_GrainIdsArrayName);
+  rename_cell_array2->preflight();
+  int err1 = rename_cell_array2->getErrorCondition();
   if (err1 < 0)
   {
-    setErrorCondition(rename_cell_array->getErrorCondition());
-    addErrorMessages(rename_cell_array->getPipelineMessages());
+    setErrorCondition(rename_cell_array2->getErrorCondition());
+    addErrorMessages(rename_cell_array2->getPipelineMessages());
     return;
   }
 
@@ -227,8 +244,8 @@ void BridgeParentIdsStatisticsToGrainIds::preflight()
   create_field_array_from_cell_array->setMessagePrefix(getMessagePrefix());
   create_field_array_from_cell_array->setSelectedCellArrayName(m_ParentDensityArrayName);
   create_field_array_from_cell_array->preflight();
-  int err3 = create_field_array_from_cell_array->getErrorCondition();
-  if (err3 < 0)
+  int err5 = create_field_array_from_cell_array->getErrorCondition();
+  if (err5 < 0)
   {
     setErrorCondition(create_field_array_from_cell_array->getErrorCondition());
     addErrorMessages(create_field_array_from_cell_array->getPipelineMessages());

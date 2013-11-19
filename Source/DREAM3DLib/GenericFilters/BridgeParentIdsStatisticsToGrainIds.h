@@ -32,6 +32,7 @@ class DREAM3DLib_EXPORT BridgeParentIdsStatisticsToGrainIds : public AbstractFil
 
     //------ Required Cell Data
     DREAM3D_INSTANCE_STRING_PROPERTY(GrainIdsArrayName)
+    DREAM3D_INSTANCE_STRING_PROPERTY(OldGrainIdsArrayName)
     DREAM3D_INSTANCE_STRING_PROPERTY(CellParentIdsArrayName)
     DREAM3D_INSTANCE_STRING_PROPERTY(ParentDensityArrayName)
     //------ Created Cell Data
@@ -74,6 +75,7 @@ class DREAM3DLib_EXPORT BridgeParentIdsStatisticsToGrainIds : public AbstractFil
 
   private:
     int32_t* m_GrainIds;
+	int32_t* m_OldGrainIds;
     int32_t* m_CellParentIds;
     int32_t* m_ParentDensity;
     int32_t* m_FieldParentIds;

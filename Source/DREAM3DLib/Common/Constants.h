@@ -103,6 +103,7 @@ namespace DREAM3D
   namespace CellData
   {
     const DREAM3D_STRING GrainIds("GrainIds");
+    const DREAM3D_STRING OldGrainIds("OldGrainIds");
     const DREAM3D_STRING FarFieldZoneIds("FarFieldZoneIds");
     const DREAM3D_STRING FarFieldQuats("FarFieldQuats");
     const DREAM3D_STRING ParentIds("ParentIds");
