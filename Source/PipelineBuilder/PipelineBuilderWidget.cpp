@@ -154,9 +154,11 @@ void PipelineBuilderWidget::initFilterListMenu()
 // -----------------------------------------------------------------------------
 void PipelineBuilderWidget::setPipelineMenu(QMenu* menuPipeline)
 {
-  this->m_MenuPipeline = menuPipeline;
+ this->m_MenuPipeline = menuPipeline;
 
-  QAction* separator = NULL;
+  QAction* separator = new QAction(this);
+  separator->setSeparator(true);
+
 
   QAction* actionAddFavorite = new QAction(m_MenuPipeline);
   actionAddFavorite->setObjectName(QString::fromUtf8("actionAddFavorite"));
@@ -188,7 +190,6 @@ void PipelineBuilderWidget::setPipelineMenu(QMenu* menuPipeline)
   connect(actionRenameFavorite, SIGNAL(triggered()),
           this, SLOT( actionRenameFavorite_triggered() ) );
   m_FavoriteItemActions << actionRenameFavorite;
-
 
   QAction* actionAppendFavorite = new QAction(m_MenuPipeline);
   actionAppendFavorite->setObjectName(QString::fromUtf8("actionAppendFavorite"));
@@ -1579,7 +1580,6 @@ void PipelineBuilderWidget::actionUpdateFavorite_triggered()
   QFileInfo filePathInfo = QFileInfo(filePath);
   // QString fileParentPath = filePathInfo.path();
   QString fileName = filePathInfo.baseName();
-
 
   if (NULL != parent && parent->text(0).compare(Detail::FavoritePipelines) == 0 )
   {
