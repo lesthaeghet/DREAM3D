@@ -11,13 +11,6 @@ For historical compatibility in versions prior to 4.2 the internal representatio
 + Update Cell Quaternions
 + Write DREAM3D File (Check EVERY array to write)
 
-**Note: This pipeline will OVERWRITE the existing DREAM3D File if both the input and output files are the same file.**
-
-<<<<<<< HEAD:Resources/ReleaseNotes/ReleaseNotes_v4288.md
-
-#### 4.2.88  Features & Bugs  Fixed  ###
-+ adding filters for volume fraction and surface area to volume ratio
-=======
 ## Version 4.2 Bugs Fixed & Features Added ##
 
 ### Version 4.2.4629 ###
@@ -45,8 +38,8 @@ For historical compatibility in versions prior to 4.2 the internal representatio
 + Fixed bug in Find Surface Voxel Fraction where the type for the surfaceVoxel was not cast correctly in the data check method
 
 ### Version 4.2.88 ###
+
 + Adding filters for volume fraction and surface area to volume ratio
->>>>>>> 716a6fd613586045d9946b883341a0725392c2a4:ReadMe.txt.in
 + Fix bug in ScalarSegmentGrains where boolean arrays are not segmented correctly
 + On the raw binary reader allow user to optionally over ride the origin and spacing values with the entries in the filter.
 + Visualize GBCD, empty GMT file causes crash.
@@ -116,10 +109,6 @@ For historical compatibility in versions prior to 4.2 the internal representatio
 + Add filter to calculate ensemble stats (fit distributions to arrays)
 + Fix calculation+storage of real stats for reading into synthetic builder
 + Read DREAM3D Filter: Not saving which SurfaceMesh arrays were checked to the file
-<<<<<<< HEAD:Resources/ReleaseNotes/ReleaseNotes_v4288.md
 + Missing Documentation File for IOFilters/ImportImageStack
 + Add "help" button to each filter that would display the help for that specific filter (right click)
-
-=======
 + Missing Documentation File for IOFilters/ImportImageStack
->>>>>>> 716a6fd613586045d9946b883341a0725392c2a4:ReadMe.txt.in
