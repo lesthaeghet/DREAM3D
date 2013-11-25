@@ -78,10 +78,10 @@ class RotateEulerRefFrameImpl
         ea1 = m_CellEulerAngles[3 * i + 0];
         ea2 = m_CellEulerAngles[3 * i + 1];
         ea3 = m_CellEulerAngles[3 * i + 2];
-        OrientationMath::EulertoMat(ea1, ea2, ea3, g);
+        OrientationMath::EulerToMat(ea1, ea2, ea3, g);
         MatrixMath::Multiply3x3with3x3(g, rotMat, gNew);
         MatrixMath::Normalize3x3(gNew);
-        OrientationMath::MattoEuler(gNew, ea1new, ea2new, ea3new);
+        OrientationMath::MatToEuler(gNew, ea1new, ea2new, ea3new);
         m_CellEulerAngles[3 * i + 0] = ea1new;
         m_CellEulerAngles[3 * i + 1] = ea2new;
 
