@@ -99,6 +99,31 @@ void WriteIPFStandardTriangle::setupFilterParameters()
 {
   FilterParameterVector parameters;
   /* Place all your option initialization code here */
+  #if 0
+  {
+    ChoiceFilterParameter::Pointer parameter = ChoiceFilterParameter::New();
+    parameter->setHumanLabel("Crystal Symmetry");
+    parameter->setPropertyName("CrystalSymmetry");
+    parameter->setWidgetType(FilterParameter::ChoiceWidget);
+    parameter->setValueType("unsigned int");
+    std::vector<std::string> choices;
+    choices.push_back("Hexagonal-High 6/mmm");
+    choices.push_back("Cubic-High m3m");
+    choices.push_back("Hexagonal-Low 6/m");
+    choices.push_back("Cubic-Low m3 (Tetrahedral)");
+    choices.push_back("TriClinic -1");
+    choices.push_back("Monoclinic 2/m");
+    choices.push_back("OrthoRhombic mmm");
+    choices.push_back("Tetragonal-Low 4/m");
+    choices.push_back("Tetragonal-High 4/mmm");
+    choices.push_back("Trigonal-Low -3");
+    choices.push_back("Trignal-High -3m");
+    //   choices.push_back("jpg");
+    parameter->setChoices(choices);
+    parameters.push_back(parameter);
+  }
+#endif
+
   {
     FilterParameter::Pointer option = FilterParameter::New();
     option->setHumanLabel("Output File");
@@ -221,8 +246,73 @@ void WriteIPFStandardTriangle::execute()
   int err = 0;
   setErrorCondition(err);
 
-  QImage image = generateCubicHighTriangle();
-  writeImage(image);
+
+  HexagonalOps::Pointer hex = HexagonalOps::New();
+  CubicOps::Pointer cubic = CubicOps::New();
+  HexagonalLowOps::Pointer hexLow = HexagonalLowOps::New();
+  CubicLowOps::Pointer cubicLow = CubicLowOps::New();
+  TriclinicOps::Pointer triclinic = TriclinicOps::New();
+  MonoclinicOps::Pointer monoclinic = MonoclinicOps::New();
+  OrthoRhombicOps::Pointer orthorhombic = OrthoRhombicOps::New();
+  TetragonalLowOps::Pointer tetragonalLow = TetragonalLowOps::New();
+  TetragonalOps::Pointer tetragonalHigh = TetragonalOps::New();
+  TrigonalLowOps::Pointer trigonalLow = TrigonalLowOps::New();
+  TrigonalOps::Pointer trigonal = TrigonalOps::New();
+
+  UInt8ArrayType::Pointer rgbaImage = UInt8ArrayType::NullPointer();
+  QImage image;
+
+  switch(m_CrystalSymmetry)
+  {
+    case Ebsd::CrystalStructure::Hexagonal_High : // 0; //!< Hexagonal-High 6/mmm
+      //   rgbaImage = hex->generateIPFTriangleLegend(getImageSize());
+      image = convertToQImage(rgbaImage);
+      break;
+    case Ebsd::CrystalStructure::Cubic_High : // 1; //!< Cubic Cubic-High m3m
+      rgbaImage = cubic->generateIPFTriangleLegend(getImageSize());
+      image = convertToQImage(rgbaImage);
+      image = overlayText(image, "[111]", "[101]", "[001]", "Cubic m-3m");
+      break;
+    case Ebsd::CrystalStructure::Hexagonal_Low : // 2; //!< Hexagonal-Low 6/m
+      //   rgbaImage = cubicLow->generateIPFTriangleLegend(getImageSize());
+      image = convertToQImage(rgbaImage);
+      break;
+    case Ebsd::CrystalStructure::Cubic_Low : // 3; //!< Cubic Cubic-Low m3 (Tetrahedral)
+      //   rgbaImage = cubicLow->generateIPFTriangleLegend(getImageSize());
+      image = convertToQImage(rgbaImage);
+      break;
+    case Ebsd::CrystalStructure::Triclinic : // 4; //!< TriClinic -1
+      //    rgbaImage = triclinic->generateIPFTriangleLegend(getImageSize());
+      image = convertToQImage(rgbaImage);
+      break;
+    case Ebsd::CrystalStructure::Monoclinic : // 5; //!< Monoclinic 2/m
+      //    rgbaImage = monoclinic->generateIPFTriangleLegend(getImageSize());
+      image = convertToQImage(rgbaImage);
+      break;
+    case Ebsd::CrystalStructure::OrthoRhombic : // 6; //!< OrthoRhombic mmm
+      //    rgbaImage = orthorhombic->generateIPFTriangleLegend(getImageSize());
+      image = convertToQImage(rgbaImage);
+      break;
+    case Ebsd::CrystalStructure::Tetragonal_Low : // 7; //!< Tetragonal-Low 4/m
+      //    rgbaImage = tetragonalLow->generateIPFTriangleLegend(getImageSize());
+      image = convertToQImage(rgbaImage);
+      break;
+    case Ebsd::CrystalStructure::Tetragonal_High : // 8; //!< Tetragonal-High 4/mmm
+      //   rgbaImage = tetragonalHigh->generateIPFTriangleLegend(getImageSize());
+      image = convertToQImage(rgbaImage);
+      break;
+    case Ebsd::CrystalStructure::Trigonal_Low : // 9; //!< Trigonal-Low -3
+      //   rgbaImage = trigonalLow->generateIPFTriangleLegend(getImageSize());
+      image = convertToQImage(rgbaImage);
+      break;
+    case Ebsd::CrystalStructure::Trigonal_High : // 10; //!< Trignal-High -3m
+      //   rgbaImage = trigonal->generateIPFTriangleLegend(getImageSize());
+      image = convertToQImage(rgbaImage);
+      break;
+
+    default:
+      break;
+  }
 
 
   /* Let the GUI know we are done with this filter */
@@ -303,7 +393,7 @@ QImage WriteIPFStandardTriangle::overlayCubicHighText(QImage image)
   painter.setFont(font);
   QFontMetrics metrics = painter.fontMetrics();
 
-  // Draw the Figure into the upper left of the enlarged image so all the extra space is at the bottom
+  // Draw the Figure into the center of image so all the extra space is at the bottom
   QPoint point(yMargin / 2, 0);
   painter.drawImage(point, image);
 
@@ -327,11 +417,13 @@ QImage WriteIPFStandardTriangle::overlayCubicHighText(QImage image)
   fontHeight = metrics.height();
   painter.drawText( 10, pImageHeight - fontHeight, label);
 
+  label = title;
 
-  label = QString("Cubic m-3m");
   fontWidth = metrics.width(label);
   fontHeight = metrics.height();
   painter.drawText( 10, fontHeight * 1.10, label);
+
+  painter.end();
 
   return pImage;
 }
