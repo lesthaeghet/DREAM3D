@@ -278,6 +278,10 @@ void GroupMicroTextureRegions::merge_micro_texture_regions()
   parentnumbers[0] = 0;
   for (size_t i = 1; i < numgrains; i++)
   {
+  	float avgCaxes[3];
+	avgCaxes[0] = 0.0f;
+	avgCaxes[1] = 0.0f;
+	avgCaxes[2] = 0.0f;
     if (parentnumbers[i] == -1 && m_FieldPhases[i] > 0)
     {
       parentcount++;
@@ -309,6 +313,12 @@ void GroupMicroTextureRegions::merge_micro_texture_regions()
         //dividing by the magnitudes (they would be 1)
         MatrixMath::Normalize3x1(c1);
 
+		if (j == 0)
+		{
+		  MatrixMath::Copy3x1(c1,avgCaxes);
+		  MatrixMath::Multiply3x1withConstant(avgCaxes,m_Volumes[i]);
+		}
+		
         size_t neigh;
         for (int k = 0; k < 2; k++)
         {
@@ -346,6 +356,10 @@ void GroupMicroTextureRegions::merge_micro_texture_regions()
                 if (w <= m_CAxisTolerance || (DREAM3D::Constants::k_Pi - w) <= m_CAxisTolerance)
                 {
                   parentnumbers[neigh] = parentcount;
+				  MatrixMath::Multiply3x1withConstant(c2, m_Volumes[neigh]);
+				  avgCaxes[0] = avgCaxes[0] + c2[0];
+				  avgCaxes[1] = avgCaxes[1] + c2[1];
+				  avgCaxes[2] = avgCaxes[2] + c2[2];
                   microtexturelist.push_back(neigh);
                   microtexturevolume += m_Volumes[neigh];
                 }
