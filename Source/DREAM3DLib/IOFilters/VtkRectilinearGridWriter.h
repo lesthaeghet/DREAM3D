@@ -127,6 +127,7 @@ class DREAM3DLib_EXPORT VtkRectilinearGridWriter : public AbstractFilter
     */
     virtual int writeFilterParameters(AbstractFilterParametersWriter* writer, int index);
 
+
     /**
     * @brief This method will read the options from a file
     * @param reader The reader that is used to read the options from a file
@@ -284,6 +285,7 @@ class DREAM3DLib_EXPORT VtkRectilinearGridWriter : public AbstractFilter
     void operator=(const VtkRectilinearGridWriter&); // Operator '=' Not Implemented
 
     int write(const std::string& file, VolumeDataContainer* r, std::vector<VtkScalarWriter*>& scalars);
+
 
 
 

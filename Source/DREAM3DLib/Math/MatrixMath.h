@@ -185,6 +185,7 @@ class DREAM3DLib_EXPORT MatrixMath
 
 
 
+
   protected:
     MatrixMath();
 

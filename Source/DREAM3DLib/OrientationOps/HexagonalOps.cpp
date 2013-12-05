@@ -785,8 +785,8 @@ void HexagonalOps::getF1(QuatF& q1, QuatF& q2, float LD[3], bool maxSF, float& F
     MatrixMath::Multiply3x3with3x1(g1,slipPlane,uvw1);
     MatrixMath::Normalize3x1(hkl1);
     MatrixMath::Normalize3x1(uvw1);
-    directionComponent1 = MatrixMath::DotProduct(LD,uvw1);
-    planeComponent1 = MatrixMath::DotProduct(LD,hkl1);
+    directionComponent1 = MatrixMath::DotProduct3x1(LD,uvw1);
+    planeComponent1 = MatrixMath::DotProduct3x1(LD,hkl1);
     schmidFactor1 = directionComponent1*planeComponent1;
     if(schmidFactor1 > maxSchmidFactor || maxSF == false)
     {
@@ -804,8 +804,8 @@ void HexagonalOps::getF1(QuatF& q1, QuatF& q2, float LD[3], bool maxSF, float& F
         MatrixMath::Multiply3x3with3x1(g2,slipPlane,uvw2);
         MatrixMath::Normalize3x1(hkl2);
         MatrixMath::Normalize3x1(uvw2);
-        directionComponent2 = MatrixMath::DotProduct(LD,uvw2);
-        planeComponent2 = MatrixMath::DotProduct(LD,hkl2);
+        directionComponent2 = MatrixMath::DotProduct3x1(LD,uvw2);
+        planeComponent2 = MatrixMath::DotProduct3x1(LD,hkl2);
         schmidFactor2 = directionComponent2*planeComponent2;
         totalDirectionMisalignment = totalDirectionMisalignment + directionMisalignment;
       }
@@ -854,8 +854,8 @@ void HexagonalOps::getF1spt(QuatF& q1, QuatF& q2, float LD[3], bool maxSF, float
     MatrixMath::Multiply3x3with3x1(g1,slipPlane,uvw1);
     MatrixMath::Normalize3x1(hkl1);
     MatrixMath::Normalize3x1(uvw1);
-    directionComponent1 = MatrixMath::DotProduct(LD,uvw1);
-    planeComponent1 = MatrixMath::DotProduct(LD,hkl1);
+    directionComponent1 = MatrixMath::DotProduct3x1(LD,uvw1);
+    planeComponent1 = MatrixMath::DotProduct3x1(LD,hkl1);
     schmidFactor1 = directionComponent1*planeComponent1;
     if(schmidFactor1 > maxSchmidFactor || maxSF == false)
     {
@@ -874,11 +874,11 @@ void HexagonalOps::getF1spt(QuatF& q1, QuatF& q2, float LD[3], bool maxSF, float
         MatrixMath::Multiply3x3with3x1(g2,slipPlane,uvw2);
         MatrixMath::Normalize3x1(hkl2);
         MatrixMath::Normalize3x1(uvw2);
-        directionComponent2 = MatrixMath::DotProduct(LD,uvw2);
-        planeComponent2 = MatrixMath::DotProduct(LD,hkl2);
+        directionComponent2 = MatrixMath::DotProduct3x1(LD,uvw2);
+        planeComponent2 = MatrixMath::DotProduct3x1(LD,hkl2);
         schmidFactor2 = directionComponent2*planeComponent2;
-        directionMisalignment = fabs(MatrixMath::DotProduct(uvw1,uvw2));
-        planeMisalignment = fabs(MatrixMath::DotProduct(hkl1,hkl2));
+        directionMisalignment = fabs(MatrixMath::DotProduct3x1(uvw1,uvw2));
+        planeMisalignment = fabs(MatrixMath::DotProduct3x1(hkl1,hkl2));
         totalDirectionMisalignment = totalDirectionMisalignment + directionMisalignment;
         totalPlaneMisalignment = totalPlaneMisalignment + planeMisalignment;
       }
@@ -926,8 +926,8 @@ void HexagonalOps::getF7(QuatF& q1, QuatF& q2, float LD[3], bool maxSF, float& F
     MatrixMath::Multiply3x3with3x1(g1,slipPlane,uvw1);
     MatrixMath::Normalize3x1(hkl1);
     MatrixMath::Normalize3x1(uvw1);
-    directionComponent1 = MatrixMath::DotProduct(LD,uvw1);
-    planeComponent1 = MatrixMath::DotProduct(LD,hkl1);
+    directionComponent1 = MatrixMath::DotProduct3x1(LD,uvw1);
+    planeComponent1 = MatrixMath::DotProduct3x1(LD,hkl1);
     schmidFactor1 = directionComponent1*planeComponent1;
     if(schmidFactor1 > maxSchmidFactor || maxSF == false)
     {
@@ -945,8 +945,8 @@ void HexagonalOps::getF7(QuatF& q1, QuatF& q2, float LD[3], bool maxSF, float& F
         MatrixMath::Multiply3x3with3x1(g2,slipPlane,uvw2);
         MatrixMath::Normalize3x1(hkl2);
         MatrixMath::Normalize3x1(uvw2);
-        directionComponent2 = MatrixMath::DotProduct(LD,uvw2);
-        planeComponent2 = MatrixMath::DotProduct(LD,hkl2);
+        directionComponent2 = MatrixMath::DotProduct3x1(LD,uvw2);
+        planeComponent2 = MatrixMath::DotProduct3x1(LD,hkl2);
         schmidFactor2 = directionComponent2*planeComponent2;
         totalDirectionMisalignment = totalDirectionMisalignment + directionMisalignment;
       }

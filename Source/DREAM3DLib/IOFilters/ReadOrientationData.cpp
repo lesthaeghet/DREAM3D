@@ -105,17 +105,25 @@ void ReadOrientationData::setupFilterParameters()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void ReadOrientationData::readFilterParameters(AbstractFilterParametersReader* reader)
+void ReadOrientationData::readFilterParameters(AbstractFilterParametersReader* reader, int index)
 {
+  reader->openFilterGroup(this, index);
+  /* Code to read the values goes between these statements */
+  /* FILTER_WIDGETCODEGEN_AUTO_GENERATED_CODE BEGIN*/
+  setInputFile( reader->readValue( "InputFile", getInputFile() ) );
+  /* FILTER_WIDGETCODEGEN_AUTO_GENERATED_CODE END*/
+  reader->closeFilterGroup();
 }
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void ReadOrientationData::writeFilterParameters(AbstractFilterParametersWriter* writer)
-
+int ReadOrientationData::writeFilterParameters(AbstractFilterParametersWriter* writer, int index)
 {
+  writer->openFilterGroup(this, index);
   writer->writeValue("InputFile", getInputFile() );
+  writer->closeFilterGroup();
+  return ++index; // we want to return the next index that was just written to
 }
 
 
@@ -126,11 +134,11 @@ void ReadOrientationData::dataCheck(bool preflight, size_t voxels, size_t fields
 {
   setErrorCondition(0);
   std::stringstream ss;
-  VoxelDataContainer* m = getVoxelDataContainer();
+  VolumeDataContainer* m = getVolumeDataContainer();
   if (NULL == m)
   {
     ss.str("");
-    ss << getHumanLabel() << "The VoxelDataContainer was NULL and this is NOT allowed. There is an error in the programming. Please contact the developers";
+    ss << getHumanLabel() << "The VolumeDataContainer was NULL and this is NOT allowed. There is an error in the programming. Please contact the developers";
     setErrorCondition(-1);
     addErrorMessage(getHumanLabel(), ss.str(), -1);
     return;
@@ -246,13 +254,13 @@ void ReadOrientationData::dataCheck(bool preflight, size_t voxels, size_t fields
       return;
     }
 
-    CREATE_NON_PREREQ_DATA(m, DREAM3D, CellData, CellEulerAngles, ss, float, FloatArrayType, 0, voxels, 3)
-    CREATE_NON_PREREQ_DATA(m, DREAM3D, CellData, CellPhases, ss, int32_t, Int32ArrayType, 0, voxels, 1)
+    CREATE_NON_PREREQ_DATA(m, DREAM3D, CellData, CellEulerAngles, float, FloatArrayType, 0, voxels, 3)
+    CREATE_NON_PREREQ_DATA(m, DREAM3D, CellData, CellPhases, int32_t, Int32ArrayType, 0, voxels, 1)
 
 
     typedef DataArray<unsigned int> XTalStructArrayType;
-    CREATE_NON_PREREQ_DATA(m, DREAM3D, EnsembleData, CrystalStructures, ss, unsigned int, XTalStructArrayType, Ebsd::CrystalStructure::UnknownCrystalStructure, ensembles, 1)
-    CREATE_NON_PREREQ_DATA(m, DREAM3D, EnsembleData, LatticeConstants, ss, float, FloatArrayType, 0.0, ensembles, 6)
+    CREATE_NON_PREREQ_DATA(m, DREAM3D, EnsembleData, CrystalStructures, unsigned int, XTalStructArrayType, Ebsd::CrystalStructure::UnknownCrystalStructure, ensembles, 1)
+    CREATE_NON_PREREQ_DATA(m, DREAM3D, EnsembleData, LatticeConstants, float, FloatArrayType, 0.0, ensembles, 6)
 
     StringDataArray::Pointer materialNames = StringDataArray::CreateArray(1, DREAM3D::EnsembleData::MaterialName);
     m->addEnsembleData( DREAM3D::EnsembleData::MaterialName, materialNames);
@@ -279,7 +287,7 @@ void ReadOrientationData::execute()
   int err = 0;
   std::stringstream ss;
   setErrorCondition(err);
-  VoxelDataContainer* m = getVoxelDataContainer();
+  VolumeDataContainer* m = getVolumeDataContainer();
   if(NULL == m)
   {
     setErrorCondition(-999);
@@ -321,7 +329,7 @@ void ReadOrientationData::readAngFile()
     notifyErrorMessage(reader.getErrorMessage(), getErrorCondition());
     return;
   }
-  VoxelDataContainer* m = getVoxelDataContainer();
+  VolumeDataContainer* m = getVolumeDataContainer();
 
   int64_t dims[3];
   dims[0] = reader.getXDimension();
@@ -420,7 +428,7 @@ void ReadOrientationData::readCtfFile()
     notifyErrorMessage(reader.getErrorMessage(), getErrorCondition());
     return;
   }
-  VoxelDataContainer* m = getVoxelDataContainer();
+  VolumeDataContainer* m = getVolumeDataContainer();
 
   int64_t dims[3];
   dims[0] = reader.getXDimension();

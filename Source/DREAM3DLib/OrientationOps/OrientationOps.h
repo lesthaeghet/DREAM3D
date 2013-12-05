@@ -47,6 +47,7 @@
 #include "DREAM3DLib/Math/MatrixMath.h"
 #include "DREAM3DLib/Utilities/PoleFigureUtilities.h"
 
+
 /*
  * @class OrientationOps OrientationOps.h DREAM3DLib/Common/OrientationOps.h
  * @brief This class performs Crystallographic Misorientation Calculations

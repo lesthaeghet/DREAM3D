@@ -71,11 +71,12 @@
 #include "QtSupport/DREAM3DHelpUrlGenerator.h"
 
 #include "DREAM3DLib/DREAM3DLib.h"
-#include "DREAM3DLib/Common/DREAM3DSetGetMacros.h"
+#include "DREAM3DLib/DREAM3DVersion.h"
 #include "DREAM3DLib/DREAM3DFilters.h"
-#include "DREAM3DLib/HDF5/H5FilterParametersReader.h"
+#include "DREAM3DLib/Common/DREAM3DSetGetMacros.h"
 #include "DREAM3DLib/Common/FilterManager.h"
 #include "DREAM3DLib/Common/IFilterFactory.hpp"
+#include "DREAM3DLib/HDF5/H5FilterParametersReader.h"
 
 #include "QFilterWidget.h"
 #include "AddFavoriteWidget.h"
@@ -643,6 +644,7 @@ void PipelineBuilderWidget::writeSettings(QSettings &prefs, PipelineViewWidget* 
 
   prefs.setValue("Number_Filters", count);
   prefs.setValue("Name", fi.baseName()); // Put a default value in here
+  prefs.setValue("DREAM3D Version", QString::fromStdString(DREAM3DLib::Version::Package()));
   prefs.endGroup();
 
   for(qint32 i = 0; i < count; ++i)

@@ -37,6 +37,7 @@
 
 #include "DREAM3DLib/Math/DREAM3DMath.h"
 #include "DREAM3DLib/Math/MatrixMath.h"
+#include "DREAM3DLib/OrientationOps/OrientationOps.h"
 #include "DREAM3DLib/SurfaceMeshingFilters/util/Vector3.h"
 #include "DREAM3DLib/SurfaceMeshingFilters/util/TriangleOps.h"
 
@@ -48,6 +49,7 @@
 #include "DREAM3DLib/OrientationOps/TetragonalOps.h"
 #include "DREAM3DLib/OrientationOps/OrthoRhombicOps.h"
 #include "DREAM3DLib/OrientationOps/MonoclinicOps.h"
+
 
 #ifdef DREAM3D_USE_PARALLEL_ALGORITHMS
 #include <tbb/parallel_for.h>

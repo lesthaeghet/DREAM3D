@@ -322,6 +322,7 @@ void RotateSampleRefFrame::preflight()
   if(fabs(MatrixMath::CosThetaBetweenVectors(xAxis, zAxisNew)) > closestAxis) { zResNew = xRes, closestAxis = fabs(MatrixMath::CosThetaBetweenVectors(xAxis, zAxisNew)); }
   if(fabs(MatrixMath::CosThetaBetweenVectors(yAxis, zAxisNew)) > closestAxis) { zResNew = yRes, closestAxis = fabs(MatrixMath::CosThetaBetweenVectors(yAxis, zAxisNew)); }
 
+
   xpNew = ((xMax - xMin) / xResNew) + 1;
   ypNew = ((yMax - yMin) / yResNew) + 1;
   zpNew = ((zMax - zMin) / zResNew) + 1;
@@ -435,6 +436,7 @@ void RotateSampleRefFrame::execute()
   closestAxis = fabs(MatrixMath::CosThetaBetweenVectors(zAxis, zAxisNew));
   if(fabs(MatrixMath::CosThetaBetweenVectors(xAxis, zAxisNew)) > closestAxis) { zResNew = xRes, closestAxis = fabs(MatrixMath::CosThetaBetweenVectors(xAxis, zAxisNew)); }
   if(fabs(MatrixMath::CosThetaBetweenVectors(yAxis, zAxisNew)) > closestAxis) { zResNew = yRes, closestAxis = fabs(MatrixMath::CosThetaBetweenVectors(yAxis, zAxisNew)); }
+
 
   xpNew = ((xMax - xMin) / xResNew) + 1;
   ypNew = ((yMax - yMin) / yResNew) + 1;

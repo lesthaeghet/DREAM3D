@@ -72,6 +72,7 @@
 #include "DREAM3DLib/DataArrays/StatsDataArray.h"
 #include "DREAM3DLib/StatsData/StatsData.h"
 
+
 #include "StatsGenerator/Presets/MicrostructurePresetManager.h"
 #include "StatsGenerator/Presets/DefaultStatsPreset.h"
 #include "StatsGenerator/Presets/EquiaxedPreset.h"

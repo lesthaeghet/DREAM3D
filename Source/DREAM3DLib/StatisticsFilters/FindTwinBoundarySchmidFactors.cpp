@@ -137,6 +137,7 @@ class CalculateTwinBoundarySchmidFactorsImpl
             m_TwinBoundarySchmidFactors[3 * i] = schmid1;
             m_TwinBoundarySchmidFactors[3 * i + 1] = schmid2;
             m_TwinBoundarySchmidFactors[3 * i + 2] = schmid3;
+
           }
           else if(n[0] > 0 && n[1] < 0)
           {
@@ -155,6 +156,7 @@ class CalculateTwinBoundarySchmidFactorsImpl
             m_TwinBoundarySchmidFactors[3 * i] = schmid1;
             m_TwinBoundarySchmidFactors[3 * i + 1] = schmid2;
             m_TwinBoundarySchmidFactors[3 * i + 2] = schmid3;
+
           }
           else if(n[0] < 0 && n[1] > 0)
           {

@@ -197,7 +197,7 @@ void DataContainerReader::dataCheck(bool preflight, size_t volumes, size_t field
     {
       H5Utilities::closeFile(fileId);
       fileId = H5Utilities::openFile(m_InputFile, false); // Re-Open the file as Read/Write
-      err = H5Lmove(fileId, "VoxelDataContainer", fileId, DREAM3D::HDF5::VolumeDataContainerName.c_str(), H5P_DEFAULT, H5P_DEFAULT);
+      err = H5Lmove(fileId, "VolumeDataContainer", fileId, DREAM3D::HDF5::VolumeDataContainerName.c_str(), H5P_DEFAULT, H5P_DEFAULT);
       err = H5Lmove(fileId, "SurfaceMeshDataContainer", fileId, DREAM3D::HDF5::SurfaceDataContainerName.c_str(), H5P_DEFAULT, H5P_DEFAULT);
       err = H5Lite::writeStringAttribute(fileId, "/", DREAM3D::HDF5::FileVersionName, DREAM3D::HDF5::FileVersion);
       H5Utilities::closeFile(fileId);
@@ -325,7 +325,7 @@ void DataContainerReader::execute()
   {
     H5Utilities::closeFile(fileId);
     fileId = H5Utilities::openFile(m_InputFile, false); // Re-Open the file as Read/Write
-    err = H5Lmove(fileId, "VoxelDataContainer", fileId, DREAM3D::HDF5::VolumeDataContainerName.c_str(), H5P_DEFAULT, H5P_DEFAULT);
+    err = H5Lmove(fileId, "VolumeDataContainer", fileId, DREAM3D::HDF5::VolumeDataContainerName.c_str(), H5P_DEFAULT, H5P_DEFAULT);
     err = H5Lmove(fileId, "SurfaceMeshDataContainer", fileId, DREAM3D::HDF5::SurfaceDataContainerName.c_str(), H5P_DEFAULT, H5P_DEFAULT);
     err = H5Lite::writeStringAttribute(fileId, "/", DREAM3D::HDF5::FileVersionName, DREAM3D::HDF5::FileVersion);
     H5Utilities::closeFile(fileId);

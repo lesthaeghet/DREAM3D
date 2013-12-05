@@ -219,7 +219,7 @@ class GenerateIntensityMapImpl
       size_t dims[3] = {m_Config->lambertDim, m_Config->lambertDim, 1 };
       float res[3] = {1.0, 1.0, 1.0};
       DoubleArrayType::Pointer north = lambert->getNorthSquare();
-      VtkRectilinearGridWriter::WriteDataArrayToFile("/tmp/NorthSquare_" + m_Intensity->GetName() + ".vtk", north.get(), dims, res, "double", true);
+     // VtkRectilinearGridWriter::WriteDataArrayToFile("/tmp/NorthSquare_" + m_Intensity->GetName() + ".vtk", north.get(), dims, res, "double", true);
       lambert->normalizeSquaresToMRD();
       m_Intensity->Resize(m_Config->imageDim * m_Config->imageDim);
       m_Intensity->SetNumberOfComponents(1);
