@@ -66,6 +66,8 @@ AlignSectionsList::AlignSectionsList() :
   AlignSections(),
   m_GoodVoxels(NULL)
 {
+  setWriteAlignmentShifts(false);
+
   setupFilterParameters();
 }
 
@@ -114,6 +116,8 @@ int AlignSectionsList::writeFilterParameters(AbstractFilterParametersWriter* wri
 {
   writer->openFilterGroup(this, index);
   writer->writeValue("InputFile", getInputFile() );
+  writer->writeValue("AlignmentShiftFileName", getAlignmentShiftFileName());
+  writer->writeValue("WriteAlignmentShifts", getWriteAlignmentShifts());
   writer->closeFilterGroup();
   return ++index; // we want to return the next index that was just written to
 }

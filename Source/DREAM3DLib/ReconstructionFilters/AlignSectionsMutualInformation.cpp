@@ -131,7 +131,8 @@ void AlignSectionsMutualInformation::readFilterParameters(AbstractFilterParamete
 int AlignSectionsMutualInformation::writeFilterParameters(AbstractFilterParametersWriter* writer, int index)
 {
   writer->openFilterGroup(this, index);
-  AlignSections::writeFilterParameters(writer, index);
+  writer->writeValue("AlignmentShiftFileName", getAlignmentShiftFileName());
+  writer->writeValue("WriteAlignmentShifts", getWriteAlignmentShifts());
   writer->writeValue("MisorientationTolerance", getMisorientationTolerance() );
   writer->closeFilterGroup();
   return ++index; // we want to return the next index that was just written to
