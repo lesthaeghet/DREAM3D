@@ -24,7 +24,7 @@ endmacro()
 
 set(DIR_SEP "/")
 if(WIN32)
-	set(DIR_SEP "\\\\")
+  set(DIR_SEP "\\\\")
 endif()
 #message(STATUS "DREAM3DTest_BINARY_DIR: ${DREAM3DTest_BINARY_DIR}")
 include_directories(${DREAM3DTest_BINARY_DIR})
@@ -228,14 +228,6 @@ add_test(AngImportTest ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/AngImportTest)
 if(NOT ${DREAM3D_DATA_DIR} STREQUAL "")
     message(STATUS "Synthetic Builder Test using ${DREAM3D_DATA_DIR} as data directory.")
     message(STATUS "  Please make sure the proper files are available in that directory")
-
-    # --------------------------------------------------------------------------
-    # FindNeighbors Testing
-    # --------------------------------------------------------------------------
-    add_executable(FindNeighborsTest ${DREAM3DTest_SOURCE_DIR}/FindNeighborsTest.cpp)
-    target_link_libraries(FindNeighborsTest DREAM3DLib)
-  set_target_properties(FindNeighborsTest PROPERTIES FOLDER Test)
-    add_test(FindNeighborsTest ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/FindNeighborsTest)
 
     # --------------------------------------------------------------------------
     # SyntheticBuilder Test

@@ -51,7 +51,7 @@
 
 
 /**
- * @class AddOrientationNoises AddOrientationNoises.h DREAM3DLib/SyntheticBuilderFilters/AddOrientationNoises.h
+ * @class AddOrientationNoises AddOrientationNoises.h DREAM3DLib/SyntheticBuildingFilters/AddOrientationNoises.h
  * @brief
  * @author
  * @date Nov 19, 2011

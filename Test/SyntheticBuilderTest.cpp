@@ -39,19 +39,19 @@
 #include "MXA/Utilities/MXAFileInfo.h"
 
 #include "DREAM3DLib/DREAM3DLib.h"
-#include "DREAM3DLib/Common/AbstractPipeline.h"
+
 #include "DREAM3DLib/Common/Observer.h"
 #include "DREAM3DLib/Common/FilterPipeline.h"
 #include "DREAM3DLib/VTKUtils/VTKFileWriters.hpp"
 //#include "DREAM3DLib/HDF5/H5VoxelReader.h"
 #include "DREAM3DLib/IOFilters/DataContainerWriter.h"
 #include "DREAM3DLib/IOFilters/VtkRectilinearGridWriter.h"
-#include "DREAM3DLib/SyntheticBuilderFilters/InitializeSyntheticVolume.h"
-#include "DREAM3DLib/SyntheticBuilderFilters/MatchCrystallography.h"
-#include "DREAM3DLib/SyntheticBuilderFilters/InsertPrecipitatePhases.h"
-#include "DREAM3DLib/SyntheticBuilderFilters/InitializeSyntheticVolume.h"
-#include "DREAM3DLib/SyntheticBuilderFilters/PackPrimaryPhases.h"
-#include "DREAM3DLib/SyntheticBuilderFilters/AdjustVolume.h"
+#include "DREAM3DLib/SyntheticBuildingFilters/InitializeSyntheticVolume.h"
+#include "DREAM3DLib/SyntheticBuildingFilters/MatchCrystallography.h"
+#include "DREAM3DLib/SyntheticBuildingFilters/InsertPrecipitatePhases.h"
+#include "DREAM3DLib/SyntheticBuildingFilters/InitializeSyntheticVolume.h"
+#include "DREAM3DLib/SyntheticBuildingFilters/PackPrimaryPhases.h"
+//#include "DREAM3DLib/SyntheticBuildingFilters/AdjustVolume.h"
 #include "DREAM3DLib/IOFilters/FieldDataCSVWriter.h"
 
 #include "UnitTestSupport.hpp"
@@ -142,8 +142,8 @@ void TestSyntheticBuilder()
 
   // Create our Pipeline object
   FilterPipeline::Pointer pipeline = FilterPipeline::New();
-  VoxelDataContainer::Pointer m = VoxelDataContainer::New();
-  pipeline->setVoxelDataContainer(m);
+//  VolumeDataContainer::Pointer m = VolumeDataContainer::New();
+//  pipeline->setVolumeDataContainer(m);
 
     ShapeTypeArrayType::Pointer m_ShapeTypes = ShapeTypeArrayType::CreateArray(4, DREAM3D::EnsembleData::ShapeTypes);
     m_ShapeTypes->SetValue(0, DREAM3D::ShapeType::UnknownShapeType);
@@ -152,7 +152,7 @@ void TestSyntheticBuilder()
     m_ShapeTypes->SetValue(3, DREAM3D::ShapeType::EllipsoidShape);
 
     InitializeSyntheticVolume::Pointer init_volume = InitializeSyntheticVolume::New();
-    init_volume->setShapeTypes(m_ShapeTypes);
+ //   init_volume->setShapeTypes(m_ShapeTypes);
     init_volume->setInputFile(getH5StatsFile());
     init_volume->setXVoxels(m_XPoints);
     init_volume->setYVoxels(m_YPoints);
@@ -160,11 +160,11 @@ void TestSyntheticBuilder()
     init_volume->setXRes(m_XResolution);
     init_volume->setYRes(m_YResolution);
     init_volume->setZRes(m_ZResolution);
-	pipeline->pushBack(init_volume);
+  pipeline->pushBack(init_volume);
 
     PackPrimaryPhases::Pointer pack_grains = PackPrimaryPhases::New();
     pack_grains->setPeriodicBoundaries(m_PeriodicBoundary);
-    pack_grains->setNeighborhoodErrorWeight(m_NeighborhoodErrorWeight);
+//    pack_grains->setNeighborhoodErrorWeight(m_NeighborhoodErrorWeight);
 #if PACK_GRAINS_ERROR_TXT_OUT
     MAKE_OUTPUT_FILE_PATH( errorFile, DREAM3D::SyntheticBuilder::ErrorFile)
     pack_grains->setErrorOutputFile(errorFile);
@@ -174,9 +174,6 @@ void TestSyntheticBuilder()
     pack_grains->setVtkOutputFile(vtkFile);
 #endif
     pipeline->pushBack(pack_grains);
-
-    AdjustVolume::Pointer adjust_grains = AdjustVolume::New();
-    pipeline->pushBack(adjust_grains);
 
     InsertPrecipitatePhases::Pointer place_precipitates = InsertPrecipitatePhases::New();
     place_precipitates->setPeriodicBoundaries(m_PeriodicBoundary);
@@ -205,16 +202,16 @@ void TestSyntheticBuilder()
     vtkWriter->setWriteGrainIds(true);
     vtkWriter->setWritePhaseIds(m_WritePhaseId);
    // vtkWriter->setWriteGoodVoxels(m_WriteGoodVoxels);
-    vtkWriter->setWriteIPFColors(m_WriteIPFColor);
+    //vtkWriter->setWriteIPFColors(m_WriteIPFColor);
     vtkWriter->setWriteBinaryFile(m_WriteBinaryVTKFiles);
     pipeline->pushBack(vtkWriter);
   }
 
   std::cout << "********* RUNNING PIPELINE **********************" << std::endl;
 
-  m = VoxelDataContainer::New();
+//  m = VolumeDataContainer::New();
 
-  pipeline->setVoxelDataContainer(m);
+//  pipeline->setVolumeDataContainer(m);
   pipeline->run();
   err = pipeline->getErrorCondition();
   DREAM3D_REQUIRE_EQUAL(err, 0);

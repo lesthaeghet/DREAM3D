@@ -47,7 +47,7 @@
 #include "DREAM3DLib/DataContainers/VolumeDataContainer.h"
 
 /**
- * @class RegularizeZSpacing RegularizeZSpacing.h DREAM3DLib/SyntheticBuilderFilters/RegularizeZSpacing.h
+ * @class RegularizeZSpacing RegularizeZSpacing.h DREAM3DLib/SamplingFilters/RegularizeZSpacing.h
  * @brief
  * @author
  * @date Nov 19, 2011
