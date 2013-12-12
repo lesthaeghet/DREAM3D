@@ -1189,19 +1189,19 @@ void CubicOps::generateSphereCoordsFromEulers(FloatArrayType* eulers, FloatArray
   float* a = xyz001->GetPointer(0);
   for(size_t i = 0; i < nOrientations * Detail::CubicHigh::symSize0 * 3; i++)
   {
-    if(isnan(a[i]))
-    {
-      std::cout << "NAN (A)" << std::endl;
-    }
+//    if(isnan(a[i]))
+//    {
+//      std::cout << "NAN (A)" << std::endl;
+//    }
   }
 
   float* b = xyz011->GetPointer(0);
   for(size_t i = 0; i < nOrientations * Detail::CubicHigh::symSize1 * 3; i++)
   {
-    if(isnan(b[i]))
-    {
-      std::cout << "NAN (B)" << std::endl;
-    }
+//    if(isnan(b[i]))
+//    {
+//      std::cout << "NAN (B)" << std::endl;
+//    }
   }
 
 
@@ -1209,10 +1209,10 @@ void CubicOps::generateSphereCoordsFromEulers(FloatArrayType* eulers, FloatArray
   float* c = xyz111->GetPointer(0);
     for(size_t i = 0; i < nOrientations * Detail::CubicHigh::symSize2 * 3; i++)
   {
-    if(isnan(c[i]))
-    {
-      std::cout << "NAN (C)" << std::endl;
-    }
+//    if(isnan(c[i]))
+//    {
+//      std::cout << "NAN (C)" << std::endl;
+//    }
   }
   #endif
 

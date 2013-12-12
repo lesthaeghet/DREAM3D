@@ -35,7 +35,7 @@
 
 #include <vector>
 
-#include <boost/tr1/array.hpp>
+//#include <boost/tr1/array.hpp>
 
 #include "DREAM3DLib/DREAM3DLib.h"
 #include "DREAM3DLib/Common/Constants.h"
