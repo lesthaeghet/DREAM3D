@@ -47,7 +47,7 @@
 #include "DREAM3DLib/DataContainers/VolumeDataContainer.h"
 
 /**
- * @class CropVolume CropVolume.h DREAM3DLib/SyntheticBuilderFilters/CropVolume.h
+ * @class CropVolume CropVolume.h DREAM3DLib/SamplingFilters/CropVolume.h
  * @brief
  * @author
  * @date Nov 19, 2011

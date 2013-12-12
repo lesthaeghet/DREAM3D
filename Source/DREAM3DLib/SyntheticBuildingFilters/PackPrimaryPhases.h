@@ -64,7 +64,7 @@ typedef struct
 } Field;
 
 /**
- * @class PackPrimaryPhases PackPrimaryPhases.h DREAM3DLib/SyntheticBuilderFilters/PackPrimaryPhases.h
+ * @class PackPrimaryPhases PackPrimaryPhases.h DREAM3DLib/SyntheticBuildingFilters/PackPrimaryPhases.h
  * @brief
  * @author
  * @date Nov 19, 2011

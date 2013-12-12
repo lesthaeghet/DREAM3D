@@ -47,7 +47,7 @@
 #include "DREAM3DLib/DataContainers/VolumeDataContainer.h"
 
 /**
- * @class ClearData ClearData.h DREAM3DLib/SyntheticBuilderFilters/ClearData.h
+ * @class ClearData ClearData.h DREAM3DLib/ProcessingFilters/ClearData.h
  * @brief
  * @author
  * @date Nov 19, 2011

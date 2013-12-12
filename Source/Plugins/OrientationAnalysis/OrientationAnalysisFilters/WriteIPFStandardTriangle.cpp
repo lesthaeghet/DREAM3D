@@ -51,7 +51,7 @@
 #include <QtGui/QColor>
 
 
-#include "QtSupport/PoleFigureImageUtilities.h"
+//#include "QtSupport/PoleFigureImageUtilities.h"
 
 
 #include "MXA/MXA.h"
@@ -66,8 +66,20 @@
 
 #include "DREAM3DLib/Common/ModifiedLambertProjection.h"
 #include "DREAM3DLib/Math/DREAM3DMath.h"
-
+#include "DREAM3DLib/Math/MatrixMath.h"
+#include "DREAM3DLib/Math/OrientationMath.h"
 #include "DREAM3DLib/OrientationOps/CubicOps.h"
+#include "DREAM3DLib/OrientationOps/CubicLowOps.h"
+#include "DREAM3DLib/OrientationOps/HexagonalOps.h"
+#include "DREAM3DLib/OrientationOps/HexagonalLowOps.h"
+#include "DREAM3DLib/OrientationOps/TrigonalOps.h"
+#include "DREAM3DLib/OrientationOps/TrigonalLowOps.h"
+#include "DREAM3DLib/OrientationOps/TetragonalOps.h"
+#include "DREAM3DLib/OrientationOps/TetragonalLowOps.h"
+#include "DREAM3DLib/OrientationOps/OrthoRhombicOps.h"
+#include "DREAM3DLib/OrientationOps/MonoclinicOps.h"
+#include "DREAM3DLib/OrientationOps/TriclinicOps.h"
+#include "DREAM3DLib/Utilities/ColorTable.h"
 
 
 
@@ -80,7 +92,7 @@ WriteIPFStandardTriangle::WriteIPFStandardTriangle() :
   m_OutputFile(""),
   m_ImageFormat(2),
   m_ImageSize(512),
-  m_ColorCorrectionFactor(1.0)
+  m_CrystalSymmetry(1)
 {
   setupFilterParameters();
 }
@@ -97,7 +109,7 @@ WriteIPFStandardTriangle::~WriteIPFStandardTriangle()
 // -----------------------------------------------------------------------------
 void WriteIPFStandardTriangle::setupFilterParameters()
 {
-  FilterParameterVector parameters;
+  std::vector<FilterParameter::Pointer> parameters;
   /* Place all your option initialization code here */
   #if 0
   {
@@ -155,15 +167,6 @@ void WriteIPFStandardTriangle::setupFilterParameters()
     option->setUnits("Pixels");
     parameters.push_back(option);
   }
-//  {
-//    FilterParameter::Pointer option = FilterParameter::New();
-//    option->setPropertyName("ColorCorrectionFactor");
-//    option->setHumanLabel("Color Correction Factor");
-//    option->setUnits("0 <= x < 1");
-//    option->setWidgetType(FilterParameter::DoubleWidget);
-//    option->setValueType("float");
-//    parameters.push_back(option);
-//  }
 
 
   setFilterParameters(parameters);
@@ -192,6 +195,7 @@ int WriteIPFStandardTriangle::writeFilterParameters(AbstractFilterParametersWrit
   writer->writeValue("OutputFile", getOutputFile() );
   writer->writeValue("ImageFormat", getImageFormat() );
   writer->writeValue("ImageSize", getImageSize() );
+  writer->writeValue("CystalSymmetry", getCrystalSymmetry());
   writer->closeFilterGroup();
   return ++index; // we want to return the next index that was just written to
 }
@@ -245,7 +249,6 @@ void WriteIPFStandardTriangle::execute()
 {
   int err = 0;
   setErrorCondition(err);
-
 
   HexagonalOps::Pointer hex = HexagonalOps::New();
   CubicOps::Pointer cubic = CubicOps::New();
@@ -315,6 +318,12 @@ void WriteIPFStandardTriangle::execute()
   }
 
 
+
+  if(image.isNull() == false)
+  {
+    writeImage(image);
+  }
+
   /* Let the GUI know we are done with this filter */
   notifyStatusMessage("Complete");
 }
@@ -323,12 +332,16 @@ void WriteIPFStandardTriangle::execute()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-QImage WriteIPFStandardTriangle::generateCubicHighTriangle()
+QImage WriteIPFStandardTriangle::convertToQImage(UInt8ArrayType::Pointer rgbaImage)
 {
-  notifyStatusMessage("Generating Cubic IPF Triangle Legend");
 
-  CubicOps ops;
-  UInt8ArrayType::Pointer rgbaImage = ops.generateIPFTriangleLegend(getImageSize());
+  if (rgbaImage.get() == NULL)
+  {
+    setErrorCondition(-54123);
+    notifyErrorMessage("The selected Crystal Symmetry is not supported when creating the IPF Triangle Legend.", getErrorCondition());
+    return QImage();
+  }
+
   QRgb* rgba = reinterpret_cast<QRgb*>(rgbaImage->GetPointer(0));
 
   QImage image(getImageSize(), getImageSize(), QImage::Format_ARGB32_Premultiplied);
@@ -346,15 +359,24 @@ QImage WriteIPFStandardTriangle::generateCubicHighTriangle()
     }
   }
 
-  image = overlayCubicHighText(image);
+  // Dump the raw rgba memory
+  rgbaImage->Resize(0);
+
   return image;
 }
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-QImage WriteIPFStandardTriangle::overlayCubicHighText(QImage image)
+QImage WriteIPFStandardTriangle::overlayText(QImage image, QString l0, QString l1, QString l2, QString title)
 {
+  if (image.isNull() == true)
+  {
+    setErrorCondition(-54123);
+    notifyErrorMessage("The selected Crystal Symmetry is not supported when creating the IPF Triangle Legend.", getErrorCondition());
+    return QImage();
+  }
+
   QSize imageSize(getImageSize(), getImageSize());
   int fontHeight = 0;
   int fontWidth = 0;
@@ -401,24 +423,23 @@ QImage WriteIPFStandardTriangle::overlayCubicHighText(QImage image)
   painter.setPen(QPen(QColor(0, 0, 0, 255), penWidth, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
 
   // Draw the [111] label in the Upper Right corner
-  QString label("[111]");
+  QString label = l0; // 111
   fontWidth = metrics.width(label);
   fontHeight = metrics.height();
   painter.drawText( pImageWidth - (fontWidth * 1.25), fontHeight * 1.10, label);
 
-  label = QString("[101]");
+  label = l1; // 101
   fontWidth = metrics.width(label);
   fontHeight = metrics.height();
   painter.drawText( pImageWidth - (fontWidth * 1.25), pImageHeight - fontHeight, label);
 
-
-  label = QString("[001]");
+  label = l2; // 001
   fontWidth = metrics.width(label);
   fontHeight = metrics.height();
   painter.drawText( 10, pImageHeight - fontHeight, label);
 
-  label = title;
 
+  label = title;
   fontWidth = metrics.width(label);
   fontHeight = metrics.height();
   painter.drawText( 10, fontHeight * 1.10, label);
