@@ -67,16 +67,16 @@ typedef struct
 
 typedef struct
 {
-    int16_t xIndex;
-    int16_t yIndex;
-    float   bc;
-    uint16_t unknown2;
-    float   euler1;
-    float   euler2;
-    float   euler3;
-    uint16_t badPoint;
-    uint16_t bands;
-    float   mad;
+    uint16_t xIndex;
+    uint16_t yIndex;
+    float   patternQuality;
+    uint16_t detectedBands;
+    float   euler1; // radians
+    float   euler2; // radians
+    float   euler3; // radians
+    int16_t phase; //Has byte value of 0xFFFF
+    uint16_t indexedBands;
+    float   bmm;
 } IndexResult_t;
 
 namespace Bcf
