@@ -35,6 +35,7 @@
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
 #include "TetragonalOps.h"
+#include "OrthoRhombicOps.h"
 // Include this FIRST because there is a needed define for some compiles
 // to expose some of the constants needed below
 #include "DREAM3DLib/Math/DREAM3DMath.h"
@@ -752,7 +753,7 @@ DREAM3D::Rgb TetragonalOps::generateMisorientationColor(const QuatF& q, const Qu
 {
   DREAM3D::Rgb rgb = RgbColor::dRgb(0, 0, 0, 0);
 
-  BOOST_ASSERT(false);
+  BOOST_ASSERT(FALSE);
 
   float n1, n2, n3, w;
   float xo, xo1, xo2, xo3, x, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11;
@@ -794,7 +795,7 @@ DREAM3D::Rgb TetragonalOps::generateMisorientationColor(const QuatF& q, const Qu
   }
   else
   {
-    k = (2.0f * sqrtf(xo * xo + yo * yo));
+    k = (DREAM3D::Constants::k_Sqrt2 * sqrtf(xo * xo + yo * yo));
     if(k == 0)
     {
       k = (xo + yo);
@@ -808,6 +809,7 @@ DREAM3D::Rgb TetragonalOps::generateMisorientationColor(const QuatF& q, const Qu
   yo1 = yo * k;
   zo1 = zo / tan(M_PI / 8);
 
+
   //eq c3.3
   k = 2.0f * atan2(yo1, xo1);
   xo2 = sqrtf(xo1 * xo1 + yo1 * yo1) * cos(k);
@@ -820,6 +822,14 @@ DREAM3D::Rgb TetragonalOps::generateMisorientationColor(const QuatF& q, const Qu
   yo3 = yo2 * k;
   zo3 = zo2;
 
+  QuatF quat, identityQuat;
+  OrientationMath::RodtoQuat(quat, xo3, yo3, zo3);
+  identityQuat.x=0.0;
+  identityQuat.y=0.0;
+  identityQuat.z=0.0;
+  identityQuat.w=1.0;
+  //rgb=OrthoRhombicOps::generateMisorientationColor(quat, identityQuat);
+/*
   //substitute c5.4 results into c1.1
   x = xo3;
   y = yo3;
@@ -865,8 +875,8 @@ DREAM3D::Rgb TetragonalOps::generateMisorientationColor(const QuatF& q, const Qu
   else if(k >= 2.0f * M_PI / 3.0f && k < 4.0f * M_PI / 3.0f)
   {
     type = 2;
-    x5 = x4;
-    y5 = y4;
+    x5 = -x4;
+    y5 = -y4;
   }
   else//k>=4*pi/3 && <2*pi
   {
@@ -898,8 +908,8 @@ DREAM3D::Rgb TetragonalOps::generateMisorientationColor(const QuatF& q, const Qu
   }
   else if(type == 2)
   {
-    x9 = x8;
-    y9 = y8;
+    x9 = -x8;
+    y9 = -y8;
   }
   else//type==3;
   {
@@ -989,7 +999,7 @@ DREAM3D::Rgb TetragonalOps::generateMisorientationColor(const QuatF& q, const Qu
   b = 1 - (b + (v - c));
 
   rgb = RgbColor::dRgb(r * 255, g * 255, b * 255, 0);
-
+*/
   return rgb;
 }
 

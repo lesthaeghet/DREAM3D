@@ -1341,8 +1341,6 @@ std::vector<UInt8ArrayType::Pointer> HexagonalOps::generatePoleFigure(PoleFigure
 // -----------------------------------------------------------------------------
 DREAM3D::Rgb HexagonalOps::generateMisorientationColor(const QuatF& q, const QuatF& refFrame)
 {
-  BOOST_ASSERT(false);
-
   float n1, n2, n3, w;
   float xo, xo1, xo2, xo3, x, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11;
   float yo, yo1, yo2, yo3, y, y1, y2, y3, y4, y5, y6, y7, y8, y9, y10, y11;
@@ -1464,11 +1462,11 @@ DREAM3D::Rgb HexagonalOps::generateMisorientationColor(const QuatF& q, const Qua
     x5 = (x4 + y4 * DREAM3D::Constants::k_Sqrt3) / 2.0f;
     y5 = (-x4 * DREAM3D::Constants::k_Sqrt3 + y4) / 2.0f;
   }
-  else if(k >= M_2PI / 3.0f && k < 4.0f * M_PI / 3.0f)
+  else if(k >= M_2PI / 3.0f && k < (2.0f * M_2PI) / 3.0f)
   {
     type = 2;
-    x5 = x4;
-    y5 = y4;
+    x5 = -x4;
+    y5 = -y4;
   }
   else//k>=4*pi/3 && <2*pi
   {
@@ -1500,8 +1498,8 @@ DREAM3D::Rgb HexagonalOps::generateMisorientationColor(const QuatF& q, const Qua
   }
   else if(type == 2)
   {
-    x9 = x8;
-    y9 = y8;
+    x9 = -x8;
+    y9 = -y8;
   }
   else//type==3;
   {

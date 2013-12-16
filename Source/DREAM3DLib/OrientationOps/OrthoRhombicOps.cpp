@@ -719,8 +719,6 @@ DREAM3D::Rgb OrthoRhombicOps::generateMisorientationColor(const QuatF& q, const 
 {
   DREAM3D::Rgb rgb = RgbColor::dRgb(0, 0, 0, 0);
 
-  BOOST_ASSERT(false);
-
   float n1, n2, n3, w;
   float x, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11;
   float y, y1, y2, y3, y4, y5, y6, y7, y8, y9, y10, y11;
@@ -748,7 +746,7 @@ DREAM3D::Rgb OrthoRhombicOps::generateMisorientationColor(const QuatF& q, const 
   //eq c1.2
   k = std::max(x, y);
   k = std::max(k, z);
-  k = (k * sqrt(3.0f)) / (x + y + z);
+  k = (k * DREAM3D::Constants::k_Sqrt3) / (x + y + z);
   x1 = x * k;
   y1 = y * k;
   z1 = z * k;
@@ -756,14 +754,14 @@ DREAM3D::Rgb OrthoRhombicOps::generateMisorientationColor(const QuatF& q, const 
   //eq c1.3
   //3 rotation matricies (in paper) can be multiplied into one (here) for simplicity / speed
   //g1*g2*g3 = {{sqrt(2/3), 0, 1/sqrt(3)},{-1/sqrt(6), 1/sqrt(2), 1/sqrt(3)},{-1/sqrt(6), 1/sqrt(2), 1/sqrt(3)}}
-  x2 = x1 * sqrt(2.0f / 3.0f) - (y1 + z1) / sqrt(6.0f);
-  y2 = (y1 - z1) / sqrt(2.0f);
-  z2 = (x1 + y1 + z1) / sqrt(3.0f);
+  x2 = x1 * (DREAM3D::Constants::k_Sqrt2/DREAM3D::Constants::k_Sqrt3) - (y1 + z1) / (DREAM3D::Constants::k_Sqrt2*DREAM3D::Constants::k_Sqrt3);
+  y2 = (y1 - z1) / DREAM3D::Constants::k_Sqrt2;
+  z2 = (x1 + y1 + z1) / DREAM3D::Constants::k_Sqrt3;
 
   //eq c1.4
-  k = fmodf(atan2f(y2, x2) + 2.0f * M_PI, 2.0f * M_PI);
-  x3 = cos(k) * sqrt((x2 * x2 + y2 * y2) / 2.0f) * sin(M_PI / 6.0f + fmodf(k, 2.0f * M_PI / 3.0f)) / 0.5f;
-  y3 = sin(k) * sqrt((x2 * x2 + y2 * y2) / 2.0f) * sin(M_PI / 6.0f + fmodf(k, 2.0f * M_PI / 3.0f)) / 0.5f;
+  k = fmodf(atan2f(y2, x2) + M_2PI, M_2PI);
+  x3 = cos(k) * sqrt((x2 * x2 + y2 * y2) / 2.0f) * sin(M_PI / 6.0f + fmodf(k, M_2PI / 3.0f)) / 0.5f;
+  y3 = sin(k) * sqrt((x2 * x2 + y2 * y2) / 2.0f) * sin(M_PI / 6.0f + fmodf(k, M_2PI / 3.0f)) / 0.5f;
   z3 = z2 - 1.0f;
 
   //eq c1.5
@@ -773,26 +771,26 @@ DREAM3D::Rgb OrthoRhombicOps::generateMisorientationColor(const QuatF& q, const 
   z4 = z3 * k;
 
   //eq c1.6, 7, and 8 (from matlab code not paper)
-  k = fmod(atan2(y4, x4) + 2 * M_PI, 2 * M_PI);
+  k = fmod(atan2(y4, x4) + M_2PI, M_2PI);
 
   int type;
-  if(k >= 0.0f && k < 2.0f * M_PI / 3.0f)
+  if(k >= 0.0f && k < M_2PI/ 3.0f)
   {
     type = 1;
-    x5 = (x4 + y4 * sqrt(3.0f)) / 2.0f;
-    y5 = (-x4 * sqrt(3.0f) + y4) / 2.0f;
+    x5 = (x4 + y4 * DREAM3D::Constants::k_Sqrt3) / 2.0f;
+    y5 = (-x4 * DREAM3D::Constants::k_Sqrt3 + y4) / 2.0f;
   }
-  else if(k >= 2.0f * M_PI / 3.0f && k < 4.0f * M_PI / 3.0f)
+  else if(k >= M_2PI / 3.0f && k < 2.0f * M_2PI / 3.0f)
   {
     type = 2;
-    x5 = x4;
-    y5 = y4;
+    x5 = -x4;
+    y5 = -y4;
   }
   else//k>=4*pi/3 && <2*pi
   {
     type = 3;
-    x5 = (x4 - y4 * sqrt(3.0f)) / 2.0f;
-    y5 = (x4 * sqrt(3.0f) + y4) / 2.0f;
+    x5 = (x4 - y4 * DREAM3D::Constants::k_Sqrt3) / 2.0f;
+    y5 = (x4 * DREAM3D::Constants::k_Sqrt3 + y4) / 2.0f;
   }
   z5 = z4;
 
@@ -813,30 +811,30 @@ DREAM3D::Rgb OrthoRhombicOps::generateMisorientationColor(const QuatF& q, const 
 
   if(type == 1)
   {
-    x9 = (x8 - y8 * sqrt(3.0f)) / 2.0f;
-    y9 = (x8 * sqrt(3.0f) + y8) / 2.0f;
+    x9 = (x8 - y8 * DREAM3D::Constants::k_Sqrt3) / 2.0f;
+    y9 = (x8 * DREAM3D::Constants::k_Sqrt3 + y8) / 2.0f;
   }
   else if(type == 2)
   {
-    x9 = x8;
-    y9 = y8;
+    x9 = -x8;
+    y9 = -y8;
   }
   else//type==3;
   {
-    x9 = (x8 + y8 * sqrt(3.0f)) / 2.0f;
-    y9 = (-x8 * sqrt(3.0f) + y8) / 2.0f;
+    x9 = (x8 + y8 * DREAM3D::Constants::k_Sqrt3) / 2.0f;
+    y9 = (-x8 * DREAM3D::Constants::k_Sqrt3 + y8) / 2.0f;
   }
   z9 = z8;
 
   //c1.9
-  x10 = (x9 - y9 * sqrt(3.0f)) / 2.0f;
-  y10 = (x9 * sqrt(3.0f) + y9) / 2.0f;
+  x10 = (x9 - y9 * DREAM3D::Constants::k_Sqrt3) / 2.0f;
+  y10 = (x9 * DREAM3D::Constants::k_Sqrt3 + y9) / 2.0f;
   z10 = z9;
 
   //cartesian to traditional hsv
   x11 = sqrt(x10 * x10 + y10 * y10 + z10 * z10); //r
   y11 = acos(z10 / x11) / M_PI; //theta
-  z11 = fmod(fmod(atan2(y10, x10) + 2.0f * M_PI, 2.0f * M_PI) + 4.0f * M_PI / 3.0f, 2.0f * M_PI) / (2.0f * M_PI); //rho
+  z11 = fmod(fmod(atan2(y10, x10) + M_2PI, M_2PI) + 2.0f * M_2PI / 3.0f, M_2PI) / (M_2PI); //rho
 
   if(x11 == 0)
   {

@@ -915,15 +915,15 @@ DREAM3D::Rgb CubicLowOps::generateMisorientationColor(const QuatF& q, const Quat
   //eq c7.3
   //3 rotation matricies (in paper) can be multiplied into one (here) for simplicity / speed
   //g1*g2*g3 = {{sqrt(2/3), 0, 1/sqrt(3)},{-1/sqrt(6), 1/sqrt(2), 1/sqrt(3)},{-1/sqrt(6), 1/sqrt(2), 1/sqrt(3)}}
-  x2 = x1 * sqrt(2.0f / 3.0f) - (y1 + z1) / sqrt(6.0f);
-  y2 = (y1 - z1) / sqrt(2.0f);
-  z2 = (x1 + y1 + z1) / sqrt(3.0f);
+  x2 = x1 * (DREAM3D::Constants::k_Sqrt2/DREAM3D::Constants::k_Sqrt3) - (y1 + z1) / (DREAM3D::Constants::k_Sqrt2*DREAM3D::Constants::k_Sqrt3);
+  y2 = (y1 - z1) / DREAM3D::Constants::k_Sqrt2;
+  z2 = (x1 + y1 + z1) / DREAM3D::Constants::k_Sqrt3;
 
   //eq c7.4
-  k = (sqrt(3.0f) * y2 + x2) / (2.0f * pow(x2 * x2 + y2 * y2, 1.5f));
-  x3 = x2 * (x2 + sqrt(3.0f) * y2) * (x2 - sqrt(3.0f) * y2) * k;
-  y3 = y2 * (y2 + sqrt(3.0f) * x2) * (sqrt(3.0f) * x2 - y2) * k;
-  z3 = z2 * sqrt(3.0f);
+  k = (DREAM3D::Constants::k_Sqrt3 * y2 + x2) / (2.0f * pow(x2 * x2 + y2 * y2, 1.5f));
+  x3 = x2 * (x2 + DREAM3D::Constants::k_Sqrt3 * y2) * (x2 - DREAM3D::Constants::k_Sqrt3 * y2) * k;
+  y3 = y2 * (y2 + DREAM3D::Constants::k_Sqrt3 * x2) * (DREAM3D::Constants::k_Sqrt3 * x2 - y2) * k;
+  z3 = z2 * DREAM3D::Constants::k_Sqrt3;
 
   //eq c7.5 these hsv are from 0 to 1 in cartesian coordinates
   x4 = -x3;

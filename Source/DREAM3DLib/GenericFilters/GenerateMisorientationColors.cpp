@@ -248,7 +248,9 @@ void GenerateMisorientationColors::execute()
     m_MisorientationColor[index + 2] = 0;
     cellQuat = quats[i];
 
-    if(m_CrystalStructures[phase] != Ebsd::CrystalStructure::Cubic_High)
+    //if(m_CrystalStructures[phase] != Ebsd::CrystalStructure::Cubic_High)
+    //if(!(m_CrystalStructures[phase]==Ebsd::CrystalStructure::Cubic_High || m_CrystalStructures[phase]==Ebsd::CrystalStructure::Hexagonal_High || m_CrystalStructures[phase]==Ebsd::CrystalStructure::Cubic_Low || m_CrystalStructures[phase]==Ebsd::CrystalStructure::Tetragonal_High || m_CrystalStructures[phase]==Ebsd::CrystalStructure::OrthoRhombic))
+    if(!(m_CrystalStructures[phase]==Ebsd::CrystalStructure::Cubic_High || m_CrystalStructures[phase]==Ebsd::CrystalStructure::Hexagonal_High || m_CrystalStructures[phase]==Ebsd::CrystalStructure::OrthoRhombic))
     {
       uint32_t idx = m_CrystalStructures[phase];
       if(idx == Ebsd::CrystalStructure::UnknownCrystalStructure)
