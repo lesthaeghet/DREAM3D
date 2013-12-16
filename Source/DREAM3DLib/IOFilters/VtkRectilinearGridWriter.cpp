@@ -320,7 +320,7 @@ int VtkRectilinearGridWriter::writeFilterParameters(AbstractFilterParametersWrit
   writer->writeValue("WriteGrainReferenceMisorientations", getWriteGrainReferenceMisorientations() );
   writer->writeValue("WriteGrainReferenceCAxisMisorientations", getWriteGrainReferenceCAxisMisorientations() );
   writer->writeValue("WriteKernelAverageMisorientations", getWriteKernelAverageMisorientations() );
-//  writer->writeValue("WriteIPFColors", getWriteIPFColors() );
+
   writer->writeValue("WriteSchmidFactors", getWriteSchmidFactors() );
   writer->writeValue("WriteGrainSizes", getWriteGrainSizes() );
   writer->writeValue("WriteBinaryFile", getWriteBinaryFile() );
@@ -407,10 +407,7 @@ void VtkRectilinearGridWriter::dataCheck(bool preflight, size_t voxels, size_t f
   {
     GET_PREREQ_DATA(m, DREAM3D, CellData, ImageQuality, -304, float, FloatArrayType, voxels, 1)
   }
-//  if(m_WriteIPFColors == true)
-//  {
-//    GET_PREREQ_DATA(m, DREAM3D, CellData, CellEulerAngles, -305, float, FloatArrayType, voxels, 3)
-//  }
+
   if(m_WriteGBEuclideanDistanceMap == true)
   {
     GET_PREREQ_DATA(m, DREAM3D, CellData, GBEuclideanDistances, -305, float, FloatArrayType, voxels, 1)
@@ -582,12 +579,6 @@ void VtkRectilinearGridWriter::execute()
     scalarsToWrite.push_back(w0);
   }
 
-//  if(m_WriteIPFColors == true)
-//  {
-//    VtkScalarWriter* w0 = static_cast<VtkScalarWriter*>(new VoxelIPFColorScalarWriter<VolumeDataContainer>(m));
-//    w0->m_WriteBinaryFiles = m_WriteBinaryFile;
-//    scalarsToWrite.push_back(w0);
-//  }
 
   if (m_WriteEulerAngles == true)
   {
@@ -653,9 +644,10 @@ int VtkRectilinearGridWriter::write(const std::string& file, VolumeDataContainer
   }
 
   // Write the XCoords
-  VtkRectilinearGridWriter::WriteCoords(f, "X_COORDINATES", "float", r->getXPoints() + 1, 0.0f - r->getXRes() * 0.5f, (float)(r->getXPoints() + 1 * r->getXRes()), r->getXRes(), m_WriteBinaryFile);
-  VtkRectilinearGridWriter::WriteCoords(f, "Y_COORDINATES", "float", r->getYPoints() + 1, 0.0f - r->getYRes() * 0.5f, (float)(r->getYPoints() + 1 * r->getYRes()), r->getYRes(), m_WriteBinaryFile);
-  VtkRectilinearGridWriter::WriteCoords(f, "Z_COORDINATES", "float", r->getZPoints() + 1, 0.0f - r->getZRes() * 0.5f, (float)(r->getZPoints() + 1 * r->getZRes()), r->getZRes(), m_WriteBinaryFile);
+
+  WriteCoords(f, "X_COORDINATES", "float", r->getXPoints() + 1, 0.0f - r->getXRes() * 0.5f, (float)(r->getXPoints() + 1 * r->getXRes()), r->getXRes(), getWriteBinaryFile());
+  WriteCoords(f, "Y_COORDINATES", "float", r->getYPoints() + 1, 0.0f - r->getYRes() * 0.5f, (float)(r->getYPoints() + 1 * r->getYRes()), r->getYRes(), getWriteBinaryFile());
+  WriteCoords(f, "Z_COORDINATES", "float", r->getZPoints() + 1, 0.0f - r->getZRes() * 0.5f, (float)(r->getZPoints() + 1 * r->getZRes()), r->getZRes(), getWriteBinaryFile());
 
   size_t total = r->getXPoints() * r->getYPoints() * r->getZPoints();
   fprintf(f, "CELL_DATA %d\n", (int)total);

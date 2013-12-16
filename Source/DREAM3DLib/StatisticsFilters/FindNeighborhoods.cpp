@@ -55,7 +55,7 @@ FindNeighborhoods::FindNeighborhoods() :
   m_NeighborhoodsArrayName(DREAM3D::FieldData::Neighborhoods),
   m_NeighborhoodListArrayName(DREAM3D::FieldData::NeighborhoodList),
   m_NumNeighborsArrayName(DREAM3D::FieldData::NumNeighbors),
-  m_MultiplesOfAverage(1),
+  m_MultiplesOfAverage(1.0f),
   m_FieldPhases(NULL),
   m_Centroids(NULL),
   m_EquivalentDiameters(NULL),
@@ -81,8 +81,9 @@ void FindNeighborhoods::setupFilterParameters()
     FilterParameter::Pointer option = FilterParameter::New();
     option->setPropertyName("MultiplesOfAverage");
     option->setHumanLabel("Multiples Of Average Diameter");
-    option->setWidgetType(FilterParameter::IntWidget);
-    option->setValueType("int");
+    option->setWidgetType(FilterParameter::DoubleWidget);
+    option->setValueType("float");
+    option->setCastableValueType("double");
     option->setUnits("");
     parameters.push_back(option);
   }
@@ -212,7 +213,7 @@ void FindNeighborhoods::find_neighborhoods()
 
   neighborhoodlist.resize(totalFields);
 
-  float aveDiam = 0;
+  float aveDiam = 0.0f;
   for (size_t i = 1; i < totalFields; i++)
   {
     m_Neighborhoods[i] = 0;
@@ -280,10 +281,20 @@ void FindNeighborhoods::find_neighborhoods()
       bin2 = bins[j];
       if(bin1 == bin2)
       {
-        m_Neighborhoods[i]++;
-        neighborhoodlist[i].push_back(j);
-        m_Neighborhoods[j]++;
-        neighborhoodlist[j].push_back(i);
+        xn = m_Centroids[3 * j];
+        yn = m_Centroids[3 * j + 1];
+        zn = m_Centroids[3 * j + 2];
+        dx = fabs(x - xn);
+        dy = fabs(y - yn);
+        dz = fabs(z - zn);
+        if (dx < criticalDistance && dy < criticalDistance && dz < criticalDistance)
+        {
+          m_Neighborhoods[i]++;
+          neighborhoodlist[i].push_back(j);
+          m_Neighborhoods[j]++;
+          neighborhoodlist[j].push_back(i);
+        }
+
       }
       else if(abs(bin1 - bin2) == 1 || abs(bin1 - bin2) == numXBins || abs(bin1 - bin2) == (numXBins * numYBins))
       {

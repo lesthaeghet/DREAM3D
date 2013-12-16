@@ -110,6 +110,7 @@ void GenerateIPFColors::readFilterParameters(AbstractFilterParametersReader* rea
   setReferenceDir( reader->readValue("ReferenceDir", getReferenceDir() ) );
   /* FILTER_WIDGETCODEGEN_AUTO_GENERATED_CODE END*/
   reader->closeFilterGroup();
+
 }
 
 // -----------------------------------------------------------------------------
@@ -149,6 +150,7 @@ void GenerateIPFColors::dataCheck(bool preflight, size_t voxels, size_t fields, 
   GET_PREREQ_DATA(m, DREAM3D, EnsembleData, CrystalStructures, -304, unsigned int, XTalStructArrayType, ensembles, 1)
 
   CREATE_NON_PREREQ_DATA(m, DREAM3D, CellData, CellIPFColors, uint8_t, UInt8ArrayType, 0, voxels, 3)
+
 }
 
 

@@ -71,11 +71,12 @@
 #include "QtSupport/DREAM3DHelpUrlGenerator.h"
 
 #include "DREAM3DLib/DREAM3DLib.h"
-#include "DREAM3DLib/Common/DREAM3DSetGetMacros.h"
+#include "DREAM3DLib/DREAM3DVersion.h"
 #include "DREAM3DLib/DREAM3DFilters.h"
-#include "DREAM3DLib/HDF5/H5FilterParametersReader.h"
+#include "DREAM3DLib/Common/DREAM3DSetGetMacros.h"
 #include "DREAM3DLib/Common/FilterManager.h"
 #include "DREAM3DLib/Common/IFilterFactory.hpp"
+#include "DREAM3DLib/HDF5/H5FilterParametersReader.h"
 
 #include "QFilterWidget.h"
 #include "AddFavoriteWidget.h"
@@ -153,9 +154,11 @@ void PipelineBuilderWidget::initFilterListMenu()
 // -----------------------------------------------------------------------------
 void PipelineBuilderWidget::setPipelineMenu(QMenu* menuPipeline)
 {
-  this->m_MenuPipeline = menuPipeline;
+ this->m_MenuPipeline = menuPipeline;
 
-  QAction* separator = NULL;
+  QAction* separator = new QAction(this);
+  separator->setSeparator(true);
+
 
   QAction* actionAddFavorite = new QAction(m_MenuPipeline);
   actionAddFavorite->setObjectName(QString::fromUtf8("actionAddFavorite"));
@@ -187,7 +190,6 @@ void PipelineBuilderWidget::setPipelineMenu(QMenu* menuPipeline)
   connect(actionRenameFavorite, SIGNAL(triggered()),
           this, SLOT( actionRenameFavorite_triggered() ) );
   m_FavoriteItemActions << actionRenameFavorite;
-
 
   QAction* actionAppendFavorite = new QAction(m_MenuPipeline);
   actionAppendFavorite->setObjectName(QString::fromUtf8("actionAppendFavorite"));
@@ -643,6 +645,7 @@ void PipelineBuilderWidget::writeSettings(QSettings &prefs, PipelineViewWidget* 
 
   prefs.setValue("Number_Filters", count);
   prefs.setValue("Name", fi.baseName()); // Put a default value in here
+  prefs.setValue("DREAM3D Version", QString::fromStdString(DREAM3DLib::Version::Package()));
   prefs.endGroup();
 
   for(qint32 i = 0; i < count; ++i)
@@ -1577,7 +1580,6 @@ void PipelineBuilderWidget::actionUpdateFavorite_triggered()
   QFileInfo filePathInfo = QFileInfo(filePath);
   // QString fileParentPath = filePathInfo.path();
   QString fileName = filePathInfo.baseName();
-
 
   if (NULL != parent && parent->text(0).compare(Detail::FavoritePipelines) == 0 )
   {

@@ -13,7 +13,8 @@ This Filter makes interior calls to Rename Cell Array and Link Field Data To Cel
 
 | Name | Type |
 |------|------|
-| Calculate Local C-Axis Misalignment Using Sub-Boundary Misalignments Only | Boolean |  
+| Calculate Local Average C-Axis Misalignment | Boolean |  
+| Calculate Unbiased Local Average C-Axis Misalignment | Boolean |
 
 ## Required DataContainers ##
 Volume
@@ -28,16 +29,16 @@ Volume
 | Ensemble | CrystalStructures | Enumeration (int) specifying the crystal structure of each Ensemble/phase (Hexagonal=0, Cubic=1, Orthorhombic=2) | Values should be present from experimental data or synthetic generation and cannot be determined by this filter. Not having these values will result in the filter to fail/not execute. | Read H5Ebsd File (IO), Read Ensemble Info File (IO), Initialize Synthetic Volume (SyntheticBuilding) |  
 | Field | ParentIds | List of grouped microtexture region **Fields**. |  | Identify MicroTexture (Reconstruction) |
 | Cell | ParentIds | List of grouped microtexture region **Cells**.  |  |  Identify MicroTexture (Reconstruction) |  
-| Field | CAxisMisalignmentList | NeighborList of c-axis misalignments. | Only needed if "Calculate Average Parent Average C-Axis Misalignment Using Grouped Microtexture Grains Only" IS checked. | Find Field Neighbor C-Axis Misalignments (Statistics) |  
-| Field | NeighborList | List of grain nearest neighbors. | Only needed if "Calculate Average Parent Average C-Axis Misalignment Using Grouped Microtexture Grains Only" IS checked. | Find Neighbors (Statistics) |
+| Field | CAxisMisalignmentList | NeighborList of c-axis misalignments. | Only needed if "Calculate Local Average C-Axis Misalignment" IS checked. | Find Field Neighbor C-Axis Misalignments (Statistics) |  
+| Field | NeighborList | List of grain nearest neighbors. | Only needed if "Calculate Unbiased Local Average C-Axis Misalignment" IS checked. | Find Neighbors (Statistics) |
 
 ## Created Arrays ##
 
 | Type | Default Name | Description | Comment |
 |------|--------------|-------------|---------|
 | Field | Active | Boolean value specifying if the **Field** is still in the sample (1 if the **Field** is in the sample and 0 if it is not). | At the end of the filter, all **Fields** will be "Active" as the "Inactive" **Fields** will have been removed.  |  
-| Field | LocalCAxisMisalignments| Float of the microtexture region average "grain"-kernel average c-axis misalignment. | This is only calculated if  "Calculate Local C-Axis Misalignment Using Sub-Boundary Misalignments Only" IS NOT checked|  
-| Field | UnbiasedLocalCAxisMisalignments| Float of the microtexture region average sub-boundary c-axis misalignment. | This is only calculated if  "Calculate Local C-Axis Misalignment Using Sub-Boundary Misalignments Only" IS checked|  
+| Field | LocalCAxisMisalignments| Float of the microtexture region average "grain"-kernel average c-axis misalignment. | This is only calculated if  "Calculate Local Average C-Axis Misalignment" IS NOT checked|  
+| Field | UnbiasedLocalCAxisMisalignments| Float of the microtexture region average sub-boundary c-axis misalignment. | This is only calculated if  "Calculate Unbiased Local Average C-Axis Misalignment" IS checked|  
 | Field | ParentDensity | Float of the voxel fraction of "flipped" microtexture against the region searched in Find Neighborhoods filter. | |  
 | Field | NumGrainsPerParent | Int of the number of grains contained in each parent grain. |  |
 

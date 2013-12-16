@@ -390,7 +390,7 @@ void VisualizeGBCD::execute()
         //calculate symmetric misorientation
         MatrixMath::Multiply3x3with3x3(dg1, sym2t, dg2);
         //convert to euler angle
-        OrientationMath::MattoEuler(dg2, mis_euler1[0], mis_euler1[1], mis_euler1[2]);
+        OrientationMath::MatToEuler(dg2, mis_euler1[0], mis_euler1[1], mis_euler1[2]);
 
         mis_euler1[1] = cosf(mis_euler1[1]);
 

@@ -1038,8 +1038,11 @@ namespace Detail
           for(size_t i = start; i < end; ++i)
           {
             currentEuler = m_Eulers->GetPointer(i * 3);
-
-            OrientationMath::EulertoMat(currentEuler[0], currentEuler[1], currentEuler[2], g);
+            if (i == 1154430)
+            {
+              std::cout << "GenerateSphereCoordsImpl:" << __LINE__ << std::endl;
+            }
+            OrientationMath::EulerToMat(currentEuler[0], currentEuler[1], currentEuler[2], g);
             MatrixMath::Transpose3x3(g, gTranpose);
 
             // -----------------------------------------------------------------------------
@@ -1181,6 +1184,37 @@ void CubicOps::generateSphereCoordsFromEulers(FloatArrayType* eulers, FloatArray
     Detail::CubicHigh::GenerateSphereCoordsImpl serial(eulers, xyz001, xyz011, xyz111);
     serial.generate(0, nOrientations);
   }
+
+#if 1
+  float* a = xyz001->GetPointer(0);
+  for(size_t i = 0; i < nOrientations * Detail::CubicHigh::symSize0 * 3; i++)
+  {
+//    if(isnan(a[i]))
+//    {
+//      std::cout << "NAN (A)" << std::endl;
+//    }
+  }
+
+  float* b = xyz011->GetPointer(0);
+  for(size_t i = 0; i < nOrientations * Detail::CubicHigh::symSize1 * 3; i++)
+  {
+//    if(isnan(b[i]))
+//    {
+//      std::cout << "NAN (B)" << std::endl;
+//    }
+  }
+
+
+
+  float* c = xyz111->GetPointer(0);
+    for(size_t i = 0; i < nOrientations * Detail::CubicHigh::symSize2 * 3; i++)
+  {
+//    if(isnan(c[i]))
+//    {
+//      std::cout << "NAN (C)" << std::endl;
+//    }
+  }
+  #endif
 
 }
 
@@ -1469,12 +1503,12 @@ std::vector<UInt8ArrayType::Pointer> CubicOps::generatePoleFigure(PoleFigureConf
   UInt8ArrayType::Pointer image001 = UInt8ArrayType::CreateArray(config.imageDim * config.imageDim, 4, label0);
   UInt8ArrayType::Pointer image011 = UInt8ArrayType::CreateArray(config.imageDim * config.imageDim, 4, label1);
   UInt8ArrayType::Pointer image111 = UInt8ArrayType::CreateArray(config.imageDim * config.imageDim, 4, label2);
-#ifdef DREAM3D_USE_PARALLEL_ALGORITHMS
+
 
   poleFigures.push_back(image001);
   poleFigures.push_back(image011);
   poleFigures.push_back(image111);
-
+#ifdef DREAM3D_USE_PARALLEL_ALGORITHMS
   g = new tbb::task_group;
 
   if(doParallel == true)
@@ -1710,9 +1744,9 @@ UInt8ArrayType::Pointer CubicOps::generateMisorientationTriangleLegend(float ang
   UInt8ArrayType::Pointer image = UInt8ArrayType::CreateArray(imageDim * imageDim, 4, "Cubic High Misorientation Triangle Legend");
   uint32_t* pixelPtr = reinterpret_cast<uint32_t*>(image->GetPointer(0));
 
-  double maxk = sqrt(2) - 1;
-  double maxdeg = 2 * atan(sqrt(6 * maxk * maxk - 4 * maxk + 1));
-  double deg1 = 2 * atan(sqrt(2 * maxk * maxk));
+  double maxk = sqrt(2.0) - 1;
+  double maxdeg = 2 * atan(sqrt(6.0 * maxk * maxk - 4.0 * maxk + 1));
+  double deg1 = 2 * atan(sqrt(2.0 * maxk * maxk));
 
   double A = angle * M_PI / 360;
   std::vector<double> B;
@@ -1732,7 +1766,7 @@ UInt8ArrayType::Pointer CubicOps::generateMisorientationTriangleLegend(float ang
   else if(A > M_PI / 8 && A <= M_PI / 6)
   {
     double theta1 = atan(1 / sin(M_PI_4));
-    double theta2 = acos(-(maxk * (1 / tan(A))) * (maxk * (1 / tan(A)))) / 2;
+    double theta2 = acos(-(maxk * (1.0 / tan(A))) * (maxk * (1.0 / tan(A)))) / 2;
     double theta3 = M_PI_2;
     int frac1 = floor((n2 - 3) * (theta2 - theta1) / (theta3 - theta1));
     int frac2 = (n2 - 3) - frac1;
@@ -1789,14 +1823,14 @@ UInt8ArrayType::Pointer CubicOps::generateMisorientationTriangleLegend(float ang
         if(theta <= theta2)
         {
           phi1 = asin(1 / tan(theta));
-          double k = (1 - tan(A) * cos(theta)) / (sqrt(2) * (tan(A) * sin(theta)));
+          double k = (1.0 - tan(A) * cos(theta)) / (sqrt(2.0) * (tan(A) * sin(theta)));
           if(k > 1) { k = 1; }
           if(k < -1) { k = -1; }
           phi2 = asin(k) - M_PI_4;
         }
         else if(theta > theta2 && theta < theta3)
         {
-          phi1 = acos((sqrt(2) - 1) / (tan(A) * sin(theta)));
+          phi1 = acos((sqrt(2.0) - 1.0) / (tan(A) * sin(theta)));
           phi2 = M_PI_4;
         }
       }
@@ -1878,7 +1912,7 @@ UInt8ArrayType::Pointer CubicOps::generateMisorientationTriangleLegend(float ang
   */
   double r = tan(A);
   std::vector<double> x, y, z;
-  y = DREAM3DMath::linspace(0, r / sqrt(2), 100);
+  y = DREAM3DMath::linspace(0, r / sqrt(2.0), 100);
   for(int i = 0; i < y.size(); i++)
   {
     double k = r * r - y[i] * y[i];
@@ -1894,7 +1928,7 @@ UInt8ArrayType::Pointer CubicOps::generateMisorientationTriangleLegend(float ang
   x.clear();
   y.clear();
   z.clear();
-  x = DREAM3DMath::linspace(r / sqrt(3), r, 100);
+  x = DREAM3DMath::linspace(r / sqrt(3.0), r, 100);
   for(int i = 0; i < x.size(); i++)
   {
     double k = r * r - x[i] * x[i];
@@ -1910,7 +1944,7 @@ UInt8ArrayType::Pointer CubicOps::generateMisorientationTriangleLegend(float ang
   x.clear();
   y.clear();
   z.clear();
-  x = DREAM3DMath::linspace(r / sqrt(3), r / sqrt(2), 100);
+  x = DREAM3DMath::linspace(r / sqrt(3.0), r / sqrt(2.0), 100);
   for(int i = 0; i < x.size(); i++)
   {
     y.push_back(x[i]);
@@ -1934,7 +1968,7 @@ UInt8ArrayType::Pointer CubicOps::generateMisorientationTriangleLegend(float ang
       d3.push_back(tan(A)*cos(B[j]));
       d2.push_back(tan(A)*sin(B[j])*sin(C[j][i]));
       d1.push_back(tan(A)*sin(B[j])*cos(C[j][i]));
-      double d = 1 - d1[k] * d1[k] - d2[k] * d2[k] - d3[k] * d3[k];
+      //double d = 1 - d1[k] * d1[k] - d2[k] * d2[k] - d3[k] * d3[k];
       k++;
     }
   }
@@ -1951,9 +1985,9 @@ UInt8ArrayType::Pointer CubicOps::generateMisorientationTriangleLegend(float ang
     }
     else
     {
-      d1.push_back(r / sqrt(3));
-      d2.push_back(r / sqrt(3));
-      d3.push_back(r / sqrt(3));
+      d1.push_back(r / sqrt(3.0));
+      d2.push_back(r / sqrt(3.0));
+      d3.push_back(r / sqrt(3.0));
     }
   }
   ba = rodri2pair(d1, d2, d3);
@@ -2135,7 +2169,7 @@ UInt8ArrayType::Pointer CubicOps::generateMisorientationTriangleLegend(float ang
     x.clear();
     y.clear();
     z.clear();
-    x = DREAM3DMath::linspace(r / sqrt(3), r, 100);
+    x = DREAM3DMath::linspace(r / sqrt(3.0), r, 100);
     for(int i = 0; i < x.size(); i++)
     {
       double k = (r * r - x[i] * x[i]) / 2;
@@ -2151,7 +2185,7 @@ UInt8ArrayType::Pointer CubicOps::generateMisorientationTriangleLegend(float ang
     x.clear();
     y.clear();
     z.clear();
-    x = DREAM3DMath::linspace(r / sqrt(3), r / sqrt(2), 100);
+    x = DREAM3DMath::linspace(r / sqrt(3.0), r / sqrt(2.0), 100);
     for(int i = 0; i < x.size(); i++)
     {
       y.push_back(x[i]);
@@ -2173,7 +2207,7 @@ UInt8ArrayType::Pointer CubicOps::generateMisorientationTriangleLegend(float ang
     double theta3 = M_PI_2;
     double phi3 = acos(maxk / (tan(A) * sin(theta3)));
 
-    y = DREAM3DMath::linspace(r * sin(phi3), r / (sqrt(2)), 100);
+    y = DREAM3DMath::linspace(r * sin(phi3), r / (sqrt(2.0)), 100);
     for(int i = 0; i < y.size(); i++)
     {
       x.push_back(sqrt(r * r - y[i]*y[i]));
@@ -2227,19 +2261,19 @@ UInt8ArrayType::Pointer CubicOps::generateMisorientationTriangleLegend(float ang
     //painter.drawPolyline(qpointlist.data(), static_cast<int>(qpointlist.size()));
 
   }
-  else if(A > M_PI / 6 && A <= deg1 / 2)
+  else if(A > M_PI / 6.0 && A <= deg1 / 2.0)
   {
     std::vector<double> x, y, z;
-    double thetac = acos((2 - sqrt(6 * (tan(A) * tan(A)) - 2)) / (6 * tan(A)));
-    double thetaa = acos((1 - sqrt(6 * (tan(A) * tan(A)) - 2)) / (3 * tan(A)));
-    double thetad = acos(-(maxk * maxk) / (tan(A) * tan(A))) / 2;
+    double thetac = acos((2.0 - sqrt(6.0 * (tan(A) * tan(A)) - 2.0)) / (6.0 * tan(A)));
+    double thetaa = acos((1.0 - sqrt(6.0 * (tan(A) * tan(A)) - 2.0)) / (3.0 * tan(A)));
+    double thetad = acos(-(maxk * maxk) / (tan(A) * tan(A))) / 2.0;
     double thetab = M_PI_2;
     double phi3 = acos(maxk / (tan(A) * sin(thetab)));
 
-    y = DREAM3DMath::linspace(r * sin(phi3), r / (sqrt(2)), 100);
+    y = DREAM3DMath::linspace(r * sin(phi3), r / (sqrt(2.0)), 100.0);
     for(int i = 0; i < y.size(); i++)
     {
-      z.push_back(0);
+      z.push_back(0.0);
       x.push_back(sqrt(r * r - y[i]*y[i]));
     }
     ptsa = rodri2pair(x, y, z);

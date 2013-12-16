@@ -175,7 +175,6 @@ void Hex2SqrConverter::execute()
    * which is going to cause problems because the data is going to be placed
    * into the HDF5 file at the wrong index. YOU HAVE BEEN WARNED.
    */
-// int totalSlicesImported = 0;
   for (std::vector<std::string>::iterator filepath = m_EbsdFileList.begin(); filepath != m_EbsdFileList.end(); ++filepath)
   {
     std::string ebsdFName = *filepath;
@@ -198,7 +197,7 @@ void Hex2SqrConverter::execute()
       reader.setFileName(ebsdFName);
       reader.setReadHexGrid(true);
       int err = reader.readFile();
-      if(err < 0)
+      if(err < 0 && err != -600)
       {
         addErrorMessage(getHumanLabel(), reader.getErrorMessage(), reader.getErrorCode());
         setErrorCondition(reader.getErrorCode());
@@ -214,6 +213,11 @@ void Hex2SqrConverter::execute()
       }
       else
       {
+
+        if (err == -600)
+        {
+          notifyWarningMessage( reader.getErrorMessage(), reader.getErrorCode() );
+        }
         std::string origHeader = reader.getOriginalHeader();
         if (origHeader.empty() == true)
         {

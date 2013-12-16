@@ -71,3 +71,4 @@ endforeach()
 #-----------------
 # This makes sure some Filter Group meta data is written to build files that is needed later
 END_FILTER_GROUP(${FilterWidgetsLib_BINARY_DIR} "${_filterGroupName}" "Generic Filters")
+

@@ -34,6 +34,9 @@
  *
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 #include "HexagonalLowOps.h"
+
+#include <limits>
+
 // Include this FIRST because there is a needed define for some compiles
 // to expose some of the constants needed below
 #include "DREAM3DLib/Math/DREAM3DMath.h"
@@ -732,8 +735,13 @@ void HexagonalLowOps::getF1(QuatF& q1, QuatF& q2, float LD[3], bool maxSF, float
     MatrixMath::Multiply3x3with3x1(g1,slipPlane,uvw1);
     MatrixMath::Normalize3x1(hkl1);
     MatrixMath::Normalize3x1(uvw1);
+<<<<<<< HEAD
     directionComponent1 = MatrixMath::DotProduct(LD,uvw1);
     planeComponent1 = MatrixMath::DotProduct(LD,hkl1);
+=======
+    directionComponent1 = MatrixMath::DotProduct3x1(LD,uvw1);
+    planeComponent1 = MatrixMath::DotProduct3x1(LD,hkl1);
+>>>>>>> 716a6fd613586045d9946b883341a0725392c2a4
     schmidFactor1 = directionComponent1*planeComponent1;
     if(schmidFactor1 > maxSchmidFactor || maxSF == false)
     {
@@ -751,8 +759,13 @@ void HexagonalLowOps::getF1(QuatF& q1, QuatF& q2, float LD[3], bool maxSF, float
         MatrixMath::Multiply3x3with3x1(g2,slipPlane,uvw2);
         MatrixMath::Normalize3x1(hkl2);
         MatrixMath::Normalize3x1(uvw2);
+<<<<<<< HEAD
         directionComponent2 = MatrixMath::DotProduct(LD,uvw2);
         planeComponent2 = MatrixMath::DotProduct(LD,hkl2);
+=======
+        directionComponent2 = MatrixMath::DotProduct3x1(LD,uvw2);
+        planeComponent2 = MatrixMath::DotProduct3x1(LD,hkl2);
+>>>>>>> 716a6fd613586045d9946b883341a0725392c2a4
         schmidFactor2 = directionComponent2*planeComponent2;
         totalDirectionMisalignment = totalDirectionMisalignment + directionMisalignment;
       }
@@ -801,8 +814,13 @@ void HexagonalLowOps::getF1spt(QuatF& q1, QuatF& q2, float LD[3], bool maxSF, fl
     MatrixMath::Multiply3x3with3x1(g1,slipPlane,uvw1);
     MatrixMath::Normalize3x1(hkl1);
     MatrixMath::Normalize3x1(uvw1);
+<<<<<<< HEAD
     directionComponent1 = MatrixMath::DotProduct(LD,uvw1);
     planeComponent1 = MatrixMath::DotProduct(LD,hkl1);
+=======
+    directionComponent1 = MatrixMath::DotProduct3x1(LD,uvw1);
+    planeComponent1 = MatrixMath::DotProduct3x1(LD,hkl1);
+>>>>>>> 716a6fd613586045d9946b883341a0725392c2a4
     schmidFactor1 = directionComponent1*planeComponent1;
     if(schmidFactor1 > maxSchmidFactor || maxSF == false)
     {
@@ -821,11 +839,19 @@ void HexagonalLowOps::getF1spt(QuatF& q1, QuatF& q2, float LD[3], bool maxSF, fl
         MatrixMath::Multiply3x3with3x1(g2,slipPlane,uvw2);
         MatrixMath::Normalize3x1(hkl2);
         MatrixMath::Normalize3x1(uvw2);
+<<<<<<< HEAD
         directionComponent2 = MatrixMath::DotProduct(LD,uvw2);
         planeComponent2 = MatrixMath::DotProduct(LD,hkl2);
         schmidFactor2 = directionComponent2*planeComponent2;
         directionMisalignment = fabs(MatrixMath::DotProduct(uvw1,uvw2));
         planeMisalignment = fabs(MatrixMath::DotProduct(hkl1,hkl2));
+=======
+        directionComponent2 = MatrixMath::DotProduct3x1(LD,uvw2);
+        planeComponent2 = MatrixMath::DotProduct3x1(LD,hkl2);
+        schmidFactor2 = directionComponent2*planeComponent2;
+        directionMisalignment = fabs(MatrixMath::DotProduct3x1(uvw1,uvw2));
+        planeMisalignment = fabs(MatrixMath::DotProduct3x1(hkl1,hkl2));
+>>>>>>> 716a6fd613586045d9946b883341a0725392c2a4
         totalDirectionMisalignment = totalDirectionMisalignment + directionMisalignment;
         totalPlaneMisalignment = totalPlaneMisalignment + planeMisalignment;
       }
@@ -873,8 +899,13 @@ void HexagonalLowOps::getF7(QuatF& q1, QuatF& q2, float LD[3], bool maxSF, float
     MatrixMath::Multiply3x3with3x1(g1,slipPlane,uvw1);
     MatrixMath::Normalize3x1(hkl1);
     MatrixMath::Normalize3x1(uvw1);
+<<<<<<< HEAD
     directionComponent1 = MatrixMath::DotProduct(LD,uvw1);
     planeComponent1 = MatrixMath::DotProduct(LD,hkl1);
+=======
+    directionComponent1 = MatrixMath::DotProduct3x1(LD,uvw1);
+    planeComponent1 = MatrixMath::DotProduct3x1(LD,hkl1);
+>>>>>>> 716a6fd613586045d9946b883341a0725392c2a4
     schmidFactor1 = directionComponent1*planeComponent1;
     if(schmidFactor1 > maxSchmidFactor || maxSF == false)
     {
@@ -892,8 +923,13 @@ void HexagonalLowOps::getF7(QuatF& q1, QuatF& q2, float LD[3], bool maxSF, float
         MatrixMath::Multiply3x3with3x1(g2,slipPlane,uvw2);
         MatrixMath::Normalize3x1(hkl2);
         MatrixMath::Normalize3x1(uvw2);
+<<<<<<< HEAD
         directionComponent2 = MatrixMath::DotProduct(LD,uvw2);
         planeComponent2 = MatrixMath::DotProduct(LD,hkl2);
+=======
+        directionComponent2 = MatrixMath::DotProduct3x1(LD,uvw2);
+        planeComponent2 = MatrixMath::DotProduct3x1(LD,hkl2);
+>>>>>>> 716a6fd613586045d9946b883341a0725392c2a4
         schmidFactor2 = directionComponent2*planeComponent2;
         totalDirectionMisalignment = totalDirectionMisalignment + directionMisalignment;
       }
@@ -943,7 +979,7 @@ namespace Detail
           {
             currentEuler = eulers->GetPointer(i * 3);
 
-            OrientationMath::EulertoMat(currentEuler[0], currentEuler[1], currentEuler[2], g);
+            OrientationMath::EulerToMat(currentEuler[0], currentEuler[1], currentEuler[2], g);
             MatrixMath::Transpose3x3(g, gTranpose);
 
             // -----------------------------------------------------------------------------
@@ -1234,11 +1270,10 @@ std::vector<UInt8ArrayType::Pointer> HexagonalLowOps::generatePoleFigure(PoleFig
   UInt8ArrayType::Pointer image001 = UInt8ArrayType::CreateArray(config.imageDim * config.imageDim, 4, label0);
   UInt8ArrayType::Pointer image011 = UInt8ArrayType::CreateArray(config.imageDim * config.imageDim, 4, label1);
   UInt8ArrayType::Pointer image111 = UInt8ArrayType::CreateArray(config.imageDim * config.imageDim, 4, label2);
-#ifdef DREAM3D_USE_PARALLEL_ALGORITHMS
-
   poleFigures.push_back(image001);
   poleFigures.push_back(image011);
   poleFigures.push_back(image111);
+#ifdef DREAM3D_USE_PARALLEL_ALGORITHMS
 
   g = new tbb::task_group;
 

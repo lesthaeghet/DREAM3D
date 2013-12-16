@@ -560,6 +560,7 @@ int MergeColonies::check_for_burgers(QuatF betaQuat, QuatF alphaQuat)
       b[1] = -0.5 * gAlphaT[1][0] - 0.866025 * gAlphaT[1][1];
       b[2] = -0.5 * gAlphaT[2][0] - 0.866025 * gAlphaT[2][1];
       dP = MatrixMath::CosThetaBetweenVectors(a, b);
+
       angle = acos(dP);
       if((angle * radToDeg) < m_AngleTolerance) { return 1; }
       if((180.0 - (angle * radToDeg)) < m_AngleTolerance) { return 1; }

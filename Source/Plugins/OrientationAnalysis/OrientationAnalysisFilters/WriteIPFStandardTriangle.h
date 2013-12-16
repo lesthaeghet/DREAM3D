@@ -68,7 +68,7 @@ class DREAM3DLib_EXPORT WriteIPFStandardTriangle : public AbstractFilter
     DREAM3D_INSTANCE_STRING_PROPERTY(OutputFile)
     DREAM3D_INSTANCE_PROPERTY(int, ImageFormat)
     DREAM3D_INSTANCE_PROPERTY(int, ImageSize)
-    DREAM3D_INSTANCE_PROPERTY(float, ColorCorrectionFactor)
+    DREAM3D_INSTANCE_PROPERTY(unsigned int, CrystalSymmetry)
 
 
 
@@ -146,8 +146,8 @@ class DREAM3DLib_EXPORT WriteIPFStandardTriangle : public AbstractFilter
 
     void writeImage(QImage& image);
 
-    QImage generateCubicHighTriangle();
-    QImage overlayCubicHighText(QImage image);
+    QImage convertToQImage(UInt8ArrayType::Pointer rgbaImage);
+    QImage overlayText(QImage image, QString l0, QString l1, QString l2, QString title);
 
 
     // These should go away

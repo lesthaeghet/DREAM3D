@@ -126,6 +126,7 @@ void GenerateMisorientationColors::readFilterParameters(AbstractFilterParameters
 int GenerateMisorientationColors::writeFilterParameters(AbstractFilterParametersWriter* writer, int index)
 {
   writer->openFilterGroup(this, index);
+
   /* Place code that will write the inputs values into a file. reference the
    AbstractFilterParametersWriter class for the proper API to use. */
   writer->writeValue("ReferenceAxis", getReferenceAxis() );
@@ -151,6 +152,7 @@ void GenerateMisorientationColors::dataCheck(bool preflight, size_t voxels, size
     return;
   }
 
+
   GET_PREREQ_DATA(m, DREAM3D, CellData, CellPhases, -302, int32_t, Int32ArrayType,  voxels, 1)
   GET_PREREQ_DATA(m, DREAM3D, CellData, Quats, -303, float, FloatArrayType, voxels, 4)
 
@@ -158,6 +160,7 @@ void GenerateMisorientationColors::dataCheck(bool preflight, size_t voxels, size
   GET_PREREQ_DATA(m, DREAM3D, EnsembleData, CrystalStructures, -304, unsigned int, XTalStructArrayType, ensembles, 1)
 
   CREATE_NON_PREREQ_DATA(m, DREAM3D, CellData, MisorientationColor, uint8_t, UInt8ArrayType, 0, voxels, 3)
+
 }
 
 

@@ -45,6 +45,7 @@
 #include "DREAM3DLib/DataArrays/DataArray.hpp"
 #include "DREAM3DLib/StatsData/StatsData.h"
 
+
 typedef std::vector<FloatArrayType::Pointer> VectorOfFloatArray;
 
 /**

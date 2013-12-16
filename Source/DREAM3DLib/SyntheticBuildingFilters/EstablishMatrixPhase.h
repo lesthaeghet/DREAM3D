@@ -51,7 +51,7 @@
 
 
 /**
- * @class EstablishMatrixPhases EstablishMatrixPhases.h DREAM3DLib/SyntheticBuilderFilters/EstablishMatrixPhases.h
+ * @class EstablishMatrixPhases EstablishMatrixPhases.h DREAM3DLib/SyntheticBuildingFilters/EstablishMatrixPhases.h
  * @brief
  * @author
  * @date Nov 19, 2011

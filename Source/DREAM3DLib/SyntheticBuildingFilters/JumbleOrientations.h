@@ -53,7 +53,7 @@
 #include "DREAM3DLib/DataContainers/VolumeDataContainer.h"
 
 /**
- * @class JumbleOrientations JumbleOrientations.h DREAM3DLib/SyntheticBuilderFilters/JumbleOrientations.h
+ * @class JumbleOrientations JumbleOrientations.h DREAM3DLib/SyntheticBuildingFilters/JumbleOrientations.h
  * @brief
  * @author
  * @date Nov 19, 2011

@@ -66,7 +66,7 @@ typedef struct
 } Precip;
 
 /**
- * @class InsertPrecipitatePhases InsertPrecipitatePhases.h DREAM3DLib/SyntheticBuilderFilters/InsertPrecipitatePhases.h
+ * @class InsertPrecipitatePhases InsertPrecipitatePhases.h DREAM3DLib/SyntheticBuildingFilters/InsertPrecipitatePhases.h
  * @brief
  * @author
  * @date Nov 19, 2011

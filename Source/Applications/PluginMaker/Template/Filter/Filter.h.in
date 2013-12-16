@@ -9,9 +9,8 @@
 
 #include "DREAM3DLib/DREAM3DLib.h"
 #include "DREAM3DLib/Common/DREAM3DSetGetMacros.h"
-#include "DREAM3DLib/Common/IDataArray.h"
 #include "DREAM3DLib/Common/AbstractFilter.h"
-
+#include "DREAM3DLib/DataArrays/IDataArray.h"
 
 /**
  * @class @ClassName@ @ClassName@.h @PluginName@/Code/@PluginName@Filters/@ClassName@.h
@@ -67,6 +66,7 @@ class @ClassName@ : public AbstractFilter
     * @return Returns the next index for writing
     */
     virtual int writeFilterParameters(AbstractFilterParametersWriter* writer, int index);
+
 
     /**
     * @brief This method will read the options from a file

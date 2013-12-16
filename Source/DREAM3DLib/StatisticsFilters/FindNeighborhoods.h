@@ -42,7 +42,6 @@
 
 #include "DREAM3DLib/DREAM3DLib.h"
 #include "DREAM3DLib/Common/DREAM3DSetGetMacros.h"
-
 #include "DREAM3DLib/Common/AbstractFilter.h"
 #include "DREAM3DLib/DataContainers/VolumeDataContainer.h"
 #include "DREAM3DLib/DataArrays/NeighborList.hpp"
@@ -74,7 +73,7 @@ class DREAM3DLib_EXPORT FindNeighborhoods : public AbstractFilter
     DREAM3D_INSTANCE_STRING_PROPERTY(NeighborhoodListArrayName)
     DREAM3D_INSTANCE_STRING_PROPERTY(NumNeighborsArrayName)
 
-    DREAM3D_INSTANCE_PROPERTY(int, MultiplesOfAverage)
+    DREAM3D_INSTANCE_PROPERTY(float, MultiplesOfAverage)
 
     virtual const std::string getGroupName() { return DREAM3D::FilterGroups::StatisticsFilters; }
     virtual const std::string getSubGroupName() { return DREAM3D::FilterSubGroups::MorphologicalFilters; }

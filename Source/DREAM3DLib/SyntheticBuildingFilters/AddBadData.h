@@ -51,7 +51,7 @@
 
 
 /**
- * @class AddBadDatas AddBadDatas.h DREAM3DLib/SyntheticBuilderFilters/AddBadDatas.h
+ * @class AddBadDatas AddBadDatas.h DREAM3DLib/SyntheticBuildingFilters/AddBadDatas.h
  * @brief
  * @author
  * @date Nov 19, 2011

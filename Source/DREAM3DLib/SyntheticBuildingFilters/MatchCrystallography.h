@@ -57,7 +57,7 @@
 #include "DREAM3DLib/DataArrays/NeighborList.hpp"
 
 /**
- * @class MatchCrystallography MatchCrystallography.h DREAM3DLib/SyntheticBuilderFilters/MatchCrystallography.h
+ * @class MatchCrystallography MatchCrystallography.h DREAM3DLib/SyntheticBuildingFilters/MatchCrystallography.h
  * @brief
  * @author
  * @date Nov 19, 2011

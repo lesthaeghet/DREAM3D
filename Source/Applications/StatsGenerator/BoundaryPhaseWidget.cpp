@@ -77,6 +77,7 @@
 #include "DREAM3DLib/StatsData/BoundaryStatsData.h"
 
 
+
 #define CHECK_ERROR_ON_WRITE(var, msg)\
     if (err < 0) {\
       QMessageBox::critical(this, tr("StatsGenerator"),\

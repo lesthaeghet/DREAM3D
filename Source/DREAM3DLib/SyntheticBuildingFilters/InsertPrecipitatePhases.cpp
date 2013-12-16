@@ -199,6 +199,7 @@ void InsertPrecipitatePhases::dataCheck(bool preflight, size_t voxels, size_t fi
   GET_PREREQ_DATA(m, DREAM3D, CellData, CellPhases, -302, int32_t, Int32ArrayType, voxels, 1)
 
   // Field Data
+  // Needs to be a create because the size of these fields will change
   CREATE_NON_PREREQ_DATA(m, DREAM3D, FieldData, FieldPhases, int32_t, Int32ArrayType, 0, fields, 1)
   CREATE_NON_PREREQ_DATA(m, DREAM3D, FieldData, EquivalentDiameters, float, FloatArrayType, 0, fields, 1)
   CREATE_NON_PREREQ_DATA(m, DREAM3D, FieldData, Omega3s, float, FloatArrayType, 0, fields, 1)
@@ -368,6 +369,9 @@ void  InsertPrecipitatePhases::place_precipitates(Int32ArrayType::Pointer grainO
   totalvol = sizex * sizey * sizez;
 
   int64_t totalPoints = m->getTotalPoints();
+
+// figure out how many grains we already have so we can start the counter at +1 this
+
   size_t currentnumgrains = m->getNumFieldTuples();
   if(currentnumgrains == 0)
   {
@@ -387,6 +391,8 @@ void  InsertPrecipitatePhases::place_precipitates(Int32ArrayType::Pointer grainO
   double totalprecipitatefractions = 0.0;
 
   size_t numensembles = m->getNumEnsembleTuples();
+
+// find out how much of each precipitate phase volume needs to be generated
 
   for (size_t i = 1; i < numensembles; ++i)
   {
@@ -541,6 +547,7 @@ void  InsertPrecipitatePhases::place_precipitates(Int32ArrayType::Pointer grainO
     random = static_cast<float>(rg.genrand_res53());
     if(random <= precipboundaryfraction)
     {
+// figure out if we want this to be a boundary centroid voxel or not for the proposed precipitate
       random2 = int(rg.genrand_res53() * double(totalPoints - 1));
       while (m_SurfaceVoxels[random2] == 0 || m_GrainIds[random2] >= firstPrecipitateField)
       {
@@ -565,6 +572,8 @@ void  InsertPrecipitatePhases::place_precipitates(Int32ArrayType::Pointer grainO
     m_Centroids[3 * i + 2] = zc;
     insert_precipitate(i);
     fillingerror = check_fillingerror(i, -1000, grainOwnersPtr);
+
+// try moving precipitate around 10 times, figure out which one of those is the best
     for (int iter = 0; iter < 10; iter++)
     {
       random = static_cast<float>(rg.genrand_res53());
@@ -609,7 +618,7 @@ void  InsertPrecipitatePhases::place_precipitates(Int32ArrayType::Pointer grainO
 
   // determine initial filling and neighbor distribution errors
   oldneighborhooderror = check_neighborhooderror(-1000, -1000);
-  // begin swaping/moving/adding/removing grains to try to improve packing
+  // begin swaping/moving grains to try to improve packing
   int totalAdjustments = static_cast<int>(10 * ((numgrains - firstPrecipitateField) - 1));
   for (int iteration = 0; iteration < totalAdjustments; ++iteration)
   {
@@ -825,6 +834,7 @@ void InsertPrecipitatePhases::transfer_attributes(int gnum, Precip* precip)
 
 void InsertPrecipitatePhases::move_precipitate(size_t gnum, float xc, float yc, float zc)
 {
+// o = original, n = new
   int occolumn, ocrow, ocplane;
   int nccolumn, ncrow, ncplane;
   int shiftcolumn, shiftrow, shiftplane;
@@ -1247,7 +1257,7 @@ void InsertPrecipitatePhases::insert_precipitate(size_t gnum)
   float PHI = m_AxisEulerAngles[3 * gnum + 1];
   float phi2 = m_AxisEulerAngles[3 * gnum + 2];
   float ga[3][3];
-  OrientationMath::EulertoMat(phi1, PHI, phi2, ga);
+  OrientationMath::EulerToMat(phi1, PHI, phi2, ga);
   xc = m_Centroids[3 * gnum];
   yc = m_Centroids[3 * gnum + 1];
   zc = m_Centroids[3 * gnum + 2];
@@ -1266,6 +1276,8 @@ void InsertPrecipitatePhases::insert_precipitate(size_t gnum)
   if(ymax > 2 * m_PackingPoints[1] - 1) { ymax = (2 * m_PackingPoints[1] - 1); }
   if(zmin < -m_PackingPoints[2]) { zmin = -m_PackingPoints[2]; }
   if(zmax > 2 * m_PackingPoints[2] - 1) { zmax = (2 * m_PackingPoints[2] - 1); }
+
+// defined box for single precipitate to check which voxels belong to it
   for (int iter1 = xmin; iter1 < xmax + 1; iter1++)
   {
     for (int iter2 = ymin; iter2 < ymax + 1; iter2++)
@@ -1379,7 +1391,7 @@ void InsertPrecipitatePhases::assign_voxels()
     float PHI = m_AxisEulerAngles[3 * i + 1];
     float phi2 = m_AxisEulerAngles[3 * i + 2];
     float ga[3][3];
-    OrientationMath::EulertoMat(phi1, PHI, phi2, ga);
+    OrientationMath::EulerToMat(phi1, PHI, phi2, ga);
     column = static_cast<size_t>( (xc - (xRes / 2.0f)) / xRes );
     row = static_cast<size_t>( (yc - (yRes / 2.0f)) / yRes );
     plane = static_cast<size_t>( (zc - (zRes / 2.0f)) / zRes );
@@ -1561,7 +1573,7 @@ void InsertPrecipitatePhases::assign_gaps()
       float PHI = m_AxisEulerAngles[3 * i + 1];
       float phi2 = m_AxisEulerAngles[3 * i + 2];
       float ga[3][3];
-      OrientationMath::EulertoMat(phi1, PHI, phi2, ga);
+      OrientationMath::EulerToMat(phi1, PHI, phi2, ga);
       column = static_cast<DimType>( (xc - (xRes / 2.0f)) / xRes );
       row = static_cast<DimType>( (yc - (yRes / 2.0f)) / yRes );
       plane = static_cast<DimType>( (zc - (zRes / 2.0f)) / zRes );
@@ -1818,6 +1830,8 @@ void InsertPrecipitatePhases::cleanup_grains()
 Int32ArrayType::Pointer  InsertPrecipitatePhases::initialize_packinggrid()
 {
   VolumeDataContainer* m = getVolumeDataContainer();
+
+  // for estimating whether a precipitate will fit, artificially make this grid 2x as coarse to speed it up
 
   m_PackingRes[0] = m->getXRes() * 2.0f;
   m_PackingRes[1] = m->getYRes() * 2.0f;

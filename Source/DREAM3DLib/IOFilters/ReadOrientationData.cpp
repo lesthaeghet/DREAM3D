@@ -87,7 +87,7 @@ ReadOrientationData::~ReadOrientationData()
 // -----------------------------------------------------------------------------
 void ReadOrientationData::setupFilterParameters()
 {
-  FilterParameterVector parameters;
+  std::vector<FilterParameter::Pointer> parameters;
 
   /*   For an input file use this code*/
   {
@@ -137,7 +137,7 @@ void ReadOrientationData::dataCheck(bool preflight, size_t voxels, size_t fields
   VolumeDataContainer* m = getVolumeDataContainer();
   if (NULL == m)
   {
-    std::stringstream ss;
+    ss.str("");
     ss << getHumanLabel() << "The VolumeDataContainer was NULL and this is NOT allowed. There is an error in the programming. Please contact the developers";
     setErrorCondition(-1);
     addErrorMessage(getHumanLabel(), ss.str(), -1);
@@ -195,18 +195,11 @@ void ReadOrientationData::dataCheck(bool preflight, size_t voxels, size_t fields
       CtfReader reader;
       reader.setFileName(m_InputFile);
       reader.readHeaderOnly();
-      dims[0] = reader.getXCells();
-      dims[1] = reader.getYCells();
-      dims[2] = reader.getZCells(); // With CTF files there can be more than a single slice
+      dims[0] = reader.getXDimension();
+      dims[1] = reader.getYDimension();
+      dims[2] = 1; // We are reading a single slice
       m->setDimensions(dims[0], dims[1], dims[2]);
-      if (reader.getZStep() != 0.0f)
-      {
-        m->setResolution(reader.getXStep(), reader.getYStep(), reader.getZStep());
-      }
-      else
-      {
-        m->setResolution(reader.getXStep(), reader.getYStep(), 1.0);
-      }
+      m->setResolution(reader.getXStep(), reader.getYStep(), 1.0);
       m->setOrigin(0.0f, 0.0f, 0.0f);
       CtfFields fields;
       names = fields.getFilterFields<std::vector<std::string> > ();
@@ -332,9 +325,8 @@ void ReadOrientationData::readAngFile()
   err = reader.readFile();
   if (err < 0)
   {
-    setErrorCondition(err);
-    notifyErrorMessage(reader.getErrorMessage(), err);
-    notifyErrorMessage("AngReader could not read the .ang file.", getErrorCondition());
+    setErrorCondition(reader.getErrorCode());
+    notifyErrorMessage(reader.getErrorMessage(), getErrorCondition());
     return;
   }
   VolumeDataContainer* m = getVolumeDataContainer();
@@ -428,7 +420,7 @@ void ReadOrientationData::readCtfFile()
   int err = 0;
   CtfReader reader;
   reader.setFileName(m_InputFile);
-  // reader.readOnlySliceIndex(0);
+  reader.readOnlySliceIndex(0);
   err = reader.readFile();
   if (err < 0)
   {
@@ -439,18 +431,11 @@ void ReadOrientationData::readCtfFile()
   VolumeDataContainer* m = getVolumeDataContainer();
 
   int64_t dims[3];
-  dims[0] = reader.getXCells();
-  dims[1] = reader.getYCells();
-  dims[2] = reader.getZCells(); // With CTF files there can be more than a single slice
+  dims[0] = reader.getXDimension();
+  dims[1] = reader.getYDimension();
+  dims[2] = 1; // We are reading a single slice
   m->setDimensions(dims[0], dims[1], dims[2]);
-  if (reader.getZStep() != 0.0f)
-  {
-    m->setResolution(reader.getXStep(), reader.getYStep(), reader.getZStep());
-  }
-  else
-  {
-    m->setResolution(reader.getXStep(), reader.getYStep(), 1.0);
-  }
+  m->setResolution(reader.getXStep(), reader.getYStep(), 1.0);
   m->setOrigin(0.0f, 0.0f, 0.0f);
 
   err = loadInfo<CtfReader, CtfPhase>(&reader);
@@ -466,16 +451,6 @@ void ReadOrientationData::readCtfFile()
 
   int64_t totalPoints = m->getTotalPoints();
   {
-    /* Take from H5CtfVolumeReader.cpp
-    * For HKL OIM Files if there is a single phase then the value of the phase
-    * data is one (1). If there are 2 or more phases then the lowest value
-    * of phase is also one (1). However, if there are "zero solutions" in the data
-    * then those points are assigned a phase of zero.  Since those points can be identified
-    * by other methods, the phase of these points should be changed to one since in the rest
-    * of the reconstruction code we follow the convention that the lowest value is One (1)
-    * even if there is only a single phase. The next if statement converts all zeros to ones
-    * if there is a single phase in the OIM data.
-    */
     phasePtr = reinterpret_cast<int*>(reader.getPointerByName(Ebsd::Ctf::Phase));
     for (int64_t i = 0; i < totalPoints; i++)
     {
@@ -550,96 +525,6 @@ void ReadOrientationData::readCtfFile()
 // -----------------------------------------------------------------------------
 void ReadOrientationData::readMicFile()
 {
-  int err = 0;
-  MicReader reader;
-  reader.setFileName(m_InputFile);
-  err = reader.readFile();
-  if (err < 0)
-  {
-    setErrorCondition(err);
-    notifyErrorMessage(reader.getErrorMessage(), getErrorCondition());
-    return;
-  }
-  VolumeDataContainer* m = getVolumeDataContainer();
-
-  int64_t dims[3];
-  dims[0] = reader.getXDimension();
-  dims[1] = reader.getYDimension();
-  dims[2] = 1; // We are reading a single slice
-  m->setDimensions(dims[0], dims[1], dims[2]);
-  m->setResolution(reader.getXStep(), reader.getYStep(), 1.0);
-  m->setOrigin(0.0f, 0.0f, 0.0f);
-
-  err = loadInfo<MicReader, MicPhase>(&reader);
-
-  float* f1 = NULL;
-  float* f2 = NULL;
-  float* f3 = NULL;
-  int* phasePtr = NULL;
-
-  FloatArrayType::Pointer fArray = FloatArrayType::NullPointer();
-  Int32ArrayType::Pointer iArray = Int32ArrayType::NullPointer();
-  int64_t totalPoints = m->getTotalPoints();
-
-  float x, y;
-  float xMin = 10000000;
-  float yMin = 10000000;
-  f1 = reinterpret_cast<float*>(reader.getPointerByName(Ebsd::Mic::X));
-  f2 = reinterpret_cast<float*>(reader.getPointerByName(Ebsd::Mic::Y));
-  for (int64_t i = 0; i < totalPoints; i++)
-  {
-    x = f1[i];
-    y = f2[i];
-    if(x < xMin) { xMin = x; }
-    if(y < yMin) { yMin = y; }
-  }
-  m->setOrigin(xMin, yMin, 0.0);
-
-  {
-    phasePtr = reinterpret_cast<int*>(reader.getPointerByName(Ebsd::Mic::Phase));
-    for (int64_t i = 0; i < totalPoints; i++)
-    {
-      if (phasePtr[i] < 1)
-      {
-        phasePtr[i] = 1;
-      }
-    }
-    iArray = Int32ArrayType::CreateArray(totalPoints, DREAM3D::CellData::Phases);
-    ::memcpy(iArray->GetPointer(0), phasePtr, sizeof(int32_t) * totalPoints);
-    m->addCellData(DREAM3D::CellData::Phases, iArray);
-  }
-
-  {
-    //  radianconversion = M_PI / 180.0;
-    f1 = reinterpret_cast<float*>(reader.getPointerByName(Ebsd::Mic::Euler1));
-    f2 = reinterpret_cast<float*>(reader.getPointerByName(Ebsd::Mic::Euler2));
-    f3 = reinterpret_cast<float*>(reader.getPointerByName(Ebsd::Mic::Euler3));
-    fArray = FloatArrayType::CreateArray(totalPoints * 3, DREAM3D::CellData::EulerAngles);
-    fArray->SetNumberOfComponents(3);
-    float* cellEulerAngles = fArray->GetPointer(0);
-    for (int64_t i = 0; i < totalPoints; i++)
-    {
-      cellEulerAngles[3 * i] = f1[i];
-      cellEulerAngles[3 * i + 1] = f2[i];
-      cellEulerAngles[3 * i + 2] = f3[i];
-    }
-    m->addCellData(DREAM3D::CellData::EulerAngles, fArray);
-  }
-
-  {
-    phasePtr = reinterpret_cast<int*>(reader.getPointerByName(Ebsd::Mic::Phase));
-    iArray = Int32ArrayType::CreateArray(totalPoints, DREAM3D::CellData::Phases);
-    iArray->SetNumberOfComponents(1);
-    ::memcpy(iArray->GetPointer(0), phasePtr, sizeof(int32_t) * totalPoints);
-    m->addCellData(DREAM3D::CellData::Phases, iArray);
-  }
-
-  {
-    f1 = reinterpret_cast<float*>(reader.getPointerByName(Ebsd::Mic::Confidence));
-    fArray = FloatArrayType::CreateArray(totalPoints, Ebsd::Mic::Confidence);
-    fArray->SetNumberOfComponents(1);
-    ::memcpy(fArray->GetPointer(0), f1, sizeof(float) * totalPoints);
-    m->addCellData(Ebsd::Mic::Confidence, fArray);
-  }
-
+  setErrorCondition(-999);
+  notifyErrorMessage("Reading HEDM data is not yet supported in the ReadOrientationFilter", getErrorCondition());
 }

@@ -42,10 +42,15 @@
 #include "MXA/Common/LogTime.h"
 #include "MXA/Utilities/MXAFileInfo.h"
 #include "MXA/Utilities/MXADir.h"
+#include "MXA/Common/LogTime.h"
 
 #include "EbsdLib/TSL/AngConstants.h"
 
 #include "DREAM3DLib/DREAM3DVersion.h"
+#include "DREAM3DLib/OrientationOps/CubicOps.h"
+#include "DREAM3DLib/OrientationOps/HexagonalOps.h"
+
+
 
 #include "DREAM3DLib/OrientationOps/CubicOps.h"
 #include "DREAM3DLib/OrientationOps/CubicLowOps.h"
@@ -332,7 +337,7 @@ int INLWriter::writeFile()
         zPos = origin[2] + (z * res[2]);
         grainId = m_GrainIds[index];
         phaseId = m_CellPhases[index];
-        // rgba[0] = 0; rgba[1] = 0; rgba[2] = 0; // Reset the color to black
+
         symmetry = m_CrystalStructures[phaseId];
         if(phaseId > 0)
         {

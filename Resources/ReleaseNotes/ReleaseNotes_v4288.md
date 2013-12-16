@@ -11,11 +11,50 @@ For historical compatibility in versions prior to 4.2 the internal representatio
 + Update Cell Quaternions
 + Write DREAM3D File (Check EVERY array to write)
 
-**Note: This pipeline will OVERWRITE the existing DREAM3D File if both the input and output files are the same file.**
+## Version 4.2 Bugs Fixed & Features Added ##
 
 
-#### 4.2.88  Features & Bugs  Fixed  ###
-+ adding filters for volume fraction and surface area to volume ratio
+## Version 4.2.XXXX ###
++ Adding Experimental "Write Pole Figure" filter which is only allowable for some Laue groups
++ Updating the Euler to Rotation Matrix and RotationMatrix to Euler functions with more robust implementations that will not cause and NAN value.
++ Fixing Bugs in the Alignment filters due to mis-use of C++ inheritance rules.
++ Adding an "Update Favorite" to the DREAM3D contextual menu. This will update the selected favorite with the current pipeline.
++ Adding in a Misorientation Coloring Filter based off the C. Schuh/S. Patala paper. This only works for some Laue groups currently.
++ Backporting all the Crystal Orientation Operations classes from the development branch to allow more functionality in certain filters
+
+### Version 4.2.4635 ###
++ Adding crystal symmetry operations for all crystal symmetries. This allows the IPF Coloring to work for all symmetries
++ Adding the Misorientation Coloring Filter based the Schuh & Patala algorithm and implemented by Will Lenthe at UCSB
++ Low level bug fixes effecting various IO filters
+
+
+### Version 4.2.4629 ###
++ Fixing an issue with sampling the ODF properly when matching crystallography
++ Adding checks for resolution values of zero at which point the value is changed to 1.0.
++ Adding another entry for the Small IN100 .ang files
++ Fixing crashing errors for MinSizePerPhase due to inappropriate use of subclass functions
++ Fixing Documentation errors
++ Crash on Visual Studio using %zu as a format specifier in printf statements on Visual Studio. Effected the INLWriter
++ Fixing bad dimension output for the INLWriter
++ Updating the tutorial for reconstruction of the Small IN100 data set
++ Adding an IN100 prebuilt pipeline that reconstructs the entire Small IN100 data set in a single pipeline
++ Updating the synthetic tutorial to match the newer version of DREAM3D
++ Setting the origin values to 0 as a default for Initialize Synthetic Volume
++ Fixing error message reporting on generate ensemble statistics filter
+
+### Version 4.2.97 ###
++ Fixed bug where the "Generate Ensemble Statistics" could not execute due to an error in the internal naming of variables.
++ Updated the documentation for the "Find Average Orientations" filter
++ Clarifying an error message that is produced when a filter requests an array from the Data Container but the array stored in the Data container does not match type and/or size and/or number of components.
+
+### Version 4.2.90 ###
+
++ fixed bug in Quaternion Math where floats were being cast to integers for the absolute value calculation
++ Fixed bug in Find Surface Voxel Fraction where the type for the surfaceVoxel was not cast correctly in the data check method
+
+### Version 4.2.88 ###
+
++ Adding filters for volume fraction and surface area to volume ratio
 + Fix bug in ScalarSegmentGrains where boolean arrays are not segmented correctly
 + On the raw binary reader allow user to optionally over ride the origin and spacing values with the entries in the filter.
 + Visualize GBCD, empty GMT file causes crash.
@@ -87,4 +126,4 @@ For historical compatibility in versions prior to 4.2 the internal representatio
 + Read DREAM3D Filter: Not saving which SurfaceMesh arrays were checked to the file
 + Missing Documentation File for IOFilters/ImportImageStack
 + Add "help" button to each filter that would display the help for that specific filter (right click)
-
++ Missing Documentation File for IOFilters/ImportImageStack
