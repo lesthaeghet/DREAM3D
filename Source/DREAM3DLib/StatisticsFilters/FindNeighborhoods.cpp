@@ -208,19 +208,27 @@ void FindNeighborhoods::find_neighborhoods()
   float dx, dy, dz;
 
   std::vector<std::vector<int> > neighborhoodlist;
+  std::vector<float> criticalDistance;
 
   int totalFields = int(m->getNumFieldTuples());
 
   neighborhoodlist.resize(totalFields);
+  criticalDistance.resize(totalFields);
 
   float aveDiam = 0.0f;
   for (size_t i = 1; i < totalFields; i++)
   {
     m_Neighborhoods[i] = 0;
     aveDiam += m_EquivalentDiameters[i];
+	criticalDistance[i] = m_EquivalentDiameters[i] * m_MultiplesOfAverage;
   }
   aveDiam /= totalFields;
-  float criticalDistance = aveDiam * m_MultiplesOfAverage;
+  for (size_t i = 1; i < totalFields; i++)
+  {
+    criticalDistance[i] /+ aveDiam;
+  }
+
+  float aveCriticalDistance = aveDiam * m_MultiplesOfAverage;
 
   float m_OriginX, m_OriginY, m_OriginZ;
   m->getOrigin(m_OriginX, m_OriginY, m_OriginZ);
@@ -240,30 +248,40 @@ void FindNeighborhoods::find_neighborhoods()
 
   size_t xP = dims[0];
   size_t yP = dims[1];
-//  size_t zP = dims[2];
+  size_t zP = dims[2];
   float xRes = m->getXRes();
   float yRes = m->getYRes();
-//  float zRes = m->getZRes();
+  float zRes = m->getZRes();
   float sizeX = float(xP) * xRes;
   float sizeY = float(yP) * yRes;
-//  float sizeZ = float(zP)*zRes;
-  int numXBins = int(sizeX / criticalDistance);
-  int numYBins = int(sizeY / criticalDistance);
-//  int numZBins = int(sizeZ/criticalDistance);
+  float sizeZ = float(zP) * zRes;
+  int numXBins = int(sizeX / aveCriticalDistance);
+  int numYBins = int(sizeY / aveCriticalDistance);
+  int numZBins = int(sizeZ / aveCriticalDistance);
 
   int xbin, ybin, zbin, bin, bin1, bin2;
-  std::vector<size_t> bins(totalFields, 0);
+//  int xStride, yStride, zStride = 0;
+  std::vector<size_t> bins(3*totalFields, 0);
+//  std::vector<size_t> binMultiplier(totalFields, 0);
   for (size_t i = 1; i < totalFields; i++)
   {
+//	binMultiplier[i] = int(criticalDistance[i] / aveCriticalDistance) + 1;
     x = m_Centroids[3 * i];
     y = m_Centroids[3 * i + 1];
     z = m_Centroids[3 * i + 2];
-    xbin = int((x - m_OriginX) / criticalDistance);
-    ybin = int((y - m_OriginY) / criticalDistance);
-    zbin = int((z - m_OriginZ) / criticalDistance);
-    bin = (zbin * numXBins * numYBins) + (ybin * numXBins) + (xbin);
-    bins[i] = bin;
+    xbin = int((x - m_OriginX) / aveCriticalDistance);
+    ybin = int((y - m_OriginY) / aveCriticalDistance);
+    zbin = int((z - m_OriginZ) / aveCriticalDistance);
+//    bin = (zbin * numXBins * numYBins) + (ybin * numXBins) + (xbin);
+//    bins[i] = bin;
+	bins[3*i] = xbin;
+	bins[3*i+1] = ybin;
+	bins[3*i+2] = zbin;
+	
   }
+  int bin1x, bin2x, bin1y, bin2y, bin1z, bin2z;
+  int dBinX, dBinY, dBinZ;
+  int criticalDistance1, criticalDistance2;
   for (size_t i = 1; i < totalFields; i++)
   {
     if (i % 1000 == 0)
@@ -275,43 +293,67 @@ void FindNeighborhoods::find_neighborhoods()
     x = m_Centroids[3 * i];
     y = m_Centroids[3 * i + 1];
     z = m_Centroids[3 * i + 2];
-    bin1 = bins[i];
-    for (size_t j = i + 1; j < totalFields; j++)
+    bin1x = bins[3*i];
+	bin1y = bins[3*i+1];
+	bin1z = bins[3*i+2];
+	criticalDistance1 = criticalDistance[i];
+    
+	for (size_t j = i + 1; j < totalFields; j++)
     {
-      bin2 = bins[j];
-      if(bin1 == bin2)
-      {
-        xn = m_Centroids[3 * j];
-        yn = m_Centroids[3 * j + 1];
-        zn = m_Centroids[3 * j + 2];
-        dx = fabs(x - xn);
-        dy = fabs(y - yn);
-        dz = fabs(z - zn);
-        if (dx < criticalDistance && dy < criticalDistance && dz < criticalDistance)
-        {
-          m_Neighborhoods[i]++;
-          neighborhoodlist[i].push_back(j);
-          m_Neighborhoods[j]++;
-          neighborhoodlist[j].push_back(i);
-        }
+      bin2x = bins[3*j];
+	  bin2y = bins[3*j+1];
+	  bin2z = bins[3*j+2];
+	  criticalDistance2 = criticalDistance[j];
 
-      }
-      else if(abs(bin1 - bin2) == 1 || abs(bin1 - bin2) == numXBins || abs(bin1 - bin2) == (numXBins * numYBins))
-      {
-        xn = m_Centroids[3 * j];
-        yn = m_Centroids[3 * j + 1];
-        zn = m_Centroids[3 * j + 2];
-        dx = fabs(x - xn);
-        dy = fabs(y - yn);
-        dz = fabs(z - zn);
-        if (dx < criticalDistance && dy < criticalDistance && dz < criticalDistance)
-        {
-          m_Neighborhoods[i]++;
-          neighborhoodlist[i].push_back(j);
-          m_Neighborhoods[j]++;
-          neighborhoodlist[j].push_back(i);
-        }
-      }
+	  dBinX = abs(bin2x - bin1x);
+	  dBinY = abs(bin2y - bin1y);
+	  dBinZ = abs(bin2z - bin1z);
+
+	  if (dBinX < criticalDistance1 && dBinY < criticalDistance1 && dBinZ < criticalDistance1)
+	  {
+		m_Neighborhoods[i]++;
+		neighborhoodlist[i].push_back(j);
+	  }
+
+	  if (dBinX < criticalDistance2 && dBinY < criticalDistance2 && dBinZ < criticalDistance2)
+	  {
+		m_Neighborhoods[j]++;
+		neighborhoodlist[j].push_back(i);
+	  }
+
+//	  if(bin1 == bin2)
+//      {
+//        xn = m_Centroids[3 * j];
+//        yn = m_Centroids[3 * j + 1];
+//        zn = m_Centroids[3 * j + 2];
+//        dx = fabs(x - xn);
+//        dy = fabs(y - yn);
+//        dz = fabs(z - zn);
+//        if (dx < criticalDistance[i] && dy < criticalDistance[i] && dz < criticalDistance[i])
+//        {
+//          m_Neighborhoods[i]++;
+//          neighborhoodlist[i].push_back(j);
+//          m_Neighborhoods[j]++;
+//          neighborhoodlist[j].push_back(i);
+//        }
+
+//      }
+//	  else if(abs(bin1 - bin2) <= binMultiplier || abs(bin1 - bin2) < (numXBins + binMultiplier) || abs(bin1 - bin2) < ((numXBins * numYBins) + binMultiplier) )
+//      {
+//        xn = m_Centroids[3 * j];
+//        yn = m_Centroids[3 * j + 1];
+//        zn = m_Centroids[3 * j + 2];
+//        dx = fabs(x - xn);
+//        dy = fabs(y - yn);
+//        dz = fabs(z - zn);
+//        if (dx < criticalDistance[i] && dy < criticalDistance[i] && dz < criticalDistance[i])
+//        {
+//          m_Neighborhoods[i]++;
+//          neighborhoodlist[i].push_back(j);
+//          m_Neighborhoods[j]++;
+//          neighborhoodlist[j].push_back(i);
+//        }
+//      } 
     }
   }
   for (size_t i = 1; i < totalFields; i++)
