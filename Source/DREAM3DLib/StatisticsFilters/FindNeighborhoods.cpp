@@ -225,7 +225,7 @@ void FindNeighborhoods::find_neighborhoods()
   aveDiam /= totalFields;
   for (size_t i = 1; i < totalFields; i++)
   {
-    criticalDistance[i] /= aveDiam;  //Divide by or Add aveDiam
+    criticalDistance[i] /= aveDiam;
   }
 
   float aveCriticalDistance = aveDiam * m_MultiplesOfAverage;
