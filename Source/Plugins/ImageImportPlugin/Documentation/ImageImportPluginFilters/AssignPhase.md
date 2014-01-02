@@ -1,4 +1,4 @@
-Import Image Stack Filter {#importimagestack}
+Assign Phase {#assignphase}
 ======
 
 ## Group (Subgroup) ##
