@@ -127,7 +127,7 @@ class DREAM3DLib_EXPORT LosAlamosFFTReader : public AbstractFilter
     float* m_MaxPrincipalStress;
     float* m_MinPrincipalStress;
 
-    float LosAlamosFFTReader::sciToF(char*);
+    float sciToF(char*);
 
     LosAlamosFFTReader(const LosAlamosFFTReader&); //Not Implemented
     void operator=(const LosAlamosFFTReader&); //Not Implemented

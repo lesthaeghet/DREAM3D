@@ -39,13 +39,17 @@
 
 #include <iostream>
 #include <cstring>
+
 #include "MXA/Utilities/MXAFileInfo.h"
 
+#include "DREAM3DLib/Math/DREAM3DMath.h"
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
 LosAlamosFFTReader::LosAlamosFFTReader() :
   AbstractFilter(),
+  m_FieldsFile(""),
+  m_RStatsFile(""),
   m_Stress11ArrayName(DREAM3D::CellData::Stress11),
   m_Stress22ArrayName(DREAM3D::CellData::Stress22),
   m_Stress33ArrayName(DREAM3D::CellData::Stress33),
@@ -63,8 +67,6 @@ LosAlamosFFTReader::LosAlamosFFTReader() :
   m_EEDArrayName(DREAM3D::CellData::EED),
   m_MaxPrincipalStressArrayName(DREAM3D::CellData::MaxPrincipalStress),
   m_MinPrincipalStressArrayName(DREAM3D::CellData::MinPrincipalStress),
-  m_FieldsFile(""),
-  m_RStatsFile(""),
   m_Stress11(NULL),
   m_Stress22(NULL),
   m_Stress33(NULL),
@@ -219,7 +221,7 @@ float LosAlamosFFTReader::sciToF(char* buff)
     }
     if(p==NULL)
     {
-        return NULL;
+        return 0.0f;
     }
     int index = p-buff;
 
