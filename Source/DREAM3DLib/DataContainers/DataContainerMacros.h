@@ -133,7 +133,7 @@
     {\
       setErrorCondition(-10000);\
       std::stringstream _ss;\
-      _ss << "The name of the array for the " << #NameSpace << #DType << #Name << " was empty. Please provide a name for this array." << std::endl; \
+      _ss << "The name of the array for the " << #NameSpace << "::" << #DType << "::" << #Name << " was empty. Please provide a name for this array." << std::endl; \
       addErrorMessage(getHumanLabel(), _ss.str(), -10000);\
     }\
     std::string _s(#Name);\

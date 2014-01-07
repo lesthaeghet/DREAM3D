@@ -57,6 +57,7 @@ FieldInfoReader::FieldInfoReader() :
   m_CellPhasesArrayName(DREAM3D::CellData::Phases),
   m_FieldEulerAnglesArrayName(DREAM3D::FieldData::EulerAngles),
   m_FieldPhasesArrayName(DREAM3D::FieldData::Phases),
+  m_ActiveArrayName(DREAM3D::FieldData::Active),
   m_InputFile(""),
   m_CreateCellLevelArrays(true),
   m_RenumberGrains(true),
