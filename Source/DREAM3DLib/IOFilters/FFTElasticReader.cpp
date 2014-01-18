@@ -42,6 +42,9 @@
 
 #include "MXA/Utilities/MXAFileInfo.h"
 #include "DREAM3DLib/Math/DREAM3DMath.h"
+
+#define ELASTIC_FIELD_COUNT 20
+
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
@@ -129,10 +132,10 @@ void FFTElasticReader::readFilterParameters(AbstractFilterParametersReader* read
 {
   reader->openFilterGroup(this, index);
   /* Code to read the values goes between these statements */
-/* FILTER_WIDGETCODEGEN_AUTO_GENERATED_CODE BEGIN*/
+  /* FILTER_WIDGETCODEGEN_AUTO_GENERATED_CODE BEGIN*/
   setFieldsFile( reader->readValue( "FieldsFile", getFieldsFile()) );
   setRStatsFile( reader->readValue( "RStatsFile", getRStatsFile()) );
-/* FILTER_WIDGETCODEGEN_AUTO_GENERATED_CODE END*/
+  /* FILTER_WIDGETCODEGEN_AUTO_GENERATED_CODE END*/
   reader->closeFilterGroup();
 }
 
@@ -225,6 +228,90 @@ void  FFTElasticReader::execute()
     notifyErrorMessage("The DataContainer Object was NULL", getErrorCondition());
     return;
   }
+
+  readFieldsFile();
+  if (getErrorCondition() < 0)
+  {
+    return;
+  }
+
+  readRStatsFile();
+    if (getErrorCondition() < 0)
+  {
+    return;
+  }
+
+
+// If there is an error set this to something negative and also set a message
+  notifyStatusMessage("Complete");
+}
+
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void FFTElasticReader::readFieldsFile()
+{
+  VolumeDataContainer* m = getVolumeDataContainer();
+
+  // Start reading the file so we can get the total number of voxels to read and get the sizes of our arrays
+
+  const int kBufferSize=512;
+  char buf[kBufferSize];
+  std::stringstream ss;
+
+  ///read fields file
+  std::ifstream in(getFieldsFile().c_str());
+  if (!in.is_open())
+  {
+    notifyErrorMessage("FFT Elastic Fields file could not be opened", -100);
+    return;
+  }
+  int64_t fftside=0, fftpoints=0;
+  bool endOfHeader=false;
+
+  // For the Elastic Files there are 4 lines that are considered "header" lines. Lets just
+  // read those 4 lines manually
+
+  ::memset(buf, 0, kBufferSize);
+  in.getline(buf, kBufferSize);
+  int numFields = sscanf(buf, "%lld", &fftside);
+  if(1 != numFields)
+  {
+    notifyErrorMessage("Error reading the FFT Side value from the Fields File", -102);
+    return;
+  }
+
+  ::memset(buf, 0, kBufferSize);
+  in.getline(buf, kBufferSize);
+  numFields = sscanf(buf, "%lld", &fftpoints);
+  if(1 != numFields)
+  {
+    notifyErrorMessage("Error reading the FFT Points value from the Fields File", -102);
+    return;
+  }
+
+  // The next has the scaling of the voxel as a 3x3 array
+  ::memset(buf, 0, kBufferSize);
+  in.getline(buf, kBufferSize);
+  float scaling[9];
+  numFields = sscanf(buf, "%f %f %f %f %f %f %f %f %f", scaling, scaling+1, scaling+2, scaling+3, scaling+4, scaling+5, scaling+6, scaling+7, scaling+8);
+  if(numFields != 9)
+  {
+    notifyErrorMessage("Error reading the FFT Tensor value from the Fields file. Aborting reading now", -101);
+    return;
+  }
+
+  // Read and dump the Column Titles
+  in.getline(buf, kBufferSize);
+  endOfHeader=true;//2nd line after is last of header
+
+  size_t volDims[3] = {fftside, fftside, fftside};
+  m->setDimensions(volDims);
+  float volScaling[3] = {scaling[0], scaling[4], scaling[8] };
+  m->setResolution(volScaling);
+
+  // Now tha the VolumeDataContainer is properly initialized with the sizes and resolutions, now run the dataCheck
   dataCheck(false, m->getTotalPoints(), m->getNumFieldTuples(), m->getNumEnsembleTuples());
   if (getErrorCondition() < 0)
   {
@@ -235,73 +322,31 @@ void  FFTElasticReader::execute()
 
   for (int64_t i=0; i<totalPoints; i++)
   {
-      m_Stress11[i]=0.0f;
-      m_Stress22[i]=0.0f;
-      m_Stress33[i]=0.0f;
-      m_Stress23[i]=0.0f;
-      m_Stress31[i]=0.0f;
-      m_Stress12[i]=0.0f;
-      m_Strain11[i]=0.0f;
-      m_Strain22[i]=0.0f;
-      m_Strain33[i]=0.0f;
-      m_Strain23[i]=0.0f;
-      m_Strain31[i]=0.0f;
-      m_Strain12[i]=0.0f;
-      m_Stress[i]=0.0f;
-      m_Strain[i]=0.0f;
-      m_EED[i]=0.0f;
-      m_MaxPrincipalStress[i]=0.0f;
-      m_MinPrincipalStress[i]=0.0f;
-  }
-
-
-  const int kBufferSize=512;
-  char buf[kBufferSize];
-  std::stringstream ss;
-
-  ///read fields file
-  std::ifstream in(getFieldsFile().c_str());
-  if (!in.is_open())
-  {
-    notifyErrorMessage("Fields file could not be opened",-100);
-  }
-  int64_t fftside=0, fftpoints=0;
-  bool endOfHeader=false;
-  int i=0;
-
-  while (!in.eof() && false == endOfHeader)
-  {
-    ::memset(buf, 0, kBufferSize);
-    in.getline(buf, kBufferSize);
-    if(0==fftpoints)
-    {
-      if(0==fftside)
-      {
-        fftside=static_cast<int64_t>(atoi(buf));
-      }
-      else
-      {
-        fftpoints=static_cast<int64_t>(atoi(buf));
-      }
-    }
-    else
-    {
-      if(0==i)//first line after getting points/sidelength
-      {
-        i++;
-      }
-      else
-      {
-        endOfHeader=true;//2nd line after is last of header
-      }
-    }
+    m_Stress11[i]=0.0f;
+    m_Stress22[i]=0.0f;
+    m_Stress33[i]=0.0f;
+    m_Stress23[i]=0.0f;
+    m_Stress31[i]=0.0f;
+    m_Stress12[i]=0.0f;
+    m_Strain11[i]=0.0f;
+    m_Strain22[i]=0.0f;
+    m_Strain33[i]=0.0f;
+    m_Strain23[i]=0.0f;
+    m_Strain31[i]=0.0f;
+    m_Strain12[i]=0.0f;
+    m_Stress[i]=0.0f;
+    m_Strain[i]=0.0f;
+    m_EED[i]=0.0f;
+    m_MaxPrincipalStress[i]=0.0f;
+    m_MinPrincipalStress[i]=0.0f;
   }
 
   if(totalPoints!=fftpoints)
   {
     ss.str("");
     ss << "Fields file " << getFieldsFile() << " contains " <<fftpoints<<" data points. Expected: "<<totalPoints;
-    notifyErrorMessage(ss.str(),-200);
+    notifyErrorMessage(ss.str(), -200);
+    return;
   }
 
   int64_t counter = 0;
@@ -315,6 +360,7 @@ void  FFTElasticReader::execute()
     ::memset(buf, 0, kBufferSize); // Clear the buffer
     in.getline(buf, kBufferSize);// Read the next line of data
     parseFieldsDataLine(buf, i);
+    if(getErrorCondition() < 0) { break; }
     ++counter;
   }
 
@@ -324,78 +370,11 @@ void  FFTElasticReader::execute()
     ss << "End of Fields file reached before all data was parsed. Expected Data Points: " << fftpoints
        << "  Current Data Point Count: " << counter
        << std::endl;
-    notifyErrorMessage(ss.str(),-600);
+    notifyErrorMessage(ss.str(), -600);
   }
   in.close();
-
-
-  ///read rstats file
-  std::ifstream in2(getRStatsFile().c_str());
-  if (!in2.is_open())
-  {
-    notifyErrorMessage("RStats file coult not be opened",-100);
-  }
-
-  endOfHeader=false;
-  while (!in2.eof() && false == endOfHeader)
-  {
-    ::memset(buf, 0, kBufferSize);
-    in2.getline(buf, kBufferSize);
-    endOfHeader=true;//only 1 header line
-  }
-
-  counter=0;
-  for(size_t i = 0; i < fftpoints; ++i)
-  {
-    if (in2.eof() == true)
-    {
-      break;
-    }
-    ::memset(buf, 0, kBufferSize); // Clear the buffer
-    in2.getline(buf, kBufferSize);// Read the next line of data
-    parseRStatsDataLine(buf, i);
-    ++counter;
-  }
-
-  if (counter != fftpoints && in2.eof() == true)
-  {
-    ss.str("");
-    ss << "End of RStats file reached before all data was parsed. Expected Data Points: " << fftpoints
-       << "  Current Data Point Count: " << counter
-       << std::endl;
-    notifyErrorMessage(ss.str(),-600);
-  }
-  in2.close();
 }
 
-// -----------------------------------------------------------------------------
-//  Read the data part of the RStats.txt file
-// -----------------------------------------------------------------------------
-void FFTElasticReader::parseRStatsDataLine(const std::string &line, size_t i)
-{
-  /* When reading the data there should be 6 cols of data.
-   * The column names should be the following:
-   * strain
-   * stress
-   * EED
-   * maxPrincipalStress
-   * minPrincipalStress
-   * phase
-   */
-  float e=0.0f, s=0.0f, EED=0.0f, maxps=0.0f, minps=0.0f;
-  int p=0;
-  size_t offset = 0;
-  size_t fieldsRead = 0;
-  fieldsRead = sscanf(line.c_str(), "%f %f %f %f %f %i", &e, &s, &EED, &maxps, &minps, &p);
-
-  offset = i;
-
-  m_Strain[offset]=e;
-  m_Stress[offset]=s;
-  m_EED[offset]=EED;
-  m_MaxPrincipalStress[offset]=maxps;
-  m_MinPrincipalStress[offset]=minps;
-}
 
 // -----------------------------------------------------------------------------
 //  Read the data part of the fields.out file
@@ -430,7 +409,12 @@ void FFTElasticReader::parseFieldsDataLine(const std::string &line, size_t i)
   size_t offset = 0;
   size_t fieldsRead = 0;
   fieldsRead = sscanf(line.c_str(), "%f %f %f %i %i %i %i %i %f %f %f %f %f %f %f %f %f %f %f %f", &unk1, &unk2, &unk3, &x, &y, &z, &phase, &spin, &e11, &e22, &e33, &e23, &e31, &e12, &s11, &s22, &s33, &s23, &s31, &s12);
-
+  if (ELASTIC_FIELD_COUNT != fieldsRead)
+  {
+    std::stringstream ss;
+    ss << "Error reading proper number of columns in Field File at line " << (i+4);
+    notifyErrorMessage(ss.str(), -120);
+  }
   offset = i;
 
   m_Stress11[offset]=s11;
@@ -445,5 +429,88 @@ void FFTElasticReader::parseFieldsDataLine(const std::string &line, size_t i)
   m_Strain23[offset]=e23;
   m_Strain31[offset]=e31;
   m_Strain12[offset]=e12;
+
 }
 
+
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void FFTElasticReader::readRStatsFile()
+{
+  VolumeDataContainer* m = getVolumeDataContainer();
+
+  int64_t fftpoints = m->getTotalPoints();
+
+   const int kBufferSize=512;
+  char buf[kBufferSize];
+  std::stringstream ss;
+
+  ///read rstats file
+  std::ifstream in2(getRStatsFile().c_str());
+  if (!in2.is_open())
+  {
+    notifyErrorMessage("RStats file could not be opened", -100);
+    return;
+  }
+
+  bool endOfHeader=false;
+
+  ::memset(buf, 0, kBufferSize);
+  in2.getline(buf, kBufferSize);
+  endOfHeader=true;//only 1 header line
+
+
+  size_t counter=0;
+  for(size_t i = 0; i < fftpoints; ++i)
+  {
+    if (in2.eof() == true)
+    {
+      break;
+    }
+    ::memset(buf, 0, kBufferSize); // Clear the buffer
+    in2.getline(buf, kBufferSize);// Read the next line of data
+    parseRStatsDataLine(buf, i);
+    ++counter;
+  }
+
+  if (counter != fftpoints && in2.eof() == true)
+  {
+    ss.str("");
+    ss << "End of RStats file reached before all data was parsed. Expected Data Points: " << fftpoints
+       << "  Current Data Point Count: " << counter
+       << std::endl;
+    notifyErrorMessage(ss.str(), -600);
+  }
+  in2.close();
+}
+
+// -----------------------------------------------------------------------------
+//  Read the data part of the RStats.txt file
+// -----------------------------------------------------------------------------
+void FFTElasticReader::parseRStatsDataLine(const std::string &line, size_t i)
+{
+  /* When reading the data there should be 6 cols of data.
+   * The column names should be the following:
+   * strain
+   * stress
+   * EED
+   * maxPrincipalStress
+   * minPrincipalStress
+   * phase
+   */
+  float e=0.0f, s=0.0f, EED=0.0f, maxps=0.0f, minps=0.0f;
+  int p=0;
+  size_t offset = 0;
+  size_t fieldsRead = 0;
+  fieldsRead = sscanf(line.c_str(), "%f %f %f %f %f %i", &e, &s, &EED, &maxps, &minps, &p);
+
+  offset = i;
+
+  m_Strain[offset]=e;
+  m_Stress[offset]=s;
+  m_EED[offset]=EED;
+  m_MaxPrincipalStress[offset]=maxps;
+  m_MinPrincipalStress[offset]=minps;
+}

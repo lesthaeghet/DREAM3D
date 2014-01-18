@@ -103,8 +103,11 @@ class DREAM3DLib_EXPORT FFTElasticReader : public AbstractFilter
     virtual void execute();
     virtual void preflight();
 
-    virtual void FFTElasticReader::parseRStatsDataLine(const std::string &line, size_t i);
-    virtual void FFTElasticReader::parseFieldsDataLine(const std::string &line, size_t i);
+    virtual void readFieldsFile();
+    virtual void readRStatsFile();
+
+    virtual void parseRStatsDataLine(const std::string &line, size_t i);
+    virtual void parseFieldsDataLine(const std::string &line, size_t i);
 
   protected:
     FFTElasticReader();
