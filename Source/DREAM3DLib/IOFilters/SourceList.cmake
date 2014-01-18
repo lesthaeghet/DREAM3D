@@ -49,7 +49,7 @@ set(_PublicFilters
   VisualizeGBCD
   ReadOrientationData
   LosAlamosFFTWriter
-  LosAlamosFFTReader
+  FFTElasticReader
   WriteAbaqusSurfaceMesh
 )
 

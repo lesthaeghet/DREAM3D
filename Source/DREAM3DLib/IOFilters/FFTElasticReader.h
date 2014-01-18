@@ -35,8 +35,8 @@
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
 
-#ifndef _LosAlamosFFTReader_H_
-#define _LosAlamosFFTReader_H_
+#ifndef _FFTElasticReader_H_
+#define _FFTElasticReader_H_
 
 #include <string>
 
@@ -46,20 +46,20 @@
 #include "DREAM3DLib/Common/AbstractFilter.h"
 
 /**
- * @class LosAlamosFFTReader LosAlamosFFTReader.h DREAM3DLib/IO/LosAlamosFFTReader.h
+ * @class FFTElasticReader FFTElasticReader.h DREAM3DLib/IO/FFTElasticReader.h
  * @brief
  * @author wlenthe
- * @date Sep 6, 2013
+ * @date Jan 17, 2013
  * @version 1.0
  */
-class DREAM3DLib_EXPORT LosAlamosFFTReader : public AbstractFilter
+class DREAM3DLib_EXPORT FFTElasticReader : public AbstractFilter
 {
   public:
-    DREAM3D_SHARED_POINTERS(LosAlamosFFTReader)
-    DREAM3D_STATIC_NEW_MACRO(LosAlamosFFTReader)
-    DREAM3D_TYPE_MACRO_SUPER(LosAlamosFFTReader, AbstractFilter)
+    DREAM3D_SHARED_POINTERS(FFTElasticReader)
+    DREAM3D_STATIC_NEW_MACRO(FFTElasticReader)
+    DREAM3D_TYPE_MACRO_SUPER(FFTElasticReader, AbstractFilter)
 
-    virtual ~LosAlamosFFTReader();
+    virtual ~FFTElasticReader();
 
     /* Input Parameters */
     DREAM3D_INSTANCE_STRING_PROPERTY(FieldsFile)
@@ -86,7 +86,7 @@ class DREAM3DLib_EXPORT LosAlamosFFTReader : public AbstractFilter
 
     virtual const std::string getGroupName() { return DREAM3D::FilterGroups::IOFilters; }
     virtual const std::string getSubGroupName() { return DREAM3D::FilterSubGroups::InputFilters; }
-    virtual const std::string getHumanLabel() { return "Read Los Alamos FFT Output"; }
+    virtual const std::string getHumanLabel() { return "Read Elastic FFT Output"; }
 
     virtual void setupFilterParameters();
     /**
@@ -103,8 +103,11 @@ class DREAM3DLib_EXPORT LosAlamosFFTReader : public AbstractFilter
     virtual void execute();
     virtual void preflight();
 
+    virtual void FFTElasticReader::parseRStatsDataLine(const std::string &line, size_t i);
+    virtual void FFTElasticReader::parseFieldsDataLine(const std::string &line, size_t i);
+
   protected:
-    LosAlamosFFTReader();
+    FFTElasticReader();
 
     void dataCheck(bool preflight, size_t voxels, size_t fields, size_t ensembles);
 
@@ -127,10 +130,8 @@ class DREAM3DLib_EXPORT LosAlamosFFTReader : public AbstractFilter
     float* m_MaxPrincipalStress;
     float* m_MinPrincipalStress;
 
-    float sciToF(char*);
-
-    LosAlamosFFTReader(const LosAlamosFFTReader&); //Not Implemented
-    void operator=(const LosAlamosFFTReader&); //Not Implemented
+    FFTElasticReader(const FFTElasticReader&); //Not Implemented
+    void operator=(const FFTElasticReader&); //Not Implemented
 
 };
 

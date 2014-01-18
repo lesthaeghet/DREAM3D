@@ -1,4 +1,4 @@
-Name of Filter {#losalamosfftreader}
+Name of Filter {#FFTElasticReader}
 =====
 
 ## Group (Subgroup) ##

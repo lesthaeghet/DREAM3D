@@ -35,18 +35,17 @@
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
 
-#include "LosAlamosFFTReader.h"
+#include "FFTElasticReader.h"
 
 #include <iostream>
 #include <cstring>
 
 #include "MXA/Utilities/MXAFileInfo.h"
-
 #include "DREAM3DLib/Math/DREAM3DMath.h"
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-LosAlamosFFTReader::LosAlamosFFTReader() :
+FFTElasticReader::FFTElasticReader() :
   AbstractFilter(),
   m_FieldsFile(""),
   m_RStatsFile(""),
@@ -91,7 +90,7 @@ LosAlamosFFTReader::LosAlamosFFTReader() :
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-LosAlamosFFTReader::~LosAlamosFFTReader()
+FFTElasticReader::~FFTElasticReader()
 {
 
 }
@@ -99,7 +98,7 @@ LosAlamosFFTReader::~LosAlamosFFTReader()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void LosAlamosFFTReader::setupFilterParameters()
+void FFTElasticReader::setupFilterParameters()
 {
   std::vector<FilterParameter::Pointer> parameters;
   {
@@ -126,7 +125,7 @@ void LosAlamosFFTReader::setupFilterParameters()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void LosAlamosFFTReader::readFilterParameters(AbstractFilterParametersReader* reader, int index)
+void FFTElasticReader::readFilterParameters(AbstractFilterParametersReader* reader, int index)
 {
   reader->openFilterGroup(this, index);
   /* Code to read the values goes between these statements */
@@ -140,7 +139,7 @@ void LosAlamosFFTReader::readFilterParameters(AbstractFilterParametersReader* re
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-int LosAlamosFFTReader::writeFilterParameters(AbstractFilterParametersWriter* writer, int index)
+int FFTElasticReader::writeFilterParameters(AbstractFilterParametersWriter* writer, int index)
 {
   writer->openFilterGroup(this, index);
   writer->writeValue("FieldsFile", getFieldsFile() );
@@ -152,7 +151,7 @@ int LosAlamosFFTReader::writeFilterParameters(AbstractFilterParametersWriter* wr
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void LosAlamosFFTReader::dataCheck(bool preflight, size_t voxels, size_t fields, size_t ensembles)
+void FFTElasticReader::dataCheck(bool preflight, size_t voxels, size_t fields, size_t ensembles)
 {
 
   setErrorCondition(0);
@@ -207,38 +206,15 @@ void LosAlamosFFTReader::dataCheck(bool preflight, size_t voxels, size_t fields,
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void LosAlamosFFTReader::preflight()
+void FFTElasticReader::preflight()
 {
   dataCheck(true, 1, 1, 1);
 }
 
-float LosAlamosFFTReader::sciToF(char* buff)
-{
-    char* p = strchr(buff, 'E');
-    if (p==NULL)
-    {
-        p = strchr(buff, 'e');
-    }
-    if(p==NULL)
-    {
-        return 0.0f;
-    }
-    int index = p-buff;
-
-    //char base[index];
-    char base[8];
-    strncpy(base, buff, std::min(index,8));
-
-    //char exp[strlen(buff)-(index+1)];
-    char exp[8];
-    strncpy(exp, buff+index+1, strlen(buff)-(index+1));
-
-    return atof(base)*pow(10,atoi(exp));
-}
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void  LosAlamosFFTReader::execute()
+void  FFTElasticReader::execute()
 {
   int err = 0;
   setErrorCondition(err);
@@ -257,303 +233,217 @@ void  LosAlamosFFTReader::execute()
 
   int64_t totalPoints = m->getTotalPoints();
 
+  for (int64_t i=0; i<totalPoints; i++)
+  {
+      m_Stress11[i]=0.0f;
+      m_Stress22[i]=0.0f;
+      m_Stress33[i]=0.0f;
+      m_Stress23[i]=0.0f;
+      m_Stress31[i]=0.0f;
+      m_Stress12[i]=0.0f;
+      m_Strain11[i]=0.0f;
+      m_Strain22[i]=0.0f;
+      m_Strain33[i]=0.0f;
+      m_Strain23[i]=0.0f;
+      m_Strain31[i]=0.0f;
+      m_Strain12[i]=0.0f;
+      m_Stress[i]=0.0f;
+      m_Strain[i]=0.0f;
+      m_EED[i]=0.0f;
+      m_MaxPrincipalStress[i]=0.0f;
+      m_MinPrincipalStress[i]=0.0f;
+  }
 
-  //open file
-    //const char *fileName = getFieldsFile();
-    FILE *pFile;
-    pFile = fopen(m_FieldsFile.c_str(), "rb");
-    if (pFile==NULL)
+
+  const int kBufferSize=512;
+  char buf[kBufferSize];
+  std::stringstream ss;
+
+  ///read fields file
+  std::ifstream in(getFieldsFile().c_str());
+  if (!in.is_open())
+  {
+    notifyErrorMessage("Fields file could not be opened",-100);
+  }
+  int64_t fftside=0, fftpoints=0;
+  bool endOfHeader=false;
+  int i=0;
+
+  while (!in.eof() && false == endOfHeader)
+  {
+    ::memset(buf, 0, kBufferSize);
+    in.getline(buf, kBufferSize);
+    if(0==fftpoints)
     {
-        notifyErrorMessage("unable to open file",-998);
+      if(0==fftside)
+      {
+        fftside=static_cast<int64_t>(atoi(buf));
+      }
+      else
+      {
+        fftpoints=static_cast<int64_t>(atoi(buf));
+      }
     }
-
-    //get length of file
-    long lSize;
-    fseek(pFile, 0, SEEK_END);
-    lSize = ftell(pFile);
-    rewind(pFile);
-
-    //allocate enough memory to read whole file
-    char* buffer;
-    buffer = (char*) malloc(sizeof(char)*lSize);
-    if (buffer == NULL)
+    else
     {
-        notifyErrorMessage("unable to allocate memory for file",-998);
+      if(0==i)//first line after getting points/sidelength
+      {
+        i++;
+      }
+      else
+      {
+        endOfHeader=true;//2nd line after is last of header
+      }
     }
+  }
 
-    //load file into allocated memory
-    size_t result;
-    result = fread(buffer, 1, lSize, pFile);
-    if (result != lSize)
+  if(totalPoints!=fftpoints)
+  {
+    ss.str("");
+    ss << "Fields file " << getFieldsFile() << " contains " <<fftpoints<<" data points. Expected: "<<totalPoints;
+    notifyErrorMessage(ss.str(),-200);
+  }
+
+  int64_t counter = 0;
+
+  for(size_t i = 0; i < fftpoints; ++i)
+  {
+    if (in.eof() == true)
     {
-        notifyErrorMessage("unable to load file",-998);
+      break;
     }
+    ::memset(buf, 0, kBufferSize); // Clear the buffer
+    in.getline(buf, kBufferSize);// Read the next line of data
+    parseFieldsDataLine(buf, i);
+    ++counter;
+  }
 
-    for (int64_t i=0; i<totalPoints; i++)
+  if (counter != fftpoints && in.eof() == true)
+  {
+    ss.str("");
+    ss << "End of Fields file reached before all data was parsed. Expected Data Points: " << fftpoints
+       << "  Current Data Point Count: " << counter
+       << std::endl;
+    notifyErrorMessage(ss.str(),-600);
+  }
+  in.close();
+
+
+  ///read rstats file
+  std::ifstream in2(getRStatsFile().c_str());
+  if (!in2.is_open())
+  {
+    notifyErrorMessage("RStats file coult not be opened",-100);
+  }
+
+  endOfHeader=false;
+  while (!in2.eof() && false == endOfHeader)
+  {
+    ::memset(buf, 0, kBufferSize);
+    in2.getline(buf, kBufferSize);
+    endOfHeader=true;//only 1 header line
+  }
+
+  counter=0;
+  for(size_t i = 0; i < fftpoints; ++i)
+  {
+    if (in2.eof() == true)
     {
-        m_Stress11[i]=0.0f;
-        m_Stress22[i]=0.0f;
-        m_Stress33[i]=0.0f;
-        m_Stress23[i]=0.0f;
-        m_Stress31[i]=0.0f;
-        m_Stress12[i]=0.0f;
-        m_Strain11[i]=0.0f;
-        m_Strain22[i]=0.0f;
-        m_Strain33[i]=0.0f;
-        m_Strain23[i]=0.0f;
-        m_Strain31[i]=0.0f;
-        m_Strain12[i]=0.0f;
-        m_Stress[i]=0.0f;
-        m_Strain[i]=0.0f;
-        m_EED[i]=0.0f;
-        m_MaxPrincipalStress[i]=0.0f;
-        m_MinPrincipalStress[i]=0.0f;
+      break;
     }
+    ::memset(buf, 0, kBufferSize); // Clear the buffer
+    in2.getline(buf, kBufferSize);// Read the next line of data
+    parseRStatsDataLine(buf, i);
+    ++counter;
+  }
 
-    //break file into tokens
-
-    //first token is side length
-    char *token = strtok(buffer, " \n");
-    //next token is # pts
-    token = strtok(NULL, " \n");
-    int64_t voxels=atoi(token);
-
-    if(voxels!=totalPoints)
-    {
-        notifyErrorMessage("number of voxels doesn't match",-997);
-    }
-
-    bool dataStart=false;
-    int i=0;
-    int j=-1;
-    while(token && i<totalPoints)
-    {
-        if(!dataStart)
-        if(strcmp(token, "SLOC")==0)
-        {
-            dataStart=true;
-        }
-
-        if(dataStart)
-        {
-            switch(j)
-            {
-                case 0://?
-                    {
-
-                    }
-                    break;
-
-                case 1://?
-                    {
-
-                    }
-                    break;
-
-                case 2://?
-                    {
-
-                    }
-                    break;
-
-                case 3://X
-                    {
-
-                    }
-                    break;
-
-                case 4://Y
-                    {
-
-                    }
-                    break;
-
-                case 5://Z
-                    {
-
-                    }
-                    break;
-
-                case 6://phase
-                    {
-
-                    }
-                    break;
-
-                case 7://spin
-                    {
-
-                    }
-                    break;
-
-                case 8://strain 11
-                    {
-                        m_Strain11[i]=sciToF(token);
-                    }
-                    break;
-
-                case 9://strain 22
-                    {
-                        m_Strain22[i]=sciToF(token);
-                    }
-                    break;
-
-                case 10://strain 33
-                    {
-                        m_Strain33[i]=sciToF(token);
-                    }
-                    break;
-
-                case 11://strain 23
-                    {
-                        m_Strain23[i]=sciToF(token);
-                    }
-                    break;
-
-                case 12://strain 31
-                    {
-                        m_Strain31[i]=sciToF(token);
-                    }
-                    break;
-
-                case 13://strain 12
-                    {
-                        m_Strain12[i]=sciToF(token);
-                    }
-                    break;
-
-                case 14://stress 11
-                    {
-                        m_Stress11[i]=sciToF(token);
-                    }
-                    break;
-
-                case 15://stress 22
-                    {
-                        m_Stress22[i]=sciToF(token);
-                    }
-                    break;
-
-                case 16://stress 33
-                    {
-                        m_Stress33[i]=sciToF(token);
-                    }
-                    break;
-
-                case 17://stress 23
-                    {
-                        m_Stress23[i]=sciToF(token);
-                    }
-                    break;
-
-                case 18://stress 31
-                    {
-                        m_Stress31[i]=sciToF(token);
-                    }
-                    break;
-
-                case 19://stress 12
-                    {
-                        m_Stress12[i]=sciToF(token);
-                    }
-                    break;
-            }
-            j++;
-            if(j==20)
-            {
-                j=0;
-                i++;
-            }
-        }
-        token = strtok(NULL, " \n");
-    }
-    free(buffer);
-
-    //const char *fileName = getFieldsFile();
-    pFile = fopen(m_RStatsFile.c_str(), "rb");
-    if (pFile==NULL)
-    {
-        notifyErrorMessage("unable to open file",-998);
-    }
-
-    //get length of file
-    fseek(pFile, 0, SEEK_END);
-    lSize = ftell(pFile);
-    rewind(pFile);
-
-    //allocate enough memory to read whole file
-    buffer = (char*) malloc(sizeof(char)*lSize);
-    if (buffer == NULL)
-    {
-        notifyErrorMessage("unable to allocate memory for file",-998);
-    }
-
-    //load file into allocated memory
-    result = fread(buffer, 1, lSize, pFile);
-    if (result != lSize)
-    {
-        notifyErrorMessage("unable to load file",-998);
-    }
-
-    //tokenize
-    token = strtok(buffer, " \n");
-    for (int i=0; i<6; i++)
-    {
-        token = strtok(NULL, " \n");
-    }
-
-    i=0;
-    j=0;
-    while(token && i<totalPoints)
-    {
-        switch(j)
-        {
-            case 0://strain
-                {
-                    m_Strain[i]=atof(token);
-                }
-                break;
-
-            case 1://stress
-                {
-                    m_Stress[i]=atof(token);
-                }
-                break;
-
-            case 2://eed
-                {
-                    m_EED[i]=atof(token);
-                }
-                break;
-
-            case 3://maxprincipalstress
-                {
-                    m_MaxPrincipalStress[i]=atof(token);
-                }
-                break;
-
-            case 4://minprincipalstress
-                {
-                    m_MinPrincipalStress[i]=atof(token);
-                }
-                break;
-
-            case 5://phase
-                {
-
-                }
-                break;
-        }
-        j++;
-        if(j==6)
-        {
-            j=0;
-            i++;
-        }
-        token = strtok(NULL, " \n");
-    }
-
-
-
-
+  if (counter != fftpoints && in2.eof() == true)
+  {
+    ss.str("");
+    ss << "End of RStats file reached before all data was parsed. Expected Data Points: " << fftpoints
+       << "  Current Data Point Count: " << counter
+       << std::endl;
+    notifyErrorMessage(ss.str(),-600);
+  }
+  in2.close();
 }
+
+// -----------------------------------------------------------------------------
+//  Read the data part of the RStats.txt file
+// -----------------------------------------------------------------------------
+void FFTElasticReader::parseRStatsDataLine(const std::string &line, size_t i)
+{
+  /* When reading the data there should be 6 cols of data.
+   * The column names should be the following:
+   * strain
+   * stress
+   * EED
+   * maxPrincipalStress
+   * minPrincipalStress
+   * phase
+   */
+  float e=0.0f, s=0.0f, EED=0.0f, maxps=0.0f, minps=0.0f;
+  int p=0;
+  size_t offset = 0;
+  size_t fieldsRead = 0;
+  fieldsRead = sscanf(line.c_str(), "%f %f %f %f %f %i", &e, &s, &EED, &maxps, &minps, &p);
+
+  offset = i;
+
+  m_Strain[offset]=e;
+  m_Stress[offset]=s;
+  m_EED[offset]=EED;
+  m_MaxPrincipalStress[offset]=maxps;
+  m_MinPrincipalStress[offset]=minps;
+}
+
+// -----------------------------------------------------------------------------
+//  Read the data part of the fields.out file
+// -----------------------------------------------------------------------------
+void FFTElasticReader::parseFieldsDataLine(const std::string &line, size_t i)
+{
+  /* When reading the data there should be 20 cols of data.
+   * The column names should be the following:
+   * ?
+   * ?
+   * ?
+   * x
+   * y
+   * z
+   * phase?
+   * spin
+   * strain_11
+   * strain_22
+   * strain_33
+   * strain_23
+   * strain_31
+   * strain_12
+   * stress_11
+   * stress_22
+   * stress_33
+   * stress_23
+   * stress_31
+   * stress_12
+   */
+  float unk1=0.0f, unk2=0.0f, unk3=0.0f, e11=0.0f, e22=0.0f, e33=0.0f, e23=0.0f, e31=0.0f, e12=0.0f, s11=0.0f, s22=0.0f, s33=0.0f, s23=0.0f, s31=0.0f, s12=0.0f;
+  int x=0, y=0, z=0, phase=0, spin=0;
+  size_t offset = 0;
+  size_t fieldsRead = 0;
+  fieldsRead = sscanf(line.c_str(), "%f %f %f %i %i %i %i %i %f %f %f %f %f %f %f %f %f %f %f %f", &unk1, &unk2, &unk3, &x, &y, &z, &phase, &spin, &e11, &e22, &e33, &e23, &e31, &e12, &s11, &s22, &s33, &s23, &s31, &s12);
+
+  offset = i;
+
+  m_Stress11[offset]=s11;
+  m_Stress22[offset]=s22;
+  m_Stress33[offset]=s33;
+  m_Stress23[offset]=s23;
+  m_Stress31[offset]=s31;
+  m_Stress12[offset]=s12;
+  m_Strain11[offset]=e11;
+  m_Strain22[offset]=e22;
+  m_Strain33[offset]=e33;
+  m_Strain23[offset]=e23;
+  m_Strain31[offset]=e31;
+  m_Strain12[offset]=e12;
+}
+
