@@ -31,6 +31,7 @@ set(_PublicFilters
   OpenCloseCoordinationNumber
   ConvertEulerAngles
   RotateEulerRefFrame
+  RotateSliceEulerRefFrame
   IdentifySample
   SingleThresholdCells
   MultiThresholdCells
