@@ -382,6 +382,7 @@ set(DREAM3D_PLUGIN_LIST
   Statistics
   SurfaceMeshing
   SyntheticBuilding
+  MegnaExtras
 )
 
 #-------------------------------------------------------------------------------
