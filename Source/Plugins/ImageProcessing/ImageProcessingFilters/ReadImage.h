@@ -2,8 +2,8 @@
  * Your License or Copyright Information can go here
  */
 
-#ifndef _ManualThresholdTemplate_H_
-#define _ManualThresholdTemplate_H_
+#ifndef _ReadImage_H_
+#define _ReadImage_H_
 
 //#include <vector>
 #include <QtCore/QString>
@@ -19,34 +19,34 @@
 
 
 /**
- * @class ManualThresholdTemplate ManualThresholdTemplate.h ImageProcessing/ImageProcessingFilters/ManualThresholdTemplate.h
+ * @class ReadImage ReadImage.h ImageProcessing/ImageProcessingFilters/ReadImage.h
  * @brief
  * @author
  * @date
  * @version 1.0
  */
-class ManualThresholdTemplate : public AbstractFilter
+class ReadImage : public AbstractFilter
 {
     Q_OBJECT /* Need this for Qt's signals and slots mechanism to work */
 
   public:
-    DREAM3D_SHARED_POINTERS(ManualThresholdTemplate)
-    DREAM3D_STATIC_NEW_MACRO(ManualThresholdTemplate)
-    DREAM3D_TYPE_MACRO_SUPER(ManualThresholdTemplate, AbstractFilter)
+    DREAM3D_SHARED_POINTERS(ReadImage)
+    DREAM3D_STATIC_NEW_MACRO(ReadImage)
+    DREAM3D_TYPE_MACRO_SUPER(ReadImage, AbstractFilter)
 
-    virtual ~ManualThresholdTemplate();
+    virtual ~ReadImage();
 
-    DREAM3D_FILTER_PARAMETER(DataArrayPath, SelectedCellArrayArrayPath)
-    Q_PROPERTY(DataArrayPath SelectedCellArrayArrayPath READ getSelectedCellArrayArrayPath WRITE setSelectedCellArrayArrayPath)
+    DREAM3D_FILTER_PARAMETER(QString, InputFileName)
+    Q_PROPERTY(QString InputFileName READ getInputFileName WRITE setInputFileName)
 
-    DREAM3D_FILTER_PARAMETER(QString, NewCellArrayName)
-    Q_PROPERTY(QString NewCellArrayName READ getNewCellArrayName WRITE setNewCellArrayName)
+    DREAM3D_FILTER_PARAMETER(QString, DataContainerName)
+    Q_PROPERTY(QString DataContainerName READ getDataContainerName WRITE setDataContainerName)
 
-    DREAM3D_FILTER_PARAMETER(bool, SaveAsNewArray)
-    Q_PROPERTY(bool SaveAsNewArray READ getSaveAsNewArray WRITE setSaveAsNewArray)
+    DREAM3D_FILTER_PARAMETER(QString, CellAttributeMatrixName)
+    Q_PROPERTY(QString CellAttributeMatrixName READ getCellAttributeMatrixName WRITE setCellAttributeMatrixName)
 
-    DREAM3D_FILTER_PARAMETER(int, ManualParameter)
-    Q_PROPERTY(int ManualParameter READ getManualParameter WRITE setManualParameter)
+    DREAM3D_FILTER_PARAMETER(QString, ImageDataArrayName)
+    Q_PROPERTY(QString ImageDataArrayName READ getImageDataArrayName WRITE setImageDataArrayName)
 
     /**
      * @brief getCompiledLibraryName Returns the name of the Library that this filter is a part of
@@ -113,7 +113,7 @@ class ManualThresholdTemplate : public AbstractFilter
      */
     virtual AbstractFilter::Pointer newFilterInstance(bool copyFilterParameters);
 
-//virtual void ManualThresholdTemplate::template_execute();
+//virtual void ReadImage::template_execute();
 
   signals:
     /**
@@ -139,7 +139,7 @@ class ManualThresholdTemplate : public AbstractFilter
     void preflightExecuted();
 
   protected:
-    ManualThresholdTemplate();
+    ReadImage();
 
     /**
     * @brief Checks for the appropriate parameter values and availability of arrays in the data container
@@ -147,12 +147,11 @@ class ManualThresholdTemplate : public AbstractFilter
     void dataCheck();
 
   private:
-    TEMPLATE_DEFINE_REQUIRED_DATAARRAY_VARIABLE(SelectedCellArray)
-    TEMPLATE_DEFINE_CREATED_DATAARRAY_VARIABLE(NewCellArray)
+    TEMPLATE_DEFINE_CREATED_DATAARRAY_VARIABLE(ImageData)
 
 
-    ManualThresholdTemplate(const ManualThresholdTemplate&); // Copy Constructor Not Implemented
-    void operator=(const ManualThresholdTemplate&); // Operator '=' Not Implemented
+    ReadImage(const ReadImage&); // Copy Constructor Not Implemented
+    void operator=(const ReadImage&); // Operator '=' Not Implemented
 };
 
-#endif /* _ManualThresholdTemplate_H_ */
+#endif /* _ReadImage_H_ */
