@@ -3,10 +3,15 @@
  */
 
 #include "BackgroundFit.h"
-
+#include "DREAM3DLib/Common/Constants.h"
 #include <QtCore/QString>
 
 #include "ImageProcessing/ImageProcessingConstants.h"
+#include "ITKUtilities.h"
+
+//// Setup some typedef 's for the ITKUtilities class to shorten up our code
+typedef ITKUtilities<ImageProcessing::DefaultPixelType>    ITKUtilitiesType;
+
 
 // -----------------------------------------------------------------------------
 //
@@ -143,6 +148,49 @@ void BackgroundFit::preflight()
   setInPreflight(false); // Inform the system this filter is NOT in preflight mode anymore.
 }
 
+template<typename T>
+void findAverage(IDataArray::Pointer inputData, size_t udims[3])//, size_t [3] udims)
+{
+  #if (CMP_SIZEOF_SIZE_T == 4)
+    typedef int32_t DimType;
+  #else
+    typedef int64_t DimType;
+  #endif
+    DimType dims[3] =
+    {
+      static_cast<DimType>(udims[0]),
+      static_cast<DimType>(udims[1]),
+      static_cast<DimType>(udims[2]),
+    };
+
+  DataArray<T>* cellArray = DataArray<T>::SafePointerDownCast(inputData.get());
+  if (NULL == cellArray) { return; }
+
+  T* cPtr = cellArray->getPointer(0);
+
+  size_t numPoints = cellArray->getNumberOfTuples();
+  size_t numSlices = dims[2];
+  size_t numXYpoints = dims[0]*dims[1];
+  size_t k;
+  QVector<int64_t> background(numXYpoints, 0);
+
+  int64_t value;
+  for (size_t i = 0; i < numSlices; i++)
+   {
+   for (size_t j = 0; j < numXYpoints; j++)
+    {
+      k = j+i*numXYpoints;
+      value = int64_t(cPtr[k]);
+      background[j] = background[j] + value;
+    }
+
+   }
+   for (size_t j = 0; j < numXYpoints; j++)
+   {
+  background[j] = int64_t(background[j] /= int64_t(numSlices));
+}
+}
+
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
@@ -211,10 +259,38 @@ void BackgroundFit::execute()
     static_cast<DimType>(udims[1]),
     static_cast<DimType>(udims[2]),
   };
+  QString ss;
 
 
+  IDataArray::Pointer inputData = m->getAttributeMatrix(m_SelectedCellArrayPath.getAttributeMatrixName())->getAttributeArray(m_SelectedCellArrayPath.getDataArrayName());
+
+  if (NULL == inputData.get())
+  {
+    ss = QObject::tr("Selected array '%1' does not exist. Was it spelled correctly?").arg(m_SelectedCellArrayPath.getDataArrayName());
+    setErrorCondition(-11001);
+    notifyErrorMessage(getHumanLabel(), ss, getErrorCondition());
+    return;
+  }
+
+  QString dType = inputData->getTypeAsString();
+  qDebug() << "inputDataType" << dType;
+
+  if (dType.compare("int8_t") == 0)
+  {
+    findAverage<int8_t>(inputData, udims);
+  }
+  else if (dType.compare("uint8_t") == 0)
+  {
+    findAverage<uint8_t>(inputData, udims);
+  }
 
 
+//  for(int i = 0; i < dims[2]; ++i)
+//  {
+//    ImageProcessing::DefaultSliceType::Pointer inputSlice = ITKUtilitiesType::ExtractSlice(inputImage, ImageProcessing::ZSlice, i);
+
+
+//  }
 
 
 
