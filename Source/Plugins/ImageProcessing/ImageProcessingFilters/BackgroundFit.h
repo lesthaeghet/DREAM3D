@@ -30,6 +30,12 @@ class BackgroundFit : public AbstractFilter
 
     virtual ~BackgroundFit();
 
+    DREAM3D_FILTER_PARAMETER(int, LowerThreshold)
+    Q_PROPERTY(int LowerThreshold READ getLowerThreshold WRITE setLowerThreshold)
+
+    DREAM3D_FILTER_PARAMETER(int, UpperThreshold)
+    Q_PROPERTY(int UpperThreshold READ getUpperThreshold WRITE setUpperThreshold)
+
     DREAM3D_FILTER_PARAMETER(DataArrayPath, SelectedCellArrayPath)
     Q_PROPERTY(DataArrayPath SelectedCellArrayPath READ getSelectedCellArrayPath WRITE setSelectedCellArrayPath)
 

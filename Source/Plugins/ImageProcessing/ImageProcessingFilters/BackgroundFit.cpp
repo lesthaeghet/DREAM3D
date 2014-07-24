@@ -19,6 +19,8 @@ typedef ITKUtilities<ImageProcessing::DefaultPixelType>    ITKUtilitiesType;
 BackgroundFit::BackgroundFit() :
   AbstractFilter(),
 /* DO NOT FORGET TO INITIALIZE ALL YOUR DREAM3D Filter Parameters HERE */
+m_LowerThreshold(0),
+m_UpperThreshold(255),
 m_SelectedCellArrayPath("", "", ""),
 m_SelectedCellArrayArrayName(""),
 m_SelectedCellArray(NULL)
@@ -39,6 +41,8 @@ BackgroundFit::~BackgroundFit()
 void BackgroundFit::setupFilterParameters()
 {
   FilterParameterVector parameters;
+  parameters.push_back(FilterParameter::New("Lowest Allowed Grayscale Value", "LowerThreshold", FilterParameterWidgetType::IntWidget, getLowerThreshold(), false, "Grayscale Value"));
+  parameters.push_back(FilterParameter::New("Highest Allowed Grayscale Value", "UpperThreshold", FilterParameterWidgetType::IntWidget, getUpperThreshold(), false, "Grayscale Value"));
   parameters.push_back(FilterParameter::New("Array to Process", "SelectedCellArrayPath", FilterParameterWidgetType::DataArraySelectionWidget, getSelectedCellArrayPath(), false, ""));
   /* There are several types of FilterParameter classes to choose from and several
   * options for each class type. The programmer can put the entire invocation into
@@ -65,10 +69,8 @@ void BackgroundFit::readFilterParameters(AbstractFilterParametersReader* reader,
 {
   reader->openFilterGroup(this, index);
   setSelectedCellArrayPath( reader->readDataArrayPath( "SelectedCellArrayPath", getSelectedCellArrayPath() ) );
-  /*
-   Place code in here that will read the parameters from a file
-   setOutputFile( reader->readValue("OutputFile", getOutputFile() ) );
-   */
+  setLowerThreshold( reader->readValue("LowerThreshold", getLowerThreshold()) );
+  setUpperThreshold( reader->readValue("UpperThreshold", getUpperThreshold()) );
   reader->closeFilterGroup();
 }
 
@@ -79,8 +81,8 @@ int BackgroundFit::writeFilterParameters(AbstractFilterParametersWriter* writer,
 {
   writer->openFilterGroup(this, index);
   DREAM3D_FILTER_WRITE_PARAMETER(SelectedCellArrayPath)
-  /* Place code that will write the inputs values into a file. reference the AbstractFilterParametersWriter class for the proper API to use. */
-  /*  writer->writeValue("OutputFile", getOutputFile() ); */
+  DREAM3D_FILTER_WRITE_PARAMETER(LowerThreshold)
+  DREAM3D_FILTER_WRITE_PARAMETER(UpperThreshold)
   writer->closeFilterGroup();
   return ++index; // we want to return the next index that was just written to
 }
@@ -149,7 +151,7 @@ void BackgroundFit::preflight()
 }
 
 template<typename T>
-void findAverage(IDataArray::Pointer inputData, size_t udims[3])//, size_t [3] udims)
+void findAverage(IDataArray::Pointer inputData, size_t udims[3], size_t threshVals[2])//, size_t [3] udims)
 {
   #if (CMP_SIZEOF_SIZE_T == 4)
     typedef int32_t DimType;
@@ -168,11 +170,14 @@ void findAverage(IDataArray::Pointer inputData, size_t udims[3])//, size_t [3] u
 
   T* cPtr = cellArray->getPointer(0);
 
-  size_t numPoints = cellArray->getNumberOfTuples();
+  //size_t numPoints = cellArray->getNumberOfTuples();
   size_t numSlices = dims[2];
   size_t numXYpoints = dims[0]*dims[1];
   size_t k;
   QVector<int64_t> background(numXYpoints, 0);
+  QVector<int64_t> counter(numXYpoints, 0);
+
+  //Need to put a catch in here to make sure every image is the same size
 
   int64_t value;
   for (size_t i = 0; i < numSlices; i++)
@@ -181,13 +186,17 @@ void findAverage(IDataArray::Pointer inputData, size_t udims[3])//, size_t [3] u
     {
       k = j+i*numXYpoints;
       value = int64_t(cPtr[k]);
-      background[j] = background[j] + value;
+      if (value > int64_t(threshVals[0]) && value < int64_t(threshVals[1]))
+      {
+            background[j] = background[j] + value;
+            counter[j] = counter[j] + 1;
+      }
     }
 
    }
    for (size_t j = 0; j < numXYpoints; j++)
    {
-  background[j] = int64_t(background[j] /= int64_t(numSlices));
+  background[j] = int64_t(background[j] /= int64_t(counter[j]));
 }
 }
 
@@ -233,6 +242,9 @@ void BackgroundFit::execute()
   if(getErrorCondition() < 0) { return; }
   setErrorCondition(0);
 
+  size_t threshVals[2] = {m_LowerThreshold, m_UpperThreshold};
+
+
   /* If some error occurs this code snippet can report the error up the call chain*/
   if (err < 0)
   {
@@ -277,11 +289,11 @@ void BackgroundFit::execute()
 
   if (dType.compare("int8_t") == 0)
   {
-    findAverage<int8_t>(inputData, udims);
+    findAverage<int8_t>(inputData, udims, threshVals);
   }
   else if (dType.compare("uint8_t") == 0)
   {
-    findAverage<uint8_t>(inputData, udims);
+    findAverage<uint8_t>(inputData, udims, threshVals);
   }
 
 
