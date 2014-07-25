@@ -151,8 +151,12 @@ void BackgroundFit::preflight()
 }
 
 template<typename T>
-void findAverage(IDataArray::Pointer inputData, size_t udims[3], size_t threshVals[2])//, size_t [3] udims)
+QVector<int64_t> findAverage(IDataArray::Pointer inputData, size_t udims[3], size_t threshVals[2])//, size_t [3] udims)
 {
+
+
+
+
   #if (CMP_SIZEOF_SIZE_T == 4)
     typedef int32_t DimType;
   #else
@@ -165,17 +169,19 @@ void findAverage(IDataArray::Pointer inputData, size_t udims[3], size_t threshVa
       static_cast<DimType>(udims[2]),
     };
 
+    size_t numSlices = dims[2];
+    size_t numXYpoints = dims[0]*dims[1];
+    size_t k;
+    QVector<int64_t> background(numXYpoints, 0);
+    QVector<int64_t> counter(numXYpoints, 0);
+
   DataArray<T>* cellArray = DataArray<T>::SafePointerDownCast(inputData.get());
-  if (NULL == cellArray) { return; }
+  if (NULL == cellArray) { return background; }
 
   T* cPtr = cellArray->getPointer(0);
 
   //size_t numPoints = cellArray->getNumberOfTuples();
-  size_t numSlices = dims[2];
-  size_t numXYpoints = dims[0]*dims[1];
-  size_t k;
-  QVector<int64_t> background(numXYpoints, 0);
-  QVector<int64_t> counter(numXYpoints, 0);
+
 
   //Need to put a catch in here to make sure every image is the same size
 
@@ -197,7 +203,8 @@ void findAverage(IDataArray::Pointer inputData, size_t udims[3], size_t threshVa
    for (size_t j = 0; j < numXYpoints; j++)
    {
   background[j] = int64_t(background[j] /= int64_t(counter[j]));
-}
+   }
+   return background;
 }
 
 // -----------------------------------------------------------------------------
@@ -289,11 +296,11 @@ void BackgroundFit::execute()
 
   if (dType.compare("int8_t") == 0)
   {
-    findAverage<int8_t>(inputData, udims, threshVals);
+    QVector<int64_t> background = findAverage<int8_t>(inputData, udims, threshVals);
   }
   else if (dType.compare("uint8_t") == 0)
   {
-    findAverage<uint8_t>(inputData, udims, threshVals);
+    QVector<int64_t> background = findAverage<uint8_t>(inputData, udims, threshVals);
   }
 
 
