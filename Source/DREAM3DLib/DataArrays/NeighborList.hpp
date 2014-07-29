@@ -398,6 +398,30 @@ class NeighborList : public IDataArray
     }
 
     /**
+     * @brief reorderCopy
+     * @param newOrderMap
+     * @return
+     */
+    virtual IDataArray::Pointer reorderCopy(QVector<size_t> newOrderMap)
+    {
+      if(newOrderMap.size()!=getNumberOfTuples())
+      {
+        return IDataArray::NullPointer();
+      }
+
+      typename NeighborList<T>::Pointer daCopyPtr = NeighborList<T>::CreateArray(getNumberOfTuples(), "Copy of NeighborList", true);
+      daCopyPtr->initializeWithZeros();
+      for(size_t i = 0; i < getNumberOfTuples(); i++)
+      {
+        typename NeighborList<T>::SharedVectorType sharedNeiLst(new std::vector<T>);
+        sharedNeiLst = m_Array[i];
+        daCopyPtr->setList(newOrderMap[i], sharedNeiLst);
+      }
+
+      return daCopyPtr;
+    }
+
+    /**
      * @brief Splats the same value c across all values in the Tuple
      * @param i The index of the Tuple
      * @param c The value to splat across all components in the tuple
