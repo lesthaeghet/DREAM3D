@@ -246,6 +246,10 @@ const QString BackgroundFit::getSubGroupName()
 void BackgroundFit::execute()
 {
   int err = 0;
+  int xval = 0;
+  int yval = 0;
+
+  QVector<int64_t> background;
   dataCheck();
   if(getErrorCondition() < 0) { return; }
   setErrorCondition(0);
@@ -280,7 +284,7 @@ void BackgroundFit::execute()
     static_cast<DimType>(udims[2]),
   };
   QString ss;
-
+  int totalpoints = dims[0]*dims[1];
 
   IDataArray::Pointer inputData = m->getAttributeMatrix(m_SelectedCellArrayPath.getAttributeMatrixName())->getAttributeArray(m_SelectedCellArrayPath.getDataArrayName());
 
@@ -297,30 +301,31 @@ void BackgroundFit::execute()
 
   if (dType.compare("int8_t") == 0)
   {
-    QVector<int64_t> background = findAverage<int8_t>(inputData, udims, threshVals);
+    background = findAverage<int8_t>(inputData, udims, threshVals);
   }
   else if (dType.compare("uint8_t") == 0)
   {
-    QVector<int64_t> background = findAverage<uint8_t>(inputData, udims, threshVals);
+    background = findAverage<uint8_t>(inputData, udims, threshVals);
   }
 
-    Eigen::MatrixXd A(dims[1]*dims[2]*dims[0], 6);
-    Eigen::Vector2i B(dims[1]*dims[2]*dims[0]);
+    Eigen::MatrixXd A(totalpoints, 6);
+    Eigen::VectorXd B(totalpoints);
 
-    for(int i=0; i<dims[0]*dims[1]*dims[2], ++i;)
+    for(int i=0; i < totalpoints; ++i)
     {
        xval = int(i/dims[0]);
        yval = int(i % dims[0]);
        B(i) = background[i];
-       A(rows, 1) = 1;
-       A(rows, 2) = xval;
-       A(rows, 3) = yval;
-       A(rows, 4) = xval*yval;
-       A(rows, 5) = xval*xval;
-       A(rows, 6) = yval*yval;
+       A(i, 0) = 1;
+       A(i, 1) = xval;
+       A(i, 2) = yval;
+       A(i, 3) = xval*yval;
+       A(i, 4) = xval*xval;
+       A(i, 5) = yval*yval;
     }
 
-
+ Eigen::VectorXd p = A.colPivHouseholderQr().solve(B);
+// Eigen::VectorXd p_jacobi = A.jacobiSvd(ComputeThinU | ComputeThinV).solve(B);
 
 //  for(int i = 0; i < dims[2]; ++i)
 //  {
