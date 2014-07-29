@@ -5,6 +5,7 @@
 #include "BackgroundFit.h"
 #include "DREAM3DLib/Common/Constants.h"
 #include <QtCore/QString>
+#include <Eigen/Dense>
 
 #include "ImageProcessing/ImageProcessingConstants.h"
 #include "ITKUtilities.h"
@@ -302,6 +303,23 @@ void BackgroundFit::execute()
   {
     QVector<int64_t> background = findAverage<uint8_t>(inputData, udims, threshVals);
   }
+
+    Eigen::MatrixXd A(dims[1]*dims[2]*dims[0], 6);
+    Eigen::Vector2i B(dims[1]*dims[2]*dims[0]);
+
+    for(int i=0; i<dims[0]*dims[1]*dims[2], ++i;)
+    {
+       xval = int(i/dims[0]);
+       yval = int(i % dims[0]);
+       B(i) = background[i];
+       A(rows, 1) = 1;
+       A(rows, 2) = xval;
+       A(rows, 3) = yval;
+       A(rows, 4) = xval*yval;
+       A(rows, 5) = xval*xval;
+       A(rows, 6) = yval*yval;
+    }
+
 
 
 //  for(int i = 0; i < dims[2]; ++i)
