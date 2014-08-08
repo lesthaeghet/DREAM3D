@@ -21,6 +21,7 @@ namespace FilterParameterWidgetType
 {
 
   const QString EbsdToH5EbsdWidget("EbsdToH5EbsdWidget");
+  const QString ImagesToMM3DWidget("ImagesToMM3DWidget");
   const QString ReadH5EbsdWidget("ReadH5EbsdWidget");
   const QString ConvertHexGridToSquareGridWidget("ConvertHexGridToSquareGridWidget");
 }

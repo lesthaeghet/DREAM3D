@@ -14,6 +14,7 @@ START_FILTER_GROUP(${MegnaExtras_BINARY_DIR} "${_filterGroupName}" "MegnaExtras"
 # List your public filters here
 set(_PublicFilters
   MatchAndRenumber
+  ImagesToMM3D
 
 )
 
@@ -43,7 +44,7 @@ foreach(f ${_PrivateFilters} )
                         ${DREAM3DLib_FILTER_DOC_DIR}/${_filterGroupName}/${f}.md FALSE)
 endforeach()
 
-
+ADD_DREAM3D_SUPPORT_HEADER(${MegnaExtras_SOURCE_DIR} ${_filterGroupName} MontageDataArray.hpp)
 
 #---------------------
 # This macro must come last after we are done adding all the filters and support files.
