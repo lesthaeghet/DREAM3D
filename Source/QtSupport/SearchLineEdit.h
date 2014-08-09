@@ -3,8 +3,8 @@
 
 
 
-#include <QLineEdit>
-#include <QAbstractButton>
+#include <QtWidgets/QLineEdit>
+#include <QtWidgets/QAbstractButton>
 
 #include "DREAM3DLib/Common/DREAM3DSetGetMacros.h"
 

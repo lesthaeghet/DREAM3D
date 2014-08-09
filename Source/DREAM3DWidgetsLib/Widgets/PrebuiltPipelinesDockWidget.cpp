@@ -43,10 +43,10 @@
 #include <QtCore/QUrl>
 #include <QtCore/QDebug>
 
-#include <QtGui/QMessageBox>
+#include <QtWidgets/QMessageBox>
 #include <QtGui/QDesktopServices>
-#include <QtGui/QTreeWidgetItem>
-#include <QtGui/QMenu>
+#include <QtWidgets/QTreeWidgetItem>
+#include <QtWidgets/QMenu>
 
 
 #include "FilterListDockWidget.h"
@@ -281,8 +281,8 @@ void PrebuiltPipelinesDockWidget::actionAppendPipeline_triggered()
   QTreeWidgetItem* item = filterLibraryTree->currentItem();
   if (NULL == item)
   {
-    QMessageBox::critical ( this, QString::fromAscii("PAppend to Pipeline Error"),
-                            QString::fromAscii("Please select either a 'Favorite' or 'Prebuilt' pipeline to append to the current pipeline") );
+    QMessageBox::critical ( this, QString::fromLatin1("PAppend to Pipeline Error"),
+                            QString::fromLatin1("Please select either a 'Favorite' or 'Prebuilt' pipeline to append to the current pipeline") );
     return;
   }
 

@@ -38,13 +38,13 @@
 #ifndef _TREEWIDGETBUILDER_H_
 #define _TREEWIDGETBUILDER_H_
 
-#include <QApplication>
+#include <QtWidgets/QApplication>
 
 
-#include <QtGui/QMenu>
+#include <QtWidgets/QMenu>
 #include <QtGui/QMouseEvent>
-#include <QtGui/QTreeWidget>
-#include <QtGui/QTreeWidgetItem>
+#include <QtWidgets/QTreeWidget>
+#include <QtWidgets/QTreeWidgetItem>
 
 #include "DREAM3DWidgetsLib/DREAM3DWidgetsLib.h"
 

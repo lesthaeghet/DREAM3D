@@ -54,6 +54,7 @@ class SurfaceMeshingPlugin : public QObject, public DREAM3DPluginInterface
     Q_OBJECT
 
     Q_INTERFACES(DREAM3DPluginInterface)
+    Q_PLUGIN_METADATA(IID "net.bluequartz.dream3d.SurfaceMeshingPlugin")
 
   public:
     SurfaceMeshingPlugin();

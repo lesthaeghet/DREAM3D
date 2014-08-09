@@ -90,13 +90,13 @@ SET(DREAM3D_RCS
 )
 
 # -- Run MOC and UIC on the necessary files
-QT4_ADD_RESOURCES( DREAM3D_Generated_RC_SRCS ${DREAM3D_RCS} ${QRC_LICENSE_FILES})
+QT5_ADD_RESOURCES( DREAM3D_Generated_RC_SRCS ${DREAM3D_RCS} ${QRC_LICENSE_FILES})
 
 # this will run uic on .ui files:
-QT4_WRAP_UI( DREAM3D_Generated_UI_HDRS ${DREAM3D_UIS} )
+QT5_WRAP_UI( DREAM3D_Generated_UI_HDRS ${DREAM3D_UIS} )
 
 # and finally this will run moc:
-#QT4_WRAP_CPP( DREAM3D_Generated_MOC_SRCS ${DREAM3D_MOC_HDRS} )
+
 
 #-- Put the generated files into their own group for IDEs
 cmp_IDE_GENERATED_PROPERTIES("Generated/ui" "${DREAM3D_Generated_UI_HDRS}" "")
@@ -139,7 +139,8 @@ BuildQtAppBundle(
     VERSION_MINOR ${DREAM3D_VER_MINOR}
     VERSION_PATCH ${DREAM3D_VER_PATCH}
     BINARY_DIR    ${${PROJECT_NAME}_BINARY_DIR}
-    LINK_LIBRARIES   ${QT_LIBRARIES} H5Support EbsdLib DREAM3DLib QtSupport DREAM3DWidgetsLib
+    LINK_LIBRARIES  H5Support EbsdLib DREAM3DLib QtSupport DREAM3DWidgetsLib
+	QT5_MODULES Core Gui Widgets Network
     LIB_SEARCH_DIRS ${CMAKE_LIBRARY_OUTPUT_DIRECTORY} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
     QT_PLUGINS    ${QT_PLUGINS}
     OTHER_PLUGINS ${DREAM3D_PLUGINS}

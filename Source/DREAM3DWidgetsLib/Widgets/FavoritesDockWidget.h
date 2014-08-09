@@ -38,8 +38,8 @@
 
 #include <QtCore/QFileInfo>
 #include <QtCore/QSettings>
-#include <QtGui/QDockWidget>
-#include <QtGui/QTreeWidgetItem>
+#include <QtWidgets/QDockWidget>
+#include <QtWidgets/QTreeWidgetItem>
 
 
 #include "DREAM3DLib/Common/Constants.h"

@@ -41,9 +41,9 @@
 #include <QtCore/QFileInfo>
 #include <QtCore/QDir>
 
-#include <QtGui/QApplication>
+#include <QtWidgets/QApplication>
 #include <QtGui/QBitmap>
-#include <QtGui/QMessageBox>
+#include <QtWidgets/QMessageBox>
 
 
 #include "DSplashScreen.h"
@@ -145,7 +145,7 @@ bool BrandedInitializer::initialize(int argc, char* argv[])
   this->MainWindow->show();
   if (show_splash)
   {
-    delay(2);
+  //  delay(2);
     this->Splash->finish(this->MainWindow);
   }
   QApplication::instance()->processEvents();
@@ -241,7 +241,7 @@ QVector<DREAM3DPluginInterface*> BrandedInitializer::loadPlugins()
 #endif
       {
         pluginFilePaths << aPluginDir.absoluteFilePath(fileName);
-        //qWarning(aPluginDir.absoluteFilePath(fileName).toAscii(), "%s");
+        //qWarning(aPluginDir.absoluteFilePath(fileName).toLatin1(), "%s");
         //qDebug() << "Adding " << aPluginDir.absoluteFilePath(fileName)() << "\n";
       }
     }

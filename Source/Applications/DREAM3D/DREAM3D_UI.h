@@ -45,10 +45,10 @@
 #include <QtCore/QList>
 #include <QtCore/QVector>
 #include <QtCore/QSettings>
-#include <QtGui/QWidget>
-#include <QtGui/QMainWindow>
+#include <QtWidgets/QWidget>
+#include <QtWidgets/QMainWindow>
 #include <QtGui/QResizeEvent>
-#include <QtGui/QToolBar>
+#include <QtWidgets/QToolBar>
 
 
 #include "DREAM3DLib/Common/FilterManager.h"

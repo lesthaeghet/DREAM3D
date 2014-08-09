@@ -38,7 +38,7 @@
 #define _QFILTERLISTWIDGET_H_
 
 #include <QtCore/QPoint>
-#include <QtGui/QListWidget>
+#include <QtWidgets/QListWidget>
 
 
 #include "DREAM3DWidgetsLib/DREAM3DWidgetsLib.h"

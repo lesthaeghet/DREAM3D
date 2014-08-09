@@ -20,10 +20,13 @@
 ** WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 **
 ****************************************************************************/
-
-#include <QtGui>
-
 #include "FaderWidget.h"
+
+#include <QtCore/QTimer>
+#include <QtGui/QPainter>
+
+
+
 
 FaderWidget::FaderWidget(QWidget* parent)
   : QWidget(parent)

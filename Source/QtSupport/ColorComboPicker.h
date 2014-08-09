@@ -37,7 +37,7 @@
 #ifndef _COLORCOMBOPICKER_H_
 #define _COLORCOMBOPICKER_H_
 
-#include <QComboBox>
+#include <QtWidgets/QComboBox>
 
 class QColor;
 class QWidget;

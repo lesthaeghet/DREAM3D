@@ -40,11 +40,11 @@
 #include <vector>
 
 #include <QtCore/QTimer>
-#include <QtGui/QFrame>
-#include <QtGui/QLabel>
-#include <QtGui/QVBoxLayout>
-#include <QtGui/QTextEdit>
-#include <QtGui/QTableWidget>
+#include <QtWidgets/QFrame>
+#include <QtWidgets/QLabel>
+#include <QtWidgets/QVBoxLayout>
+#include <QtWidgets/QTextEdit>
+#include <QtWidgets/QTableWidget>
 
 
 #include "DREAM3DLib/Common/PipelineMessage.h"

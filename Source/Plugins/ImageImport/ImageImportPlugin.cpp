@@ -40,9 +40,6 @@
 #include "DREAM3DLib/Common/IFilterFactory.hpp"
 #include "DREAM3DLib/Common/FilterFactory.hpp"
 
-#include "ImageImport/moc_ImageImportPlugin.cpp"
-
-Q_EXPORT_PLUGIN2(ImageImportPlugin, ImageImportPlugin)
 
 namespace Detail
 {

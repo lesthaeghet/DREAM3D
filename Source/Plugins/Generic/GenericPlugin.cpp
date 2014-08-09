@@ -40,9 +40,7 @@
 #include "DREAM3DLib/Common/FilterFactory.hpp"
 
 
-#include "Generic/moc_GenericPlugin.cpp"
-
-Q_EXPORT_PLUGIN2(GenericPlugin, GenericPlugin)
+// #include "Generic/moc_GenericPlugin.cpp"
 
 namespace Detail
 {

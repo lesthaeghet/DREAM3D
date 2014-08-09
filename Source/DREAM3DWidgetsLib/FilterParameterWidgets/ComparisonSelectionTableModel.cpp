@@ -37,9 +37,9 @@
 #include "ComparisonSelectionTableModel.h"
 
 #include <QtCore/QDebug>
-#include <QApplication>
-#include <QtGui/QStyleOptionComboBox>
-#include <QtGui/QAbstractItemDelegate>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QStyleOptionComboBox>
+#include <QtWidgets/QAbstractItemDelegate>
 
 #include "ComparisonSelectionItemDelegate.h"
 

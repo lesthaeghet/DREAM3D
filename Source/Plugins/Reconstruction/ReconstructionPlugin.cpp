@@ -40,9 +40,6 @@
 #include "DREAM3DLib/Common/FilterFactory.hpp"
 #include "Reconstruction/ReconstructionConstants.h"
 
-#include "moc_ReconstructionPlugin.cpp"
-
-Q_EXPORT_PLUGIN2(ReconstructionPlugin, ReconstructionPlugin)
 
 namespace Detail
 {

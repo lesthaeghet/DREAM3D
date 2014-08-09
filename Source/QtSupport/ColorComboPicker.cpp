@@ -33,10 +33,9 @@
  *                           FA8650-07-D-5800
  *
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
-
-#include <QtGui>
-
 #include "ColorComboPicker.h"
+
+#include <QtCore/QVariant>
 
 // -----------------------------------------------------------------------------
 //
@@ -51,7 +50,8 @@ ColorComboPicker::ColorComboPicker(QWidget* widget) :
 // -----------------------------------------------------------------------------
 QColor ColorComboPicker::color() const
 {
-  return qVariantValue<QColor > (itemData(currentIndex(), Qt::DecorationRole));
+	QVariant color = itemData(currentIndex(), Qt::DecorationRole);
+	return color.value<QColor>();
 }
 // -----------------------------------------------------------------------------
 //
