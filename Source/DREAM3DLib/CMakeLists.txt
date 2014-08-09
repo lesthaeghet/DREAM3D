@@ -13,7 +13,7 @@
 
 # set project's name
 PROJECT( DREAM3DLib )
-cmake_minimum_required(VERSION 2.8.9)
+cmake_minimum_required(VERSION 3.0.1)
 
 if(${CMAKE_MAJOR_VERSION} STREQUAL "3")
     # CMake 3.0 introduces VERSION variables for each Project. We do our own version numbering so we need to have
@@ -147,6 +147,7 @@ include_directories( ${DREAM3DLib_BINARY_DIR} )
 #-- Add a library for the DREAM3DLib Code
 add_library(${PROJECT_NAME} ${LIB_TYPE} ${Project_SRCS} )
 target_link_libraries(${PROJECT_NAME} EbsdLib ${TBB_LIBRARIES})
+qt5_use_modules(${PROJECT_NAME} Core)
 LibraryProperties( ${PROJECT_NAME} ${EXE_DEBUG_EXTENSION} )
 
 set(install_dir "tools")

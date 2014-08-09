@@ -41,10 +41,6 @@
 #include "DREAM3DLib/Common/FilterFactory.hpp"
 
 
-#include "moc_SurfaceMeshingPlugin.cpp"
-
-Q_EXPORT_PLUGIN2(SurfaceMeshingPlugin, SurfaceMeshingPlugin)
-
 namespace Detail
 {
   const QString SurfaceMeshingPluginFile("SurfaceMeshingPlugin");

@@ -41,9 +41,6 @@
 #include "DREAM3DLib/Common/FilterFactory.hpp"
 
 
-#include "moc_SyntheticBuildingPlugin.cpp"
-
-Q_EXPORT_PLUGIN2(SyntheticBuildingPlugin, SyntheticBuildingPlugin)
 
 namespace Detail
 {

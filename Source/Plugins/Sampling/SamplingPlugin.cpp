@@ -8,12 +8,6 @@
 #include "DREAM3DLib/Common/IFilterFactory.hpp"
 #include "DREAM3DLib/Common/FilterFactory.hpp"
 
-//#include "PipelineBuilder/FilterWidgetManager.h"
-//#include "FilterWidgets/PipelineFilterWidgetFactory.hpp"
-
-#include "moc_SamplingPlugin.cpp"
-
-Q_EXPORT_PLUGIN2(SamplingPlugin, SamplingPlugin)
 
 namespace Detail
 {

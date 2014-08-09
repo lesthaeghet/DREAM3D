@@ -8,20 +8,20 @@
 #--
 #--////////////////////////////////////////////////////////////////////////////
 project(StatsGenerator)
-cmake_minimum_required(VERSION 2.8.9)
+cmake_minimum_required(VERSION 3.0.1)
 
 # ------------------------------------------------------------------------------
 #  Qt 4 Section
 # ------------------------------------------------------------------------------
-if(QT4_FOUND)
+if(Qt5Core_FOUND)
     set(QT_USE_QTSVG "TRUE")
     set(QT_USE_QTSCRIPT "TRUE")
-    include( ${QT_USE_FILE} )
-    CMP_COPY_QT4_RUNTIME_LIBRARIES( "QtSvg;QtScript")
+    
+    CMP_COPY_QT5_RUNTIME_LIBRARIES( "QtSvg;QtScript")
     CMP_QT_LIBRARIES_INSTALL_RULES( "QtSvg;QtScript" "./")
 else()
     message(FATAL_ERROR "Qt 4 is Needed for this project.")
-endif(QT4_FOUND)
+endif()
 
 # ------------------------------------------------------------------------------
 #  Qwt Section
@@ -177,13 +177,13 @@ SET(StatsGenerator_RCS ${PROJECT_RESOURCES_DIR}/icons/images/Icons.qrc)
 #foreach(lic ${QRC_LICENSE_FILES})
 #  message(STATUS "  ${lic}")
 #endforeach(lic ${QRC_LICENSE_FILES})
-QT4_ADD_RESOURCES( Generated_RC_SRCS ${StatsGenerator_RCS} ${QRC_LICENSE_FILES})
+QT5_ADD_RESOURCES( Generated_RC_SRCS ${StatsGenerator_RCS} ${QRC_LICENSE_FILES})
 
 # this will run uic on .ui files:
-QT4_WRAP_UI( Generated_UI_HDRS ${StatsGenerator_UIS} )
+QT5_WRAP_UI( Generated_UI_HDRS ${StatsGenerator_UIS} )
 
 # and finally this will run moc:
-#QT4_WRAP_CPP( Generated_MOC_SRCS
+
 #            ${StatsGenerator_MOC_HDRS}
 #            ${StatsGenerator_DELEGATE_HDRS}
 #            ${StatsGenerator_TABLEMODEL_HDRS}
@@ -245,8 +245,7 @@ BuildQtAppBundle(
     BINARY_DIR    ${${PROJECT_NAME}_BINARY_DIR}
     LINK_LIBRARIES  H5Support EbsdLib DREAM3DLib ${QT_LIBRARIES} QtSupport ${QWT_LIBRARY}
     LIB_SEARCH_DIRS ${CMAKE_LIBRARY_OUTPUT_DIRECTORY} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-#    QT_PLUGINS    ${QT_PLUGINS}
-#    OTHER_PLUGINS ${OTHER_PLUGINS}
+	QT5_MODULES Core Gui Widgets
     COMPONENT     Applications
     INSTALL_DEST  ${DEST_DIR}
 )

@@ -37,8 +37,8 @@
 #include "SGAbstractTableModel.h"
 #include <iostream>
 
-#include <QApplication>
-#include <QtGui/QStyleOptionComboBox>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QStyleOptionComboBox>
 
 // -----------------------------------------------------------------------------
 //

@@ -36,7 +36,7 @@
 #include "FilterListDockWidget.h"
 
 #include <QtCore/QFileInfo>
-#include <QtGui/QTreeWidgetItem>
+#include <QtWidgets/QTreeWidgetItem>
 #include <QtGui/QPainter>
 
 #include "QtSupport/DREAM3DHelpUrlGenerator.h"
@@ -111,7 +111,7 @@ void FilterListDockWidget::setupSearchField()
   {
     m_ActionSearchFilterHumanName = new QAction(filterSearch);
     m_ActionSearchFilterHumanName->setObjectName(QString::fromUtf8("actionFilterHumanLabel"));
-    m_ActionSearchFilterHumanName->setText(QApplication::translate("DREAM3D_UI", "Filter Human Name", 0, QApplication::UnicodeUTF8));
+    m_ActionSearchFilterHumanName->setText(QApplication::translate("DREAM3D_UI", "Filter Human Name", 0));
     m_ActionSearchFilterHumanName->setCheckable(true);
     m_ActionSearchFilterHumanName->setChecked(m_SearchFilterHumanName);
     filterSearch->addAction(m_ActionSearchFilterHumanName);
@@ -122,7 +122,7 @@ void FilterListDockWidget::setupSearchField()
   {
     m_ActionSearchFilterClassName = new QAction(filterSearch);
     m_ActionSearchFilterClassName->setObjectName(QString::fromUtf8("actionFilterClassName"));
-    m_ActionSearchFilterClassName->setText(QApplication::translate("DREAM3D_UI", "Filter Class Name", 0, QApplication::UnicodeUTF8));
+    m_ActionSearchFilterClassName->setText(QApplication::translate("DREAM3D_UI", "Filter Class Name", 0));
     m_ActionSearchFilterClassName->setCheckable(true);
     m_ActionSearchFilterClassName->setChecked(m_SearchFilterClassName);
     filterSearch->addAction(m_ActionSearchFilterClassName);
@@ -134,7 +134,7 @@ void FilterListDockWidget::setupSearchField()
   {
     m_ActionSearchParameterName = new QAction(filterSearch);
     m_ActionSearchParameterName->setObjectName(QString::fromUtf8("actionFilterParameterName"));
-    m_ActionSearchParameterName->setText(QApplication::translate("DREAM3D_UI", "Parameter Name", 0, QApplication::UnicodeUTF8));
+    m_ActionSearchParameterName->setText(QApplication::translate("DREAM3D_UI", "Parameter Name", 0));
     m_ActionSearchParameterName->setCheckable(true);
     m_ActionSearchParameterName->setChecked(m_SearchParameterHumanName);
     filterSearch->addAction(m_ActionSearchParameterName);
@@ -145,7 +145,7 @@ void FilterListDockWidget::setupSearchField()
   {
     m_ActionSearchParameterPropertyName = new QAction(filterSearch);
     m_ActionSearchParameterPropertyName->setObjectName(QString::fromUtf8("actionFilterParameterPropertyName"));
-    m_ActionSearchParameterPropertyName->setText(QApplication::translate("DREAM3D_UI", "Parameter Property Name", 0, QApplication::UnicodeUTF8));
+    m_ActionSearchParameterPropertyName->setText(QApplication::translate("DREAM3D_UI", "Parameter Property Name", 0));
     m_ActionSearchParameterPropertyName->setCheckable(true);
     m_ActionSearchParameterPropertyName->setChecked(m_SearchParameterPropertyName);
     filterSearch->addAction(m_ActionSearchParameterPropertyName);

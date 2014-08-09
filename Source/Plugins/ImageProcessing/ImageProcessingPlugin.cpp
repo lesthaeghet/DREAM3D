@@ -40,10 +40,6 @@
 #include "DREAM3DLib/Common/FilterFactory.hpp"
 
 
-#include "ImageProcessing/moc_ImageProcessingPlugin.cpp"
-
-Q_EXPORT_PLUGIN2(ImageProcessingPlugin, ImageProcessingPlugin)
-
 namespace Detail
 {
   const QString ImageProcessingPluginFile("ImageProcessingPlugin");

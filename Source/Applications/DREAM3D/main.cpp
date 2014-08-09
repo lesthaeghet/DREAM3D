@@ -46,7 +46,7 @@ int main (int argc, char* argv[])
   QCoreApplication::setOrganizationName("BlueQuartz Software");
   QCoreApplication::setOrganizationDomain("bluequartz.net");
   QCoreApplication::setApplicationName("DREAM3D");
-#if defined( Q_WS_MAC )
+#if defined( Q_OS_MAC )
   //Needed for typical Mac program behavior.
   app.setQuitOnLastWindowClosed( true );
 #endif //APPLE
@@ -71,7 +71,7 @@ int main (int argc, char* argv[])
 #else
 
 
-#include <QtGui/QApplication>
+#include <QtWidgets/QApplication>
 #include "BrandedInitializer.h"
 
 #ifdef Q_WS_X11
@@ -95,7 +95,7 @@ int main(int argc, char* argv[])
   QCoreApplication::setOrganizationName("BlueQuartz Software");
 
   QApplication qtapp(argc, argv);
-#if defined( Q_WS_MAC )
+#if defined( Q_OS_MAC )
   //Needed for typical Mac program behavior.
   qtapp.setQuitOnLastWindowClosed( true );
 #endif //APPLE

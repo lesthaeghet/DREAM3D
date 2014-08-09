@@ -11,7 +11,7 @@
 #///////////////////////////////////////////////////////////////////////////////
 
 project(DREAM3DWidgetsLib)
-cmake_minimum_required(VERSION 2.8.9)
+cmake_minimum_required(VERSION 3.0.1)
 
 if(${CMAKE_MAJOR_VERSION} STREQUAL "3")
   # CMake 3.0 introduces VERSION variables for each Project. We do our own version numbering so we need to have
@@ -110,7 +110,7 @@ cmp_IDE_SOURCE_PROPERTIES( "DREAM3DWidgetsLib" "${DREAM3DWidgetsLib_HDRS};${DREA
 
 # --------------------------------------------------------------------
 # and finally this will run moc:
-#QT4_WRAP_CPP( DREAM3DWidgetsLib_Generated_MOC_SRCS ${DREAM3DWidgetsLib_MOC_HDRS} )
+
 
 # These generated moc files will be #include in the FilterWidget source file that
 # are generated so we need to tell the build system to NOT compile these files
@@ -118,11 +118,11 @@ set_source_files_properties( ${DREAM3DWidgetsLib_Generated_MOC_SRCS} PROPERTIES 
 
 
 # -- Run MOC and UIC on the necessary files
-# QT4_ADD_RESOURCES( DREAM3DWidgetsLib_Generated_RC_SRCS "${DREAM3DProj_SOURCE_DIR}/Documentation/Filters/Generated_FilterDocs.qrc"  )
+# QT5_ADD_RESOURCES( DREAM3DWidgetsLib_Generated_RC_SRCS "${DREAM3DProj_SOURCE_DIR}/Documentation/Filters/Generated_FilterDocs.qrc"  )
 
 # --------------------------------------------------------------------
 # Continue on with our Qt4 section
-QT4_WRAP_UI( DREAM3DWidgetsLib_Generated_UI_HDRS   )
+QT5_WRAP_UI( DREAM3DWidgetsLib_Generated_UI_HDRS   )
 
 # --------------------------------------------------------------------
 #-- Put the Qt generated files into their own group for IDEs
@@ -181,11 +181,10 @@ endif()
 
 add_library(DREAM3DWidgetsLib ${LIB_TYPE} ${Project_SRCS})
 target_link_libraries(DREAM3DWidgetsLib
-                    ${QT_QTCORE_LIBRARY}
-                    ${QT_QTGUI_LIBRARY}
                     QtSupport
                     DREAM3DLib
 )
+qt5_use_modules(${PROJECT_NAME} Core Gui Widgets Network)
 
 LibraryProperties( DREAM3DWidgetsLib ${EXE_DEBUG_EXTENSION})
 

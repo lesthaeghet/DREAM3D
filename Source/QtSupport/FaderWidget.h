@@ -24,7 +24,7 @@
 #ifndef FADERWIDGET_H
 #define FADERWIDGET_H
 
-#include <QWidget>
+#include <QtWidgets/QWidget>
 
 class QTimer;
 

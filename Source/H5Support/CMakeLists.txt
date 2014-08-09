@@ -13,7 +13,7 @@
 
 # set project's name
 PROJECT( H5Support )
-cmake_minimum_required(VERSION 2.8.9)
+cmake_minimum_required(VERSION 3.0.1)
 
 if(${CMAKE_MAJOR_VERSION} STREQUAL "3")
   # CMake 3.0 introduces VERSION variables for each Project. We do our own version numbering so we need to have
@@ -126,8 +126,8 @@ set(PROJECT_SRCS
 )
 
 add_library(${PROJECT_NAME} ${LIB_TYPE} ${PROJECT_SRCS})
-target_link_libraries(${PROJECT_NAME} ${HDF5_LIBRARIES} ${QT_QTCORE_LIBRARY} )
-
+target_link_libraries(${PROJECT_NAME} ${HDF5_LIBRARIES})
+qt5_use_modules(${PROJECT_NAME} Core)
 
 LibraryProperties( ${PROJECT_NAME}  ${EXE_DEBUG_EXTENSION} )
 

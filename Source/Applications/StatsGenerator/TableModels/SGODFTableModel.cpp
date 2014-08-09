@@ -36,9 +36,9 @@
 #include "SGODFTableModel.h"
 #include <iostream>
 
-#include <QApplication>
-#include <QtGui/QStyleOptionComboBox>
-#include <QtGui/QAbstractItemDelegate>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QStyleOptionComboBox>
+#include <QtWidgets/QAbstractItemDelegate>
 
 #include "StatsGenerator/Delegates/SGODFItemDelegate.h"
 

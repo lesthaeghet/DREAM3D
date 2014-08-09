@@ -103,7 +103,7 @@ function(BuildQtAppBundle)
     set(options )
     set(oneValueArgs TARGET DEBUG_EXTENSION ICON_FILE VERSION_MAJOR VERSION_MINOR VERSION_PATCH
                      BINARY_DIR COMPONENT INSTALL_DEST PLUGIN_LIST_FILE)
-    set(multiValueArgs SOURCES LINK_LIBRARIES LIB_SEARCH_DIRS QT_PLUGINS OTHER_PLUGINS)
+    set(multiValueArgs SOURCES LINK_LIBRARIES LIB_SEARCH_DIRS QT_PLUGINS OTHER_PLUGINS QT5_MODULES)
     cmake_parse_arguments(QAB "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
 
     # Default GUI type is blank
@@ -156,8 +156,9 @@ function(BuildQtAppBundle)
 
 #-- Add and Link our executable
     add_executable( ${QAB_TARGET} ${GUI_TYPE} ${QAB_SOURCES} )
-    target_link_libraries( ${QAB_TARGET}
-                        ${QAB_LINK_LIBRARIES} )
+    target_link_libraries( ${QAB_TARGET} ${QAB_LINK_LIBRARIES} )
+    qt5_use_modules(${QAB_TARGET} ${QAB_QT5_MODULES})
+
 
 #-- Make sure we have a proper bundle icon. This must occur AFTER the add_executable command
     if(APPLE)
@@ -523,7 +524,7 @@ endmacro()
 # Finds plugins from the Qt installation. The pluginlist argument should be
 # something like "qgif;qjpeg;qtiff"
 #-------------------------------------------------------------------------------
-macro (FindQt4Plugins pluginlist pluginfile libdirsearchfile plugintype)
+macro (FindQt5Plugins pluginlist pluginfile libdirsearchfile plugintype)
   set(qt_plugin_list ${pluginlist})
   set(qt_plugin_types "Debug;Release")
   if(WIN32)
@@ -607,18 +608,18 @@ macro (FindQt4Plugins pluginlist pluginfile libdirsearchfile plugintype)
     file(APPEND ${pluginfile} "${QTPLUGINS};")
     file(APPEND ${libdirsearchfile} "${QT_PLUGINS_DIR}/${plugintype};")
 
-endmacro(FindQt4Plugins pluginlist)
+endmacro(FindQt5Plugins pluginlist)
 
 # --------------------------------------------------------------------
-#-- Copy all the Qt4 dependent DLLs into the current build directory so that
-#-- one can debug an application or library that depends on Qt4 libraries.
+#-- Copy all the Qt5 dependent DLLs into the current build directory so that
+#-- one can debug an application or library that depends on Qt5 libraries.
 #-- This macro is really intended for Windows Builds because windows libraries
 #-- do not have any type of rpath or install_name encoded in the libraries so
 #-- the least intrusive way to deal with the PATH issues is to just copy all
 #-- the dependend DLL libraries into the build directory. Note that this is
 #-- NOT needed for static libraries.
-macro(CMP_COPY_QT4_RUNTIME_LIBRARIES QTLIBLIST)
-    # message(STATUS "CMP_COPY_QT4_RUNTIME_LIBRARIES")
+macro(CMP_COPY_QT5_RUNTIME_LIBRARIES QTLIBLIST)
+    # message(STATUS "CMP_COPY_QT5_RUNTIME_LIBRARIES")
     set(SUPPORT_LIB_OPTION 1)
     if(MSVC_IDE)
       set(SUPPORT_LIB_OPTION 0)
@@ -628,8 +629,8 @@ macro(CMP_COPY_QT4_RUNTIME_LIBRARIES QTLIBLIST)
       set(SUPPORT_LIB_OPTION 3)
     endif()
 
-    if(NOT DEFINED QT_QMAKE_EXECUTABLE)
-      message(FATAL_ERROR "Qt is REQUIRED to use this Function or macro. Make sure Qt is found on your system.")
+	if(NOT Qt5Core_FOUND)
+      message(FATAL_ERROR "Qt 5 is REQUIRED to use this Function or macro. Make sure Qt is found on your system.")
     endif()
 
     if(SUPPORT_LIB_OPTION EQUAL 0)
@@ -674,8 +675,8 @@ endmacro()
 #
 macro (CMP_QT_LIBRARIES_INSTALL_RULES QTLIBLIST destination)
    # message(STATUS "CMP_QT_LIBRARIES_INSTALL_RULES")
-    if(NOT DEFINED QT_QMAKE_EXECUTABLE)
-      message(FATAL_ERROR "Qt is REQUIRED to use this Function or macro. Make sure Qt is found on your system.")
+	if(NOT Qt5Core_FOUND)
+      message(FATAL_ERROR "Qt 5 is REQUIRED to use this Function or macro. Make sure Qt is found on your system.")
     endif()
 
     if(MSVC)

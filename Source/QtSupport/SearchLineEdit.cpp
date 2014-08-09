@@ -6,15 +6,15 @@
 #include <QDebug>
 #include <QString>
 #include <QPropertyAnimation>
-#include <QApplication>
-#include <QMenu>
-#include <QMouseEvent>
-#include <QLabel>
-#include <QAbstractButton>
-#include <QPainter>
-#include <QStyle>
-#include <QPaintEvent>
-#include <QDesktopWidget>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QMenu>
+#include <QtGui/QMouseEvent>
+#include <QtWidgets/QLabel>
+#include <QtWidgets/QAbstractButton>
+#include <QtGui/QPainter>
+#include <QtWidgets/QStyle>
+#include <QtGui/QPaintEvent>
+#include <QtWidgets/QDesktopWidget>
 
 /**
  * @brief execMenuAtWidget

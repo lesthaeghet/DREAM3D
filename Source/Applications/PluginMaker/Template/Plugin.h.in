@@ -23,6 +23,8 @@ class @PluginName@Plugin : public QObject, public DREAM3DPluginInterface
     Q_OBJECT
 
     Q_INTERFACES(DREAM3DPluginInterface)
+    #error FIX THE NEXT LINE FOR YOUR DOMAIN TO MAKE A UNIQUE IDENTIFIER
+    Q_PLUGIN_METADATA(IID "xxx.xxx.xxx.@PluginName@")
 
   public:
     @PluginName@Plugin();

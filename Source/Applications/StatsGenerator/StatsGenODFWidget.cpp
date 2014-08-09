@@ -44,7 +44,7 @@
 
 //-- Qt Includes
 #include <QtCore/QVector>
-#include <QtCore/QtConcurrentMap>
+#include <QtConcurrent/QtConcurrentMap>
 #include <QtCore/QFileInfo>
 #include <QtCore/QFile>
 #include <QtCore/QDir>
@@ -52,9 +52,9 @@
 #include <QtCore/QSettings>
 
 #include <QtGui/QCloseEvent>
-#include <QtGui/QMessageBox>
-#include <QtGui/QFileDialog>
-#include <QtGui/QAbstractItemDelegate>
+#include <QtWidgets/QMessageBox>
+#include <QtWidgets/QFileDialog>
+#include <QtWidgets/QAbstractItemDelegate>
 
 #include "DREAM3DLib/Common/Texture.hpp"
 #include "DREAM3DLib/Common/StatsGen.hpp"
@@ -341,7 +341,7 @@ void StatsGenODFWidget::setupGui()
 {
   // Setup the TableView and Table Models
   QHeaderView* headerView = new QHeaderView(Qt::Horizontal, m_ODFTableView);
-  headerView->setResizeMode(QHeaderView::Interactive);
+  headerView->setSectionResizeMode(QHeaderView::Interactive);
   m_ODFTableView->setHorizontalHeader(headerView);
   headerView->show();
 

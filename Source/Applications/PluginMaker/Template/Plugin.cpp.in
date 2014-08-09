@@ -9,11 +9,6 @@
 #include "DREAM3DLib/Common/IFilterFactory.hpp"
 #include "DREAM3DLib/Common/FilterFactory.hpp"
 
-
-#include "@PluginName@/moc_@PluginName@Plugin.cpp"
-
-Q_EXPORT_PLUGIN2(@PluginName@Plugin, @PluginName@Plugin)
-
 namespace Detail
 {
   const QString @PluginName@PluginFile("@PluginName@Plugin");

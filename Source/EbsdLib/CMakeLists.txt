@@ -12,7 +12,7 @@
 #///////////////////////////////////////////////////////////////////////////////
 # set project's name
 PROJECT( EbsdLib )
-cmake_minimum_required(VERSION 2.8.9)
+cmake_minimum_required(VERSION 3.0.1)
 
 if(${CMAKE_MAJOR_VERSION} STREQUAL "3")
 	# CMake 3.0 introduces VERSION variables for each Project. We do our own version numbering so we need to have
@@ -86,8 +86,8 @@ if(NOT DEFINED DREAM3DProj_BINARY_DIR)
 	# this command finds Qt4 libraries and sets all required variables
 	# note that it's Qt4, not QT4 or qt4
 	FIND_PACKAGE( Qt4 REQUIRED )
-	if(QT4_FOUND)
-	   CMP_COPY_QT4_RUNTIME_LIBRARIES( "QtCore")
+	if(Qt5Core_FOUND)
+	   CMP_COPY_QT5_RUNTIME_LIBRARIES( "QtCore")
 	   CMP_QT_LIBRARIES_INSTALL_RULES("QtCore" ".")
 	else()
 	  message(FATAL_ERROR "Qt version 4.8 Core Library is REQUIRED to build EBSDLib")
@@ -240,14 +240,10 @@ if(${EbsdLib_ENABLE_HDF5})
 		)
 endif()
 
-if(QT4_FOUND)
-	set(EBSDLib_LINK_LIBRARIES
-		${EBSDLib_LINK_LIBRARIES}
-		 ${QT_QTCORE_LIBRARY}
-		)
-endif()
-
 target_link_libraries(${PROJECT_NAME} ${EBSDLib_LINK_LIBRARIES})
+if(Qt5Core_FOUND)
+qt5_use_modules(${PROJECT_NAME} Core)
+endif()
 
 LibraryProperties( ${PROJECT_NAME} ${EXE_DEBUG_EXTENSION} )
 

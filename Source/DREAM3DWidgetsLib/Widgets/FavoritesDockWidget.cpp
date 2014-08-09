@@ -43,10 +43,10 @@
 #include <QtCore/QUrl>
 #include <QtCore/QDebug>
 
-#include <QtGui/QMessageBox>
+#include <QtWidgets/QMessageBox>
 #include <QtGui/QDesktopServices>
-#include <QtGui/QTreeWidgetItem>
-#include <QtGui/QMenu>
+#include <QtWidgets/QTreeWidgetItem>
+#include <QtWidgets/QMenu>
 
 #include "DREAM3DLib/Common/FilterManager.h"
 #include "DREAM3DLib/Common/FilterFactory.hpp"
@@ -715,8 +715,8 @@ void FavoritesDockWidget::removeFavorite(QTreeWidgetItem* item)
     bool didRemove = file.remove();
     if(didRemove == false)
     {
-      QMessageBox::warning ( this, QString::fromAscii("Pipeline Save Error"),
-                             QString::fromAscii("There was an error removing the existing Pipeline file. The pipeline was NOT removed") );
+      QMessageBox::warning ( this, QString::fromLatin1("Pipeline Save Error"),
+                             QString::fromLatin1("There was an error removing the existing Pipeline file. The pipeline was NOT removed") );
       return;
     }
   }

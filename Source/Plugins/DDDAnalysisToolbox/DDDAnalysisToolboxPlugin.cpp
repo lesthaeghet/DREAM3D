@@ -10,10 +10,6 @@
 #include "DREAM3DLib/Common/FilterFactory.hpp"
 
 
-#include "DDDAnalysisToolbox/moc_DDDAnalysisToolboxPlugin.cpp"
-
-Q_EXPORT_PLUGIN2(DDDAnalysisToolboxPlugin, DDDAnalysisToolboxPlugin)
-
 namespace Detail
 {
   const QString DDDAnalysisToolboxPluginFile("DDDAnalysisToolboxPlugin");

@@ -41,10 +41,6 @@
 #include "DREAM3DLib/Common/FilterFactory.hpp"
 
 
-#include "IO/moc_IOPlugin.cpp"
-
-Q_EXPORT_PLUGIN2(IOPlugin, IOPlugin)
-
 namespace Detail
 {
   const QString IOPluginFile("IOPlugin");

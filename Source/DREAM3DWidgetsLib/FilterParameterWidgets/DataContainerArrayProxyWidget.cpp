@@ -36,8 +36,10 @@
 #include "DataContainerArrayProxyWidget.h"
 
 #include <QtCore/QMetaProperty>
+#include <QtCore/QItemSelectionModel>
+
 #include <QtGui/QStandardItemModel>
-#include <QtGui/QItemSelectionModel>
+
 #include "DREAM3DWidgetsLib/DREAM3DWidgetsLibConstants.h"
 
 #include "FilterParameterWidgetsDialogs.h"

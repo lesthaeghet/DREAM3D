@@ -41,12 +41,14 @@
 #include <QtCore/QTimer>
 #include <QtCore/QResource>
 #include <QtCore/QDir>
+#include <QtCore/QMimeData>
 
-#include <QtGui/QLabel>
-#include <QtGui/QVBoxLayout>
+#include <QtWidgets/QLabel>
+#include <QtWidgets/QVBoxLayout>
 #include <QtGui/QMouseEvent>
 #include <QtGui/QPainter>
-#include <QtGui/QFileDialog>
+#include <QtGui/QDrag>
+#include <QtWidgets/QFileDialog>
 
 
 
@@ -147,7 +149,7 @@ void PipelineFilterWidget::initialize(AbstractFilter::Pointer filter)
 #if 0
   QAction* action = new QAction(NULL);
   action->setObjectName(QString::fromUtf8("actionSomeAction"));
-  action->setText(QApplication::translate("DREAM3D_UI", "Some Action", 0, QApplication::UnicodeUTF8));
+  action->setText(QApplication::translate("DREAM3D_UI", "Some Action", 0));
   m_MenuActions << action;
   //m_Menu->addAction(action);
   //QKeySequence actionClearKeySeq(Qt::CTRL + Qt::Key_Delete);

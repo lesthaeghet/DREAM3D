@@ -23,6 +23,7 @@ class Version4CompatibilityPlugin : public QObject, public DREAM3DPluginInterfac
     Q_OBJECT
 
     Q_INTERFACES(DREAM3DPluginInterface)
+    Q_PLUGIN_METADATA(IID "net.bluequartz.dream3d.Version4CompatibilityPlugin")
 
   public:
     Version4CompatibilityPlugin();

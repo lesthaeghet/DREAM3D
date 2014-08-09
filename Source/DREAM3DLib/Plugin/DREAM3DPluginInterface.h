@@ -115,10 +115,6 @@ class FilterWidgetManager;
  *      Q_OBJECT
  *      Q_INTERFACES(DREAM3DPluginInterface )
  *    @endcode
- *    The programmer will also need to add the following macros to their implementation file.
- *    @code
- *    Q_EXPORT_PLUGIN2(MyPlugin, MyPlugin);
- *    @endcode
  *
  *    At this point the developer is ready to implement each of the virtual functions in the
  *    DREAM3DPluginInterface in order to make their plugin valid

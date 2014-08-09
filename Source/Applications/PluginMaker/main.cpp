@@ -35,7 +35,7 @@
  *
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
-#include <QApplication>
+#include <QtWidgets/QApplication>
 
 #include "PluginMaker.h"
 
