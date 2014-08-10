@@ -11,17 +11,40 @@ project(StatsGenerator)
 cmake_minimum_required(VERSION 3.0.1)
 
 # ------------------------------------------------------------------------------
-#  Qt 4 Section
+#  Qt 5 Section
 # ------------------------------------------------------------------------------
-if(Qt5Core_FOUND)
-    set(QT_USE_QTSVG "TRUE")
-    set(QT_USE_QTSCRIPT "TRUE")
-    
-    CMP_COPY_QT5_RUNTIME_LIBRARIES( "QtSvg;QtScript")
-    CMP_QT_LIBRARIES_INSTALL_RULES( "QtSvg;QtScript" "./")
-else()
-    message(FATAL_ERROR "Qt 4 is Needed for this project.")
+find_package(Qt5Script)
+get_target_property(Qt5Script_location Qt5::Script LOCATION)
+if(Qt5Script_FOUND)
+  message(STATUS "Qt5Script Found at ${Qt5Script_location}")
+  CMP_COPY_QT5_RUNTIME_LIBRARIES( "Qt5Script")
+  CMP_QT_LIBRARIES_INSTALL_RULES( "Qt5Script" "./")
 endif()
+
+find_package(Qt5Svg)
+get_target_property(Qt5Svg_location Qt5::Svg LOCATION)
+if(Qt5Svg_FOUND)
+  message(STATUS "Qt5Svg Found at ${Qt5Svg_location}")
+  CMP_COPY_QT5_RUNTIME_LIBRARIES( "Qt5Svg")
+  CMP_QT_LIBRARIES_INSTALL_RULES( "Qt5Svg" "./")
+endif()
+
+find_package(Qt5OpenGL)
+get_target_property(Qt5OpenGL_location Qt5::OpenGL LOCATION)
+if(Qt5OpenGL_FOUND)
+  message(STATUS "Qt5OpenGL Found at ${Qt5OpenGL_location}")
+  CMP_COPY_QT5_RUNTIME_LIBRARIES( "Qt5OpenGL")
+  CMP_QT_LIBRARIES_INSTALL_RULES( "Qt5OpenGL" "./")
+endif()
+
+find_package(Qt5PrintSupport)
+get_target_property(Qt5PrintSupport_location Qt5::PrintSupport LOCATION)
+if(Qt5PrintSupport_FOUND)
+  message(STATUS "Qt5PrintSupport Found at ${Qt5PrintSupport_location}")
+  CMP_COPY_QT5_RUNTIME_LIBRARIES( "Qt5PrintSupport")
+  CMP_QT_LIBRARIES_INSTALL_RULES( "Qt5PrintSupport" "./")
+endif()
+
 
 # ------------------------------------------------------------------------------
 #  Qwt Section
@@ -225,9 +248,9 @@ if(APPLE)
     set(APPLICATION_ICON ${PROJECT_RESOURCES_DIR}/icons/icns/${PROJECT_NAME}.icns)
 endif(APPLE)
 
-if(Q_WS_WIN)
+if(WIN32)
     set(APPLICATION_ICON ${PROJECT_RESOURCES_DIR}/icons/ico/${PROJECT_NAME}.ico)
-ENDif(Q_WS_WIN)
+ENDif(WIN32)
 
 set(DEST_DIR ".")
 if(UNIX AND NOT APPLE)
@@ -243,7 +266,7 @@ BuildQtAppBundle(
     VERSION_MINOR ${DREAM3D_VER_MINOR}
     VERSION_PATCH ${DREAM3D_VER_PATCH}
     BINARY_DIR    ${${PROJECT_NAME}_BINARY_DIR}
-    LINK_LIBRARIES  H5Support EbsdLib DREAM3DLib ${QT_LIBRARIES} QtSupport ${QWT_LIBRARY}
+    LINK_LIBRARIES  H5Support EbsdLib DREAM3DLib QtSupport ${QWT_LIBRARY}
     LIB_SEARCH_DIRS ${CMAKE_LIBRARY_OUTPUT_DIRECTORY} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
 	QT5_MODULES Core Gui Widgets
     COMPONENT     Applications

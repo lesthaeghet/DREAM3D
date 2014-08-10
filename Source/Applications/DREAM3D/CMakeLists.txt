@@ -12,6 +12,16 @@
 PROJECT( DREAM3D )
 cmake_minimum_required(VERSION 2.8.10)
 
+if(${CMAKE_MAJOR_VERSION} STREQUAL "3")
+  # CMake 3.0 introduces VERSION variables for each Project. We do our own version numbering so we need to have
+  # cmake ignore that policy
+  cmake_policy(SET CMP0048 OLD)
+  # CMake 3.0 introduces some OS X RPath policies
+  cmake_policy(SET CMP0042 OLD)
+
+  #Policy CMP0043 is not set: Ignore COMPILE_DEFINITIONS_<Config> properties.
+  cmake_policy(SET CMP0043 NEW)
+endif()
 
 # ---------- Setup output Directories -------------------------
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY
@@ -118,9 +128,9 @@ if(APPLE)
     set(APPLICATION_ICON ${PROJECT_RESOURCES_DIR}/icons/icns/DREAM3D.icns)
 endif(APPLE)
 
-if(Q_WS_WIN)
+if(WIN32)
     set(APPLICATION_ICON ${PROJECT_RESOURCES_DIR}/icons/ico/DREAM3D.ico)
-ENDif(Q_WS_WIN)
+ENDif(WIN32)
 
 set(DEST_DIR ".")
 if(UNIX AND NOT APPLE)
@@ -140,7 +150,7 @@ BuildQtAppBundle(
     VERSION_PATCH ${DREAM3D_VER_PATCH}
     BINARY_DIR    ${${PROJECT_NAME}_BINARY_DIR}
     LINK_LIBRARIES  H5Support EbsdLib DREAM3DLib QtSupport DREAM3DWidgetsLib
-	QT5_MODULES Core Gui Widgets Network
+	  QT5_MODULES Core Gui Widgets Network
     LIB_SEARCH_DIRS ${CMAKE_LIBRARY_OUTPUT_DIRECTORY} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
     QT_PLUGINS    ${QT_PLUGINS}
     OTHER_PLUGINS ${DREAM3D_PLUGINS}
