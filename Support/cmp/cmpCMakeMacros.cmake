@@ -529,8 +529,8 @@ macro (FindQt5Plugins pluginlist pluginfile libdirsearchfile plugintype)
   set(qt_plugin_types "Debug;Release")
   if(WIN32)
     set(qt_plugin_prefix "")
-    set(qt_plugin_DEBUG_suffix "d4")
-    set(qt_plugin_RELEASE_suffix "4")
+    set(qt_plugin_DEBUG_suffix "d")
+    set(qt_plugin_RELEASE_suffix "")
   else ()
     set(qt_plugin_prefix "lib")
     set(qt_plugin_DEBUG_suffix "_debug")
@@ -634,26 +634,28 @@ macro(CMP_COPY_QT5_RUNTIME_LIBRARIES QTLIBLIST)
     endif()
 
     if(SUPPORT_LIB_OPTION EQUAL 0)
+      #message(STATUS "SUPPORT_LIB_OPTION = 0")
       set(TYPE "d")
       FOREACH(qtlib ${QTLIBLIST})
         GET_FILENAME_COMPONENT(QT_DLL_PATH_tmp ${QT_QMAKE_EXECUTABLE} PATH)
-        # message(STATUS "CMAKE_GENERATOR: ${CMAKE_GENERATOR}")
+        # message(STATUS "Copy Rule for Qt library ${qtlib}${TYPE}.dll")
         # We need to copy both the Debug and Release versions of the libraries into their respective
         # subfolders for Visual Studio builds
         add_custom_target(ZZ_${qtlib}-Debug-Copy ALL
-                            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${QT_DLL_PATH_tmp}/${qtlib}${TYPE}4.dll
+                            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${QT_DLL_PATH_tmp}/${qtlib}${TYPE}.dll
                             ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug/
-                            COMMENT "Copying ${qtlib}${TYPE}4.dll to ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug/")
+                            COMMENT "Copying ${qtlib}${TYPE}.dll to ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug/")
         set_target_properties(ZZ_${qtlib}-Debug-Copy PROPERTIES FOLDER ZZ_COPY_FILES)
-      #   message(STATUS "Generating Copy Rule for Qt Release DLL Library ${QT_DLL_PATH_tmp}/${qtlib}d4.dll")
+      #   message(STATUS "Generating Copy Rule for Qt Release DLL Library ${QT_DLL_PATH_tmp}/${qtlib}d.dll")
         add_custom_target(ZZ_${qtlib}-Release-Copy ALL
-                            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${QT_DLL_PATH_tmp}/${qtlib}4.dll
+                            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${QT_DLL_PATH_tmp}/${qtlib}.dll
                             ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release/
-                            COMMENT "Copying ${qtlib}4.dll to ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release/")
+                            COMMENT "Copying ${qtlib}.dll to ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release/")
         set_target_properties(ZZ_${qtlib}-Release-Copy PROPERTIES FOLDER ZZ_COPY_FILES)
 
       ENDFOREACH(qtlib)
     elseif(SUPPORT_LIB_OPTION EQUAL 1)
+      message(STATUS "SUPPORT_LIB_OPTION = 1")
       set(TYPE "")
       if( ${CMAKE_BUILD_TYPE} STREQUAL "Debug")
           set(TYPE "d")
@@ -662,9 +664,9 @@ macro(CMP_COPY_QT5_RUNTIME_LIBRARIES QTLIBLIST)
           GET_FILENAME_COMPONENT(QT_DLL_PATH_tmp ${QT_QMAKE_EXECUTABLE} PATH)
           #message(STATUS "Generating Copy Rule for Qt DLL: ${QT_DLL_PATH_tmp}/${qtlib}d4.dll")
           add_custom_target(ZZ_${qtlib}-Debug-Copy ALL
-                      COMMAND ${CMAKE_COMMAND} -E copy_if_different ${QT_DLL_PATH_tmp}/${qtlib}${TYPE}4.dll
+                      COMMAND ${CMAKE_COMMAND} -E copy_if_different ${QT_DLL_PATH_tmp}/${qtlib}${TYPE}.dll
                       ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/
-                      COMMENT "Copying ${qtlib}${TYPE}4.dll to ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/")
+                      COMMENT "Copying ${qtlib}${TYPE}.dll to ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/")
           set_target_properties(ZZ_${qtlib}-Debug-Copy PROPERTIES FOLDER ZZ_COPY_FILES)
       ENDFOREACH(qtlib)
     endif()
@@ -684,12 +686,12 @@ macro (CMP_QT_LIBRARIES_INSTALL_RULES QTLIBLIST destination)
       FOREACH(qtlib ${QTLIBLIST})
         # message(STATUS "Generating Install Rules for Qt DLL: ${QT_DLL_PATH_tmp}/${qtlib}d4.dll")
         GET_FILENAME_COMPONENT(QT_DLL_PATH_tmp ${QT_QMAKE_EXECUTABLE} PATH)
-        install(FILES ${QT_DLL_PATH_tmp}/${qtlib}${type}d4.dll
+        install(FILES ${QT_DLL_PATH_tmp}/${qtlib}${type}d.dll
             DESTINATION "${destination}"
             CONFIGURATIONS Debug
             COMPONENT Applications)
    #    message(STATUS "Generating Install Rule for Qt Release DLL Library ${QT_DLL_PATH_tmp}/${qtlib}4.dll")
-        install(FILES ${QT_DLL_PATH_tmp}/${qtlib}4.dll
+        install(FILES ${QT_DLL_PATH_tmp}/${qtlib}5.dll
             DESTINATION "${destination}"
             CONFIGURATIONS Release
             COMPONENT Applications)
@@ -741,6 +743,7 @@ macro(CMP_COPY_DEPENDENT_LIBRARIES _libraryList)
       file(MAKE_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/MinSizeRel)
       file(MAKE_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/RelWithDebInfo)
     endif()
+
     FOREACH(lib ${_libraryList})
 
       STRING(TOUPPER ${lib} upperlib)
