@@ -162,17 +162,14 @@ if(NOT MSVC)
   set(CMAKE_LIBRARY_OUTPUT_DIRECTORY  ${DREAM3DProj_BINARY_DIR}/Bin/Plugins  )
 endif()
 
-
-
 add_library(${PLUGIN_NAME} MODULE ${${PLUGIN_NAME}_MODULE_SRCS})
 target_link_libraries(${PLUGIN_NAME}
-                    ${QT_QTCORE_LIBRARY}
                     DREAM3DLib
-                    ${QT_QTGUI_LIBRARY}
                     QtSupport
                     DREAM3DWidgetsLib
                     )
 SET_TARGET_PROPERTIES(${PLUGIN_NAME} PROPERTIES FOLDER ${PLUGIN_NAME}Plugin)
+qt5_use_modules(${PROJECT_NAME} Core Gui Widgets)
 
 # --------------------------------------------------------------------
 # Set some additional properties of the plugin like its output name
