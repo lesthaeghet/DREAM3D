@@ -231,17 +231,20 @@ QString FavoritesDockWidget::generateHtmlFilterListFromPipelineFile(QString path
   prefs.beginGroup(DREAM3D::Settings::PipelineBuilderGroup);
   bool ok = false;
   int filterCount = prefs.value("Number_Filters").toInt(&ok);
+
   QString name = prefs.value("Name").toString();
   QString dVers = prefs.value("DREAM3D_Version").toString();
   if(dVers.isEmpty() == true)
   {
     dVers = prefs.value("Version").toString();
   }
+
   prefs.endGroup();
   if (false == ok) {filterCount = 0;}
 
   QString html;
   QTextStream ss(&html);
+
   ss << "<html><head></head>\n";
   ss << "<body>\n";
 
@@ -272,6 +275,7 @@ QString FavoritesDockWidget::generateHtmlFilterListFromPipelineFile(QString path
   for (int i = 0; i < filterCount; ++i)
   {
     if (rowColor == 0) { rowColor = 1; color = odd; } else { rowColor = 0; color = even; }
+
     QString gName = QString::number(i);
     prefs.beginGroup(gName);
     QString item = prefs.value("Filter_Name", "").toString();
@@ -305,9 +309,7 @@ QString FavoritesDockWidget::generateHtmlFilterListFromPipelineFile(QString path
     ss << "or ask the individual who gave you the pipeline file for more details.</th></tr>\n";
   }
   ss << "</tbody></table>\n";
-
   ss << "</body></html>";
-
   return html;
 }
 
@@ -403,7 +405,6 @@ void FavoritesDockWidget::on_filterLibraryTree_itemChanged(QTreeWidgetItem* item
 // -----------------------------------------------------------------------------
 void FavoritesDockWidget::on_filterLibraryTree_currentItemChanged(QTreeWidgetItem* item, QTreeWidgetItem* previous )
 {
-  //  on_filterLibraryTree_itemClicked(item, 0);
 }
 
 // -----------------------------------------------------------------------------
