@@ -157,7 +157,7 @@ void FilterListDockWidget::setupSearchField()
   {
     m_ActionSearchGroupName = new QAction(filterSearch);
     m_ActionSearchGroupName->setObjectName(QString::fromUtf8("actionSearchGroupName"));
-    m_ActionSearchGroupName->setText(QApplication::translate("DREAM3D_UI", "Filter Group", 0, QApplication::UnicodeUTF8));
+    m_ActionSearchGroupName->setText(QApplication::translate("DREAM3D_UI", "Filter Group", 0));
     m_ActionSearchGroupName->setCheckable(true);
     m_ActionSearchGroupName->setChecked(m_SearchSearchGroupName);
     filterSearch->addAction(m_ActionSearchGroupName);
@@ -169,7 +169,7 @@ void FilterListDockWidget::setupSearchField()
   {
     m_ActionSearchSubGroupName = new QAction(filterSearch);
     m_ActionSearchSubGroupName->setObjectName(QString::fromUtf8("actionSearchSubGroupName"));
-    m_ActionSearchSubGroupName->setText(QApplication::translate("DREAM3D_UI", "Filter Subgroup", 0, QApplication::UnicodeUTF8));
+    m_ActionSearchSubGroupName->setText(QApplication::translate("DREAM3D_UI", "Filter Subgroup", 0));
     m_ActionSearchSubGroupName->setCheckable(true);
     m_ActionSearchSubGroupName->setChecked(m_SearchSubGroupName);
     filterSearch->addAction(m_ActionSearchSubGroupName);
@@ -181,7 +181,7 @@ void FilterListDockWidget::setupSearchField()
   {
     m_ActionSearchPluginName = new QAction(filterSearch);
     m_ActionSearchPluginName->setObjectName(QString::fromUtf8("actionSearchPluginName"));
-    m_ActionSearchPluginName->setText(QApplication::translate("DREAM3D_UI", "Filter Plugin", 0, QApplication::UnicodeUTF8));
+    m_ActionSearchPluginName->setText(QApplication::translate("DREAM3D_UI", "Filter Plugin", 0));
     m_ActionSearchPluginName->setCheckable(true);
     m_ActionSearchPluginName->setChecked(m_SearchPluginName);
     filterSearch->addAction(m_ActionSearchPluginName);

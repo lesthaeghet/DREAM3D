@@ -112,26 +112,27 @@ function(BuildQtAppBundle)
     #-- Configure the OS X Bundle Plist
     if(APPLE)
         SET(GUI_TYPE MACOSX_BUNDLE)
-        #-- Make sure the qt_menu.nib is copied if we are using Qt Cocoa by setting the
-        # source files properties of the qt_menu.nib package
-        if(QT_MAC_USE_COCOA)
-            GET_FILENAME_COMPONENT(qt_menu_nib
-              "${QT_QTGUI_LIBRARY_RELEASE}/Resources/qt_menu.nib"
-              REALPATH)
-            set(qt_menu_nib_sources
-              "${qt_menu_nib}/classes.nib"
-              "${qt_menu_nib}/info.nib"
-              "${qt_menu_nib}/keyedobjects.nib"
+        if(0)
+          #-- Make sure the qt_menu.nib is copied if we are using Qt Cocoa by setting the
+          # source files properties of the qt_menu.nib package
+          if(QT_MAC_USE_COCOA)
+              GET_FILENAME_COMPONENT(qt_menu_nib
+                "${QT_QTGUI_LIBRARY_RELEASE}/Resources/qt_menu.nib"
+                REALPATH)
+              set(qt_menu_nib_sources
+                "${qt_menu_nib}/classes.nib"
+                "${qt_menu_nib}/info.nib"
+                "${qt_menu_nib}/keyedobjects.nib"
+                )
+              SET_SOURCE_FILES_PROPERTIES(
+                ${qt_menu_nib_sources}
+                PROPERTIES
+                MACOSX_PACKAGE_LOCATION Resources/qt_menu.nib
               )
-            SET_SOURCE_FILES_PROPERTIES(
-              ${qt_menu_nib_sources}
-              PROPERTIES
-              MACOSX_PACKAGE_LOCATION Resources/qt_menu.nib
-            )
-        ELSE(QT_MAC_USE_COCOA)
-            set(qt_menu_nib_sources)
-        endif(QT_MAC_USE_COCOA)
-
+          ELSE(QT_MAC_USE_COCOA)
+              set(qt_menu_nib_sources)
+          endif(QT_MAC_USE_COCOA)
+        endif()
 #-- Write out a qt.conf file to place in our App bundle
 #        set(qt_conf_file ${${QAB_TARGET}_BINARY_DIR}/qt.conf)
 #        file(WRITE ${qt_conf_file})
