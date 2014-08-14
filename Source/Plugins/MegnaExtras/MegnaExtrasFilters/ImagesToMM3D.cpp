@@ -46,15 +46,15 @@
 #include "EbsdLib/EbsdLib.h"
 #include "EbsdLib/EbsdConstants.h"
 #include "EbsdLib/EbsdImporter.h"
-#include "EbsdLib/TSL/AngConstants.h"
-#include "EbsdLib/TSL/AngFields.h"
-#include "EbsdLib/TSL/H5AngImporter.h"
-#include "EbsdLib/HKL/CtfConstants.h"
-#include "EbsdLib/HKL/CtfFields.h"
-#include "EbsdLib/HKL/H5CtfImporter.h"
-#include "EbsdLib/HEDM/MicConstants.h"
-#include "EbsdLib/HEDM/MicFields.h"
-#include "EbsdLib/HEDM/H5MicImporter.h"
+//#include "EbsdLib/TSL/AngConstants.h"
+//#include "EbsdLib/TSL/AngFields.h"
+//#include "EbsdLib/TSL/H5AngImporter.h"
+//#include "EbsdLib/HKL/CtfConstants.h"
+//#include "EbsdLib/HKL/CtfFields.h"
+//#include "EbsdLib/HKL/H5CtfImporter.h"
+//#include "EbsdLib/HEDM/MicConstants.h"
+//#include "EbsdLib/HEDM/MicFields.h"
+//#include "EbsdLib/HEDM/H5MicImporter.h"
 
 #include "DREAM3DLib/Common/Constants.h"
 #include "DREAM3DLib/Common/Observer.h"
@@ -201,25 +201,25 @@ void ImagesToMM3D::dataCheck()
     QString ext = fi.suffix();
     //QVector<QString> columnNames;
     //    AbstractEbsdFields* ebsdFeatures = NULL;
-    if(ext.compare(Ebsd::Ang::FileExt) == 0)
-    {
-      //      ebsdFeatures = new AngFields;
-    }
-    else if(ext.compare(Ebsd::Ctf::FileExt) == 0)
-    {
-      //       ebsdFeatures = new CtfFields;
-    }
-    else if(ext.compare(Ebsd::Mic::FileExt) == 0)
-    {
-      //       ebsdFeatures = new MicFields;
-    }
-    else
-    {
-      ss = QObject::tr("The File extension '%1' was not recognized. Currently .ang or .ctf are the only recognized file extensions").arg(ext);
-      notifyErrorMessage(getHumanLabel(), ss, -997);
-      setErrorCondition(-997);
-      return;
-    }
+//    if(ext.compare(Ebsd::Ang::FileExt) == 0)
+//    {
+//      //      ebsdFeatures = new AngFields;
+//    }
+//    else if(ext.compare(Ebsd::Ctf::FileExt) == 0)
+//    {
+//      //       ebsdFeatures = new CtfFields;
+//    }
+//    else if(ext.compare(Ebsd::Mic::FileExt) == 0)
+//    {
+//      //       ebsdFeatures = new MicFields;
+//    }
+//    else
+//    {
+//      ss = QObject::tr("The File extension '%1' was not recognized. Currently .ang or .ctf are the only recognized file extensions").arg(ext);
+//      notifyErrorMessage(getHumanLabel(), ss, -997);
+//      setErrorCondition(-997);
+//      return;
+//    }
   }
 
 
@@ -380,55 +380,55 @@ void ImagesToMM3D::execute()
   // This list will grow to be the number of EBSD file formats we support
   QFileInfo fiExt(fileList.front());
   QString ext = fiExt.suffix();
-  if(ext.compare(Ebsd::Ang::FileExt) == 0)
-  {
-    err = QH5Lite::writeStringDataset(fileId, Ebsd::H5::Manufacturer, Ebsd::Ang::Manufacturer);
-    if(err < 0)
-    {
+//  if(ext.compare(Ebsd::Ang::FileExt) == 0)
+//  {
+//    err = QH5Lite::writeStringDataset(fileId, Ebsd::H5::Manufacturer, Ebsd::Ang::Manufacturer);
+//    if(err < 0)
+//    {
 
-      QString ss = QObject::tr("Could not write the Manufacturer Data to the HDF5 File");
-      setErrorCondition(-1);
-      notifyErrorMessage(getHumanLabel(), ss, getErrorCondition());
+//      QString ss = QObject::tr("Could not write the Manufacturer Data to the HDF5 File");
+//      setErrorCondition(-1);
+//      notifyErrorMessage(getHumanLabel(), ss, getErrorCondition());
 
-    }
-    fileImporter = H5AngImporter::New();
-  }
-  else if(ext.compare(Ebsd::Ctf::FileExt) == 0)
-  {
-    err = QH5Lite::writeStringDataset(fileId, Ebsd::H5::Manufacturer, Ebsd::Ctf::Manufacturer);
-    if(err < 0)
-    {
+//    }
+//    fileImporter = H5AngImporter::New();
+//  }
+//  else if(ext.compare(Ebsd::Ctf::FileExt) == 0)
+//  {
+//    err = QH5Lite::writeStringDataset(fileId, Ebsd::H5::Manufacturer, Ebsd::Ctf::Manufacturer);
+//    if(err < 0)
+//    {
 
-      QString ss = QObject::tr("Could not write the Manufacturer Data to the HDF5 File");
-      setErrorCondition(-1);
-      notifyErrorMessage(getHumanLabel(), ss, getErrorCondition());
+//      QString ss = QObject::tr("Could not write the Manufacturer Data to the HDF5 File");
+//      setErrorCondition(-1);
+//      notifyErrorMessage(getHumanLabel(), ss, getErrorCondition());
 
-    }
-    fileImporter = H5CtfImporter::New();
-  }
-  else if(ext.compare(Ebsd::Mic::FileExt) == 0)
-  {
-    err = QH5Lite::writeStringDataset(fileId, Ebsd::H5::Manufacturer, Ebsd::Mic::Manufacturer);
-    if(err < 0)
-    {
+//    }
+//    fileImporter = H5CtfImporter::New();
+//  }
+//  else if(ext.compare(Ebsd::Mic::FileExt) == 0)
+//  {
+//    err = QH5Lite::writeStringDataset(fileId, Ebsd::H5::Manufacturer, Ebsd::Mic::Manufacturer);
+//    if(err < 0)
+//    {
 
-      QString ss = QObject::tr("Could not write the Manufacturer Data to the HDF5 File");
-      setErrorCondition(-1);
-      notifyErrorMessage(getHumanLabel(), ss, getErrorCondition());
+//      QString ss = QObject::tr("Could not write the Manufacturer Data to the HDF5 File");
+//      setErrorCondition(-1);
+//      notifyErrorMessage(getHumanLabel(), ss, getErrorCondition());
 
-    }
-    fileImporter = H5MicImporter::New();
-  }
-  else
-  {
-    err = -1;
+//    }
+//    fileImporter = H5MicImporter::New();
+//  }
+//  else
+//  {
+//    err = -1;
 
-    QString ss = QObject::tr("The File extension was not detected correctly");
-    setErrorCondition(-1);
-    notifyErrorMessage(getHumanLabel(), ss, getErrorCondition());
+//    QString ss = QObject::tr("The File extension was not detected correctly");
+//    setErrorCondition(-1);
+//    notifyErrorMessage(getHumanLabel(), ss, getErrorCondition());
 
-    return;
-  }
+//    return;
+//  }
 
   QVector<int> indices;
   // Loop on Each EBSD File
