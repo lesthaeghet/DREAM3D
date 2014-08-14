@@ -48,6 +48,9 @@
 #include <QtGui/QTreeWidgetItem>
 #include <QtGui/QMenu>
 
+#include "DREAM3DLib/Common/FilterManager.h"
+#include "DREAM3DLib/Common/FilterFactory.hpp"
+
 #include "DREAM3DWidgetsLib/Widgets/AddFavoriteWidget.h"
 #include "DREAM3DWidgetsLib/Widgets/FilterListDockWidget.h"
 
@@ -90,6 +93,16 @@ void FavoritesDockWidget::setupGui()
   filterLibraryTree->clear();
 
   readPipelines();
+
+  QString css(" QToolTip {\
+              border: 2px solid #434343;\
+              padding: 2px;\
+              border-radius: 3px;\
+              opacity: 255;\
+              background-color: #FFFFFF;\
+              }");
+filterLibraryTree->setStyleSheet(css);
+
 }
 
 // -----------------------------------------------------------------------------
@@ -203,22 +216,96 @@ void FavoritesDockWidget::addPipelinesRecursively(QDir currentDir, QTreeWidgetIt
     {
       itemWidget->setFlags(itemWidget->flags() | Qt::ItemIsEditable);
     }
+    QString htmlFormattedString = generateHtmlFilterListFromPipelineFile(itemInfo.absoluteFilePath());
+    itemWidget->setToolTip(0, htmlFormattedString);
   }
 }
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void FavoritesDockWidget::on_filterLibraryTree_itemClicked( QTreeWidgetItem* item, int column )
+QString FavoritesDockWidget::generateHtmlFilterListFromPipelineFile(QString path)
 {
-  QString favoritePath = item->data(0, Qt::UserRole).toString();
-  QStringList filterList = generateFilterListFromPipelineFile(favoritePath);
-  if(filterList.size() > 0)
-  {
-    emit filterListGenerated(filterList, false);
-  }
-}
+  QSettings prefs(path, QSettings::IniFormat);
 
+  prefs.beginGroup(DREAM3D::Settings::PipelineBuilderGroup);
+  bool ok = false;
+  int filterCount = prefs.value("Number_Filters").toInt(&ok);
+  QString name = prefs.value("Name").toString();
+  QString dVers = prefs.value("DREAM3D_Version").toString();
+  prefs.endGroup();
+  if (false == ok) {filterCount = 0;}
+
+  QString html;
+  QTextStream ss(&html);
+  ss << "<html><head></head>\n";
+  ss << "<body>\n";
+
+  // A table for the summary items
+  ss << "<table cellpadding=\"2\" cellspacing=\"0\" border=\"0\">\n";
+  ss << "<tbody>\n";
+  ss << "	<tr><th align=\"right\">Pipeline Name:</th><td>" << name << "</td></tr>\n";
+  ss << "	<tr><th align=\"right\">Filter Count:</th><td>" << filterCount << "</td></tr>\n";
+  ss << "	<tr><th align=\"right\">DREAM3D Version:</th><td>" << dVers << "</td></tr>\n";
+  ss << "</tbody>\n";
+  ss << "</table>\n";
+  ss << "<p></p>\n";
+
+  // Start the table of the Pipeline
+  ss << "<table cellpadding=\"2\" cellspacing=\"0\" border=\"0\" width=\"300px\">\n";
+  ss << "<tbody>\n";
+  ss << "<tr bgcolor=\"#A2E99C\"><th>Index</th><th>Filter Group</th><th>Filter Name</th></tr>\n";
+
+  FilterManager* filtManager = FilterManager::Instance();
+  char rowColor = 0;
+  QString red("#FFAAAA");
+  QString odd("#FFFFFF");
+  QString even("#B0E4FF");
+  QString color = odd;
+  QString unknownFilter("Unknown");
+  bool unknownFilters = false;
+
+  for (int i = 0; i < filterCount; ++i)
+  {
+    if (rowColor == 0) { rowColor = 1; color = odd; } else { rowColor = 0; color = even; }
+    QString gName = QString::number(i);
+    prefs.beginGroup(gName);
+    QString item = prefs.value("Filter_Name", "").toString();
+    prefs.endGroup();
+
+    IFilterFactory::Pointer factory = filtManager->getFactoryForFilter(item);
+    if(factory.get() != NULL)
+    {
+      AbstractFilter::Pointer filter = factory->create();
+      if(NULL != filter.get())
+      {
+        AbstractFilter::Pointer filter = factory->create();
+        ss << "<tr bgcolor=\"" << color << "\"><td>" << i<< "</td><td>" << filter->getGroupName() << "</td><td>" << item << "</td></tr>\n";
+      }
+    }
+    else
+    {
+      color = red;
+      ss << "<tr bgcolor=\"" << color << "\"><td>" << i<< "</td><td>" << unknownFilter << "</td><td>" << item << "</td></tr>\n";
+      unknownFilters = true;
+    }
+  }
+
+
+  if(unknownFilters)
+  {
+    color = red;
+    ss << "<tr bgcolor=\"" << color << "\"><th colspan=\"3\">There are filters in the pipeline that the currently running version of DREAM3D does not know about. This ";
+    ss << "can happen if you are missing plugins that contain the filters or if the pipeline was created in a prior version ";
+    ss << "of DREAM3D in which case those filters may have been renamed. Please consult the DREAM3D documentation for more details ";
+    ss << "or ask the individual who gave you the pipeline file for more details.</th></tr>\n";
+  }
+  ss << "</tbody></table>\n";
+
+  ss << "</body></html>";
+
+  return html;
+}
 
 // -----------------------------------------------------------------------------
 //
@@ -245,12 +332,44 @@ QStringList FavoritesDockWidget::generateFilterListFromPipelineFile(QString path
   return filterNames;
 }
 
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void FavoritesDockWidget::on_filterLibraryTree_itemClicked( QTreeWidgetItem* item, int column )
+{
+#if 0
+  QString favoritePath = item->data(0, Qt::UserRole).toString();
+  QStringList filterList = generateFilterListFromPipelineFile(favoritePath);
+  if(filterList.size() > 0)
+  {
+    emit filterListGenerated(filterList, false);
+  }
+#endif
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void FavoritesDockWidget::on_filterLibraryTree_itemDoubleClicked( QTreeWidgetItem* item, int column )
+{
+  QString pipelinePath = item->data(0, Qt::UserRole).toString();
+  if (item->type() == FilterLibraryTreeWidget::Node_Item_Type)
+  {
+    return; // The user double clicked a folder, so don't do anything
+  }
+  if (pipelinePath.isEmpty() == false)
+  {
+    emit pipelineFileActivated(pipelinePath, QSettings::IniFormat, false);
+  }
+
+}
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
 void FavoritesDockWidget::on_filterLibraryTree_itemChanged(QTreeWidgetItem* item, int column)
 {
+#if 0
   if (NULL != item->parent() )
   {
     QString favoritePath = item->data(0, Qt::UserRole).toString();
@@ -271,6 +390,16 @@ void FavoritesDockWidget::on_filterLibraryTree_itemChanged(QTreeWidgetItem* item
     newFavoritePrefs.setValue("Name", item->text(0) );
     newFavoritePrefs.endGroup();
   }
+#endif
+}
+
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void FavoritesDockWidget::on_filterLibraryTree_currentItemChanged(QTreeWidgetItem* item, QTreeWidgetItem* previous )
+{
+  //  on_filterLibraryTree_itemClicked(item, 0);
 }
 
 // -----------------------------------------------------------------------------
@@ -393,32 +522,6 @@ QString FavoritesDockWidget::writeNewFavoriteFilePath(QString newFavoriteTitle, 
   filterLibraryTree->blockSignals(false);
 
   return newPath;
-}
-
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void FavoritesDockWidget::on_filterLibraryTree_currentItemChanged(QTreeWidgetItem* item, QTreeWidgetItem* previous )
-{
-  on_filterLibraryTree_itemClicked(item, 0);
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void FavoritesDockWidget::on_filterLibraryTree_itemDoubleClicked( QTreeWidgetItem* item, int column )
-{
-  QString pipelinePath = item->data(0, Qt::UserRole).toString();
-  if (item->type() == FilterLibraryTreeWidget::Node_Item_Type)
-  {
-    return; // The user double clicked a folder, so don't do anything
-  }
-  if (pipelinePath.isEmpty() == false)
-  {
-    emit pipelineFileActivated(pipelinePath, QSettings::IniFormat, false);
-  }
-
 }
 
 // -----------------------------------------------------------------------------
