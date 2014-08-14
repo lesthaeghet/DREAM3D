@@ -83,10 +83,10 @@ ImagesToMM3D::ImagesToMM3D() :
   m_SampleTransformation.k = 0.0f;
   m_SampleTransformation.l = 1.0f;
 
-  m_EulerTransformation.angle = 0.0f;
-  m_EulerTransformation.h = 0.0f;
-  m_EulerTransformation.k = 0.0f;
-  m_EulerTransformation.l = 1.0f;
+//  m_EulerTransformation.angle = 0.0f;
+//  m_EulerTransformation.h = 0.0f;
+//  m_EulerTransformation.k = 0.0f;
+//  m_EulerTransformation.l = 1.0f;
 
   setupFilterParameters();
 }
@@ -120,14 +120,14 @@ void ImagesToMM3D::readFilterParameters(AbstractFilterParametersReader* reader, 
   setZStartIndex( reader->readValue("ZStartIndex", getZStartIndex()) );
   setZEndIndex( reader->readValue("ZEndIndex", getZEndIndex()) );
   setZResolution( reader->readValue("ZResolution", getZResolution()) );
-  setRefFrameZDir( reader->readValue("RefFrameZDir", getRefFrameZDir()) );
+//  setRefFrameZDir( reader->readValue("RefFrameZDir", getRefFrameZDir()) );
   setInputPath( reader->readString("InputPath", getInputPath()) );
   setFilePrefix( reader->readString("FilePrefix", getFilePrefix()) );
   setFileSuffix( reader->readString("FileSuffix", getFileSuffix()) );
   setFileExtension( reader->readString("FileExtension", getFileExtension()) );
   setPaddingDigits( reader->readValue("PaddingDigits", getPaddingDigits()) );
   setSampleTransformation( reader->readAxisAngle("SampleTransformation", getSampleTransformation(), -1) );
-  setEulerTransformation( reader->readAxisAngle("EulerTransformation", getEulerTransformation(), -1) );
+//  setEulerTransformation( reader->readAxisAngle("EulerTransformation", getEulerTransformation(), -1) );
 
   reader->closeFilterGroup();
 }
@@ -142,14 +142,14 @@ int ImagesToMM3D::writeFilterParameters(AbstractFilterParametersWriter* writer, 
   DREAM3D_FILTER_WRITE_PARAMETER(ZStartIndex)
   DREAM3D_FILTER_WRITE_PARAMETER(ZEndIndex)
   DREAM3D_FILTER_WRITE_PARAMETER(ZResolution)
-  DREAM3D_FILTER_WRITE_PARAMETER(RefFrameZDir)
+//  DREAM3D_FILTER_WRITE_PARAMETER(RefFrameZDir)
   DREAM3D_FILTER_WRITE_PARAMETER(InputPath)
   DREAM3D_FILTER_WRITE_PARAMETER(FilePrefix)
   DREAM3D_FILTER_WRITE_PARAMETER(FileSuffix)
   DREAM3D_FILTER_WRITE_PARAMETER(FileExtension)
   DREAM3D_FILTER_WRITE_PARAMETER(PaddingDigits)
   DREAM3D_FILTER_WRITE_PARAMETER(SampleTransformation)
-  DREAM3D_FILTER_WRITE_PARAMETER(EulerTransformation)
+//  DREAM3D_FILTER_WRITE_PARAMETER(EulerTransformation)
   writer->closeFilterGroup();
   return ++index; // we want to return the next index that was just written to
 }
@@ -336,7 +336,7 @@ void ImagesToMM3D::execute()
 
   }
 
-  err = QH5Lite::writeScalarDataset(fileId, Ebsd::H5::EulerTransformationAngle, m_EulerTransformation.angle);
+//  err = QH5Lite::writeScalarDataset(fileId, Ebsd::H5::EulerTransformationAngle, m_EulerTransformation.angle);
   if(err < 0)
   {
 
@@ -346,7 +346,7 @@ void ImagesToMM3D::execute()
 
   }
 
-  err = QH5Lite::writePointerDataset<float>(fileId, Ebsd::H5::EulerTransformationAxis, rank, dims, &(m_EulerTransformation.h));
+//  err = QH5Lite::writePointerDataset<float>(fileId, Ebsd::H5::EulerTransformationAxis, rank, dims, &(m_EulerTransformation.h));
   if(err < 0)
   {
 
@@ -598,7 +598,7 @@ AbstractFilter::Pointer ImagesToMM3D::newFilterInstance(bool copyFilterParameter
     DREAM3D_COPY_INSTANCEVAR(FileExtension)
     DREAM3D_COPY_INSTANCEVAR(PaddingDigits)
     DREAM3D_COPY_INSTANCEVAR(SampleTransformation)
-    DREAM3D_COPY_INSTANCEVAR(EulerTransformation)
+//    DREAM3D_COPY_INSTANCEVAR(EulerTransformation)
   }
   return filter;
 }

@@ -105,7 +105,7 @@ class ImagesToMM3DWidget : public QWidget, private Ui::ImagesToMM3DWidget
     /* OIM Data Import Slots */
     void on_m_InputDirBtn_clicked();
     void on_m_OutputFileBtn_clicked();
-    void on_m_RefFrameOptionsBtn_clicked();
+//    void on_m_RefFrameOptionsBtn_clicked();
 
     void on_m_FilePrefix_textChanged(const QString& string);
     void on_m_FileSuffix_textChanged(const QString& string);
@@ -162,7 +162,7 @@ class ImagesToMM3DWidget : public QWidget, private Ui::ImagesToMM3DWidget
      * @brief getRefFrameZDir
      * @return
      */
-    uint32_t getRefFrameZDir();
+//    uint32_t getRefFrameZDir();
 
     /**
      * @brief setRefFrameZDir
@@ -178,7 +178,7 @@ class ImagesToMM3DWidget : public QWidget, private Ui::ImagesToMM3DWidget
     /**
      * @brief IdentifyRefFrame
      */
-    void identifyRefFrame();
+//    void identifyRefFrame();
 
 
   private:
@@ -189,12 +189,12 @@ class ImagesToMM3DWidget : public QWidget, private Ui::ImagesToMM3DWidget
     QButtonGroup*               m_OriginGroup;
     QButtonGroup*               m_zSpacingGroup;
 
-    bool m_TSLchecked;
-    bool m_HKLchecked;
-    bool m_HEDMchecked;
-    bool m_NoTranschecked;
+//    bool m_TSLchecked;
+//    bool m_HKLchecked;
+//    bool m_HEDMchecked;
+//    bool m_NoTranschecked;
     AxisAngleInput_t m_SampleTransformation;
-    AxisAngleInput_t m_EulerTransformation;
+//    AxisAngleInput_t m_EulerTransformation;
 
     static QString                m_OpenDialogLastDirectory;
     bool m_DidCausePreflight;

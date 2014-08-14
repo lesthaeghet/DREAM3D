@@ -79,7 +79,7 @@ class ImagesToMM3D : public AbstractFilter
     DREAM3D_FILTER_PARAMETER(int, PaddingDigits)
 
     DREAM3D_FILTER_PARAMETER(AxisAngleInput_t, SampleTransformation)
-    DREAM3D_FILTER_PARAMETER(AxisAngleInput_t, EulerTransformation)
+//    DREAM3D_FILTER_PARAMETER(AxisAngleInput_t, EulerTransformation)
 
     virtual void preflight();
 

@@ -75,10 +75,10 @@ ImagesToMM3DWidget::ImagesToMM3DWidget(FilterParameter* parameter, AbstractFilte
   QWidget(parent),
   m_FilterParameter(parameter),
   m_StackingGroup(NULL),
-  m_TSLchecked(false),
-  m_HKLchecked(false),
-  m_HEDMchecked(false),
-  m_NoTranschecked(true),
+//  m_TSLchecked(false),
+//  m_HKLchecked(false),
+//  m_HEDMchecked(false),
+//  m_NoTranschecked(true),
   m_DidCausePreflight(false)
 {
   m_SampleTransformation.angle = 0.0f;
@@ -86,10 +86,10 @@ ImagesToMM3DWidget::ImagesToMM3DWidget(FilterParameter* parameter, AbstractFilte
   m_SampleTransformation.k = 0.0f;
   m_SampleTransformation.l = 1.0f;
 
-  m_EulerTransformation.angle = 0.0f;
-  m_EulerTransformation.h = 0.0f;
-  m_EulerTransformation.k = 0.0f;
-  m_EulerTransformation.l = 1.0f;
+//  m_EulerTransformation.angle = 0.0f;
+//  m_EulerTransformation.h = 0.0f;
+//  m_EulerTransformation.k = 0.0f;
+//  m_EulerTransformation.l = 1.0f;
 
   m_Filter = qobject_cast<ImagesToMM3D*>(filter);
   Q_ASSERT_X(NULL != m_Filter, "ImagesToMM3DWidget can ONLY be used with ImagesToMM3D filter", __FILE__);
@@ -198,7 +198,7 @@ void ImagesToMM3DWidget::getGuiParametersFromFilter()
   m_TotalDigits->setValue(m_Filter->getPaddingDigits());
 
   m_SampleTransformation = m_Filter->getSampleTransformation();
-  m_EulerTransformation = m_Filter->getEulerTransformation();
+//  m_EulerTransformation = m_Filter->getEulerTransformation();
 
   foreach(QObject * ob, obs)
   {
@@ -364,12 +364,12 @@ void ImagesToMM3DWidget::on_m_InputDir_textChanged(const QString& text)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-uint32_t ImagesToMM3DWidget::getRefFrameZDir()
-{
-  if (m_StackLowToHigh->isChecked()) { return Ebsd::RefFrameZDir::LowtoHigh; }
-  if (m_StackHighToLow->isChecked()) { return Ebsd::RefFrameZDir::HightoLow; }
-  return Ebsd::RefFrameZDir::UnknownRefFrameZDirection;
-}
+//uint32_t ImagesToMM3DWidget::getRefFrameZDir()
+//{
+//  if (m_StackLowToHigh->isChecked()) { return Ebsd::RefFrameZDir::LowtoHigh; }
+//  if (m_StackHighToLow->isChecked()) { return Ebsd::RefFrameZDir::HightoLow; }
+//  return Ebsd::RefFrameZDir::UnknownRefFrameZDirection;
+//}
 
 // -----------------------------------------------------------------------------
 //
@@ -515,11 +515,11 @@ void ImagesToMM3DWidget::generateExampleEbsdInputFile()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void ImagesToMM3DWidget::on_m_RefFrameOptionsBtn_clicked()
-{
+//void ImagesToMM3DWidget::on_m_RefFrameOptionsBtn_clicked()
+//{
 
-if(true)
-{return;}
+//if(true)
+//{return;}
 //  //  QString filename = QString("%1%2%3.%4").arg(m_FilePrefix->text())
 //  //      .arg(m_ZStartIndex->text(), m_TotalDigits->value(), '0')
 //  //      .arg(m_FileSuffix->text()).arg(m_FileExt->text());
@@ -565,67 +565,67 @@ if(true)
 //    d.getEulerTranformation(m_EulerTransformation);
 //    emit parametersChanged(); // emit to let the system know to preflight
 //  }
-}
+//}
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void ImagesToMM3DWidget::identifyRefFrame()
-{
-  m_TSLchecked = false;
-  m_HKLchecked = false;
-  m_NoTranschecked = false;
-  m_HEDMchecked = false;
+//void ImagesToMM3DWidget::identifyRefFrame()
+//{
+//  m_TSLchecked = false;
+//  m_HKLchecked = false;
+//  m_NoTranschecked = false;
+//  m_HEDMchecked = false;
 
-  // TSL/EDAX
-  if (      m_SampleTransformation.angle == 180.0f
-            && m_SampleTransformation.h == 0.0f
-            && m_SampleTransformation.k == 1.0f
-            && m_SampleTransformation.l == 0.0f
+//  // TSL/EDAX
+//  if (      m_SampleTransformation.angle == 180.0f
+//            && m_SampleTransformation.h == 0.0f
+//            && m_SampleTransformation.k == 1.0f
+//            && m_SampleTransformation.l == 0.0f
 
-            && m_EulerTransformation.angle == 90.0f
-            && m_EulerTransformation.h == 0.0f
-            && m_EulerTransformation.k == 0.0f
-            && m_EulerTransformation.l == 1.0f
-     )
+//            && m_EulerTransformation.angle == 90.0f
+//            && m_EulerTransformation.h == 0.0f
+//            && m_EulerTransformation.k == 0.0f
+//            && m_EulerTransformation.l == 1.0f
+//     )
 
-  {
-    m_TSLchecked = true;
-    m_NoTranschecked = false;
-  }
-  else if (       m_SampleTransformation.angle == 180.0f      // HKL
-                  && m_SampleTransformation.h == 0.0f
-                  && m_SampleTransformation.k == 1.0f
-                  && m_SampleTransformation.l == 0.0f
+//  {
+//    m_TSLchecked = true;
+//    m_NoTranschecked = false;
+//  }
+//  else if (       m_SampleTransformation.angle == 180.0f      // HKL
+//                  && m_SampleTransformation.h == 0.0f
+//                  && m_SampleTransformation.k == 1.0f
+//                  && m_SampleTransformation.l == 0.0f
 
-                  && m_EulerTransformation.angle == 0.0f
-                  && m_EulerTransformation.h == 0.0f
-                  && m_EulerTransformation.k == 0.0f
-                  && m_EulerTransformation.l == 1.0f
-          )
+//                  && m_EulerTransformation.angle == 0.0f
+//                  && m_EulerTransformation.h == 0.0f
+//                  && m_EulerTransformation.k == 0.0f
+//                  && m_EulerTransformation.l == 1.0f
+//          )
 
-  {
-    m_HKLchecked = true;
-    m_NoTranschecked = false;
-  }
-  else if (       m_SampleTransformation.angle == 0.0f     // HEDM
-                  && m_SampleTransformation.h == 0.0f
-                  && m_SampleTransformation.k == 0.0f
-                  && m_SampleTransformation.l == 1.0f
+//  {
+//    m_HKLchecked = true;
+//    m_NoTranschecked = false;
+//  }
+//  else if (       m_SampleTransformation.angle == 0.0f     // HEDM
+//                  && m_SampleTransformation.h == 0.0f
+//                  && m_SampleTransformation.k == 0.0f
+//                  && m_SampleTransformation.l == 1.0f
 
-                  && m_EulerTransformation.angle == 0.0f
-                  && m_EulerTransformation.h == 0.0f
-                  && m_EulerTransformation.k == 0.0f
-                  && m_EulerTransformation.l == 1.0f
-          )
+//                  && m_EulerTransformation.angle == 0.0f
+//                  && m_EulerTransformation.h == 0.0f
+//                  && m_EulerTransformation.k == 0.0f
+//                  && m_EulerTransformation.l == 1.0f
+//          )
 
-  {
-    m_HEDMchecked = true;
-    m_NoTranschecked = false;
-  }
+//  {
+//    m_HEDMchecked = true;
+//    m_NoTranschecked = false;
+//  }
 
 
-}
+//}
 
 // -----------------------------------------------------------------------------
 //
@@ -762,7 +762,7 @@ void ImagesToMM3DWidget::filterNeedsInputParameters(AbstractFilter* filter)
   ebsdConverter->setZStartIndex(m_ZStartIndex->text().toLongLong(&ok));
   ebsdConverter->setZEndIndex(m_ZEndIndex->text().toLongLong(&ok));
   ebsdConverter->setZResolution(m_zSpacing->text().toDouble(&ok));
-  ebsdConverter->setRefFrameZDir( getRefFrameZDir() );
+//  ebsdConverter->setRefFrameZDir( getRefFrameZDir() );
 
   ebsdConverter->setInputPath(m_InputDir->text());
   ebsdConverter->setFilePrefix(m_FilePrefix->text());
@@ -771,7 +771,7 @@ void ImagesToMM3DWidget::filterNeedsInputParameters(AbstractFilter* filter)
   ebsdConverter->setPaddingDigits(m_TotalDigits->value());
 
   ebsdConverter->setSampleTransformation(m_SampleTransformation);
-  ebsdConverter->setEulerTransformation(m_EulerTransformation);
+//  ebsdConverter->setEulerTransformation(m_EulerTransformation);
 }
 
 
