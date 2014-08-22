@@ -163,6 +163,7 @@ BuildQtAppBundle(
 #-------------------------------------------------------------------------------
 #- This copies all the Prebuilt Pipeline files into the Build directory so the help
 #- works from the Build Tree
+file(MAKE_DIRECTORY ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/PrebuiltPipelines/)
 add_custom_target(PrebuiltPipelinesCopy ALL
             COMMAND ${CMAKE_COMMAND} -E copy_directory ${DREAM3D_SUPPORT_DIR}/PrebuiltPipelines/
             ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/PrebuiltPipelines/

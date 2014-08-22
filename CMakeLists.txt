@@ -140,7 +140,11 @@ AddQt5LibraryInstallRule( LIBRARIES ${Qt5_COMPONENTS})
 #-- Let CMake determine which files need to have 'moc' run on them
 set(CMAKE_AUTOMOC TRUE)
 #-- Make sure we include the proper Qt5 include directories
-include_directories(${Qt5Core_INCLUDE_DIRS})
+foreach(qtlib ${Qt5_COMPONENTS})
+  include_directories( ${Qt5${qtlib}_INCLUDE_DIRS})
+endforeach()
+
+
 
 # --------------------------------------------------------------------
 # We need the Qt Image Plugins (Most likley) for either the DREAM3D application
