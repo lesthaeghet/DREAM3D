@@ -38,7 +38,7 @@
 
 //-- Qt Includes
 #include <QtCore/QDir>
-#include <QtGui/QFileDialog>
+#include <QtWidgets/QFileDialog>
 
 #include "DREAM3DLib/Common/Constants.h"
 #include "DREAM3DLib/Utilities/FilePathGenerator.h"
@@ -63,7 +63,7 @@ ProcessMonitoringWidget::ProcessMonitoringWidget(FilterParameter* parameter, Abs
   m_DidCausePreflight(false)
 {
   m_Filter = qobject_cast<LoadAdditiveMonitoringData*>(filter);
-  Q_ASSERT_X(NULL != m_Filter, "ProcessMonitoringWidget can ONLY be used with ImportImageStack filter", __FILE__);
+  Q_ASSERT_X(NULL != m_Filter, "ProcessMonitoringWidget can ONLY be used with LoadAdditiveMonitoringData filter", __FILE__);
 
   if ( getOpenDialogLastDirectory().isEmpty() )
   {
