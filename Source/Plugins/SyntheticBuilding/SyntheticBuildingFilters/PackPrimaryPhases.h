@@ -38,6 +38,7 @@
 #define _PackPrimaryPhases_H_
 
 #include <vector>
+#include <map>
 #include <QtCore/QString>
 
 #include <boost/shared_array.hpp>
@@ -134,12 +135,14 @@ class PackPrimaryPhases : public AbstractFilter
     DREAM3D_FILTER_PARAMETER(DataArrayPath, InputShapeTypesArrayPath)
     Q_PROPERTY(DataArrayPath InputShapeTypesArrayPath READ getInputShapeTypesArrayPath WRITE setInputShapeTypesArrayPath)
 
+    DREAM3D_FILTER_PARAMETER(bool, HaveFeatures)
+    Q_PROPERTY(bool HaveFeatures READ getHaveFeatures WRITE setHaveFeatures)
+    DREAM3D_FILTER_PARAMETER(QString, FeatureInputFile)
+    Q_PROPERTY(QString FeatureInputFile READ getFeatureInputFile WRITE setFeatureInputFile)
     DREAM3D_FILTER_PARAMETER(QString, CsvOutputFile)
     Q_PROPERTY(QString CsvOutputFile READ getCsvOutputFile WRITE setCsvOutputFile)
-
     DREAM3D_FILTER_PARAMETER(bool, PeriodicBoundaries)
     Q_PROPERTY(bool PeriodicBoundaries READ getPeriodicBoundaries WRITE setPeriodicBoundaries)
-
     DREAM3D_FILTER_PARAMETER(bool, WriteGoalAttributes)
     Q_PROPERTY(bool WriteGoalAttributes READ getWriteGoalAttributes WRITE setWriteGoalAttributes)
 
@@ -183,9 +186,12 @@ class PackPrimaryPhases : public AbstractFilter
   protected:
     PackPrimaryPhases();
 
-    void initialize_packinggrid();
+    Int32ArrayType::Pointer initialize_packinggrid();
 
+    void place_features(Int32ArrayType::Pointer featureOwnersPtr);
     void generate_feature(int phase, int Seed, Feature* feature, unsigned int shapeclass);
+    void load_features();
+
 
     void transfer_attributes(int gnum, Feature* feature);
     void insert_feature(size_t featureNum);
@@ -196,7 +202,7 @@ class PackPrimaryPhases : public AbstractFilter
     void determine_neighbors(size_t featureNum, int add);
     float check_neighborhooderror(int gadd, int gremove);
 
-    float check_fillingerror(int gadd, int gremove, Int32ArrayType::Pointer featureOwnersPtr, BoolArrayType::Pointer exclusionZonesPtr);
+    float check_fillingerror(int gadd, int gremove, Int32ArrayType::Pointer featureOwnersPtr, Int32ArrayType::Pointer exclusionOwnersPtr, std::map<size_t,size_t> &availablePoints, std::map<size_t,size_t> &availablePointsInv);
     void assign_voxels();
     void assign_gaps_only();
     void cleanup_features();
@@ -206,7 +212,7 @@ class PackPrimaryPhases : public AbstractFilter
     void compare_2Ddistributions(std::vector<std::vector<float> >, std::vector<std::vector<float> >, float& sqrerror);
     void compare_3Ddistributions(std::vector<std::vector<std::vector<float> > >, std::vector<std::vector<std::vector<float> > >, float& sqrerror);
 
-    int writeVtkFile(int32_t* featureOwners, bool* exclusionZonesPtr);
+    int writeVtkFile(int32_t* featureOwners, int32_t* exclusionZonesPtr);
     int estimate_numfeatures(int xpoints, int ypoints, int zpoints, float xres, float yres, float zres);
 
 
@@ -281,6 +287,7 @@ class PackPrimaryPhases : public AbstractFilter
     std::vector<int> primaryphases;
     std::vector<float> primaryphasefractions;
 
+    size_t availablePointsCount;
     float fillingerror, oldfillingerror;
     float currentneighborhooderror, oldneighborhooderror;
     float currentsizedisterror, oldsizedisterror;
