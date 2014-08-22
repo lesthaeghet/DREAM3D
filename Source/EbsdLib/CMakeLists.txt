@@ -240,11 +240,16 @@ if(${EbsdLib_ENABLE_HDF5})
 		)
 endif()
 
-target_link_libraries(${PROJECT_NAME} ${EBSDLib_LINK_LIBRARIES})
 if(Qt5Core_FOUND)
-qt5_use_modules(${PROJECT_NAME} Core)
+	set(EBSDLib_LINK_LIBRARIES
+		${EBSDLib_LINK_LIBRARIES}
+		Qt5::Core
+		)
 endif()
 
+
+
+target_link_libraries(${PROJECT_NAME} ${EBSDLib_LINK_LIBRARIES})
 LibraryProperties( ${PROJECT_NAME} ${EXE_DEBUG_EXTENSION} )
 
 set(install_dir "tools")

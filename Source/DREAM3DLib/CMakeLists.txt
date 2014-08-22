@@ -146,8 +146,8 @@ include_directories( ${DREAM3DLib_BINARY_DIR} )
 
 #-- Add a library for the DREAM3DLib Code
 add_library(${PROJECT_NAME} ${LIB_TYPE} ${Project_SRCS} )
-target_link_libraries(${PROJECT_NAME} EbsdLib ${TBB_LIBRARIES})
-qt5_use_modules(${PROJECT_NAME} Core)
+target_link_libraries(${PROJECT_NAME} Qt5::Core EbsdLib ${TBB_LIBRARIES} )
+
 LibraryProperties( ${PROJECT_NAME} ${EXE_DEBUG_EXTENSION} )
 
 set(install_dir "tools")

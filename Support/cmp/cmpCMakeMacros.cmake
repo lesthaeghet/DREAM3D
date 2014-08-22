@@ -157,9 +157,7 @@ function(BuildQtAppBundle)
 
 #-- Add and Link our executable
     add_executable( ${QAB_TARGET} ${GUI_TYPE} ${QAB_SOURCES} )
-    target_link_libraries( ${QAB_TARGET} ${QAB_LINK_LIBRARIES} )
-    qt5_use_modules(${QAB_TARGET} ${QAB_QT5_MODULES})
-
+    target_link_libraries( ${QAB_TARGET} ${QAB_LINK_LIBRARIES} ${QAB_QT5_MODULES})
 
 #-- Make sure we have a proper bundle icon. This must occur AFTER the add_executable command
     if(APPLE)
@@ -379,55 +377,6 @@ function(BuildToolBundle)
 endfunction()
 
 # --------------------------------------------------------------------
-#
-# --------------------------------------------------------------------
-macro(cmp_ToolInstallationSupport_old EXE_NAME EXE_DEBUG_EXTENSION EXE_BINARY_DIR installFiles
-                                  comp dest lib_search_dirs)
-if(0)
-    message(STATUS "EXE_NAME: ${EXE_NAME}")
-    message(STATUS "EXE_DEBUG_EXTENSION: ${EXE_DEBUG_EXTENSION}")
-    message(STATUS "EXE_BINARY_DIR: ${EXE_BINARY_DIR}")
-    message(STATUS "appNeedsPlugins: ${appNeedsPlugins}")
-    message(STATUS "installFiles: ${installFiles}")
-    message(STATUS "comp: ${comp}")
-    message(STATUS "dest: ${dest}")
-    message(STATUS "lib_search_dirs: ${lib_search_dirs}")
-endif()
-
-    SET_TARGET_PROPERTIES( ${EXE_NAME}
-        PROPERTIES
-        DEBUG_OUTPUT_NAME ${EXE_NAME}${EXE_DEBUG_EXTENSION}
-        RELEASE_OUTPUT_NAME ${EXE_NAME}
-    )
-    if(${installFiles} EQUAL 1)
-        install(TARGETS ${EXE_NAME}
-            COMPONENT ${comp}
-            RUNTIME DESTINATION ${dest}
-            LIBRARY DESTINATION ${dest}
-            ARCHIVE DESTINATION ${dest}
-            BUNDLE DESTINATION  ${dest}
-        )
-
-        #   message(STATUS "Creating Install CMake file for tool application ${EXE_NAME}")
-        if(APPLE)
-            if(CMAKE_BUILD_TYPE MATCHES "Debug")
-                MakeOSXTool( "${EXE_NAME}${EXE_DEBUG_EXTENSION}"
-                            ${EXE_BINARY_DIR}
-                            ${CMP_OSX_TOOLS_SOURCE_DIR}
-                            "${dest}"
-                            "${lib_search_dirs}")
-            else(CMAKE_BUILD_TYPE MATCHES "Debug")
-                MakeOSXTool(${EXE_NAME}
-                             ${EXE_BINARY_DIR}
-                             ${CMP_OSX_TOOLS_SOURCE_DIR}
-                             "${dest}"
-                             "${lib_search_dirs}")
-            endif()
-        endif(APPLE)
-    endif()
-endmacro()
-
-# --------------------------------------------------------------------
 
 macro(LibraryProperties targetName DEBUG_EXTENSION)
     if( NOT BUILD_SHARED_LIBS AND MSVC)
@@ -521,13 +470,19 @@ macro(PluginProperties targetName DEBUG_EXTENSION projectVersion binaryDir plugi
     endif()
 endmacro()
 
+
 #-------------------------------------------------------------------------------
 # Finds plugins from the Qt installation. The pluginlist argument should be
 # something like "qgif;qjpeg;qtiff"
 #-------------------------------------------------------------------------------
-macro (FindQt5Plugins pluginlist pluginfile libdirsearchfile plugintype)
-  set(qt_plugin_list ${pluginlist})
-  set(qt_plugin_types "Debug;Release")
+function(AddQt5Plugins)
+
+  set(options)
+  set(oneValueArgs PLUGIN_FILE LIBRARY_SEARCH_FILE PLUGIN_TYPE)
+  set(multiValueArgs PLUGIN_NAMES)
+
+  cmake_parse_arguments(P "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
+  set(build_types "Debug;Release")
   if(WIN32)
     set(qt_plugin_prefix "")
     set(qt_plugin_DEBUG_suffix "d")
@@ -538,78 +493,43 @@ macro (FindQt5Plugins pluginlist pluginfile libdirsearchfile plugintype)
     set(qt_plugin_RELEASE_suffix "")
   endif()
 
-  #message(STATUS "qt_plugin_debug_suffix: ${qt_plugin_debug_suffix}")
-  set(QTPLUGINS_RELEASE "")
-  set(QTPLUGINS_DEBUG   "")
-  set(QTPLUGINS "")
+  message(STATUS "Qt5 Plugins: ${P_PLUGIN_NAMES}")
 
-  # Loop through all the Build Types and all the plugins to find each one.
-  foreach(build_type ${qt_plugin_types})
-    string(TOUPPER ${build_type} BTYPE)
-      foreach(plugin ${qt_plugin_list})
-        STRING(TOUPPER ${plugin} PLUGIN)
-        #message(STATUS "|-- Looking for ${plugin}${qt_plugin_${BTYPE}_suffix}")
-        FIND_LIBRARY( QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE}
-                      NAMES ${plugin}${qt_plugin_${BTYPE}_suffix}
-                      PATHS ${QT_PLUGINS_DIR}/${plugintype}
-                      DOC "Library Path for ${plugin}"
-                      NO_DEFAULT_PATH NO_CMAKE_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH)
-        if(MSVC OR NINJA)
-            #  message(STATUS "QT_PLUGINS_DIR: ${QT_PLUGINS_DIR}")
-            #  message(STATUS " QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE}: ${QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE}}")
-            get_filename_component(lib_path ${QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE}} PATH)
-            get_filename_component(lib_name ${QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE}} NAME_WE)
-            #  message(STATUS "lib_path: ${lib_path}")
-            #  message(STATUS "lib_name: ${lib_name}")
-            set(QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE} ${lib_path}/${lib_name}.dll CACHE PATH "" FORCE)
-            if( ${QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE}} STREQUAL  "QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE}-NOTFOUND")
-              message(STATUS "A Companion DLL for ${upperlib}_LIBRARY_${TYPE} was NOT found which usually means"
-                                " that the library was NOT built as a DLL. I looked in the "
-                                " following locations:  ${lib_path}\n  ${lib_path}/..\n  ${lib_path}/../bin")
-            else()
-                #  set(${upperlib}_LIBRARY_DLL_${TYPE}  ${${upperlib}_LIBRARY_DLL_${TYPE}}/${lib_name}.dll)
-                #  message(STATUS "${upperlib}_LIBRARY_DLL_${TYPE}: ${${upperlib}_LIBRARY_DLL_${TYPE}}")
-                #  message(STATUS "Generating Install Rule for DLL File for QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE}\n  ${QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE}}")
-                install(FILES ${QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE}}
-                    DESTINATION ./Plugins/${plugintype}
-                    CONFIGURATIONS ${BTYPE}
-                    COMPONENT Applications)
-            endif()
-        elseif(UNIX AND NOT APPLE)
-            install(FILES ${QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE}}
-                DESTINATION ./Plugins/${plugintype}
-                CONFIGURATIONS ${BTYPE}
-                COMPONENT Applications)
-        endif()
+  foreach(build_type ${build_types})
+    # message(STATUS "build_type: ${build_type}")
+    foreach(plugin ${P_PLUGIN_NAMES})
 
-        mark_as_advanced(QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE})
-        #message(STATUS "|--  QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE}: ${QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE}}")
-        LIST(APPEND QTPLUGINS_${BTYPE} ${QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE}})
-      endforeach()
+      get_target_property(${build_type}_loc Qt5::${plugin}Plugin LOCATION_${build_type})
+      # message("${plugin}: ${${build_type}_loc}")
+
+      install(FILES ${${build_type}_loc}
+          DESTINATION ./Plugins/${P_PLUGIN_TYPE}
+          CONFIGURATIONS ${build_type}
+          COMPONENT Applications)
     endforeach()
+  endforeach()
 
-    # Assign either the debug or release plugin list to the QTPLUGINS variable on NON msvc platforms.
-    if(NOT MSVC)
-      if( NOT DEFINED CMAKE_BUILD_TYPE )
-        if( ${CMAKE_BUILD_TYPE} STREQUAL "Debug")
-            set(QTPLUGINS ${QTPLUGINS_DEBUG})
-        else()
-            set(QTPLUGINS ${QTPLUGINS_RELEASE})
-        endif()
-      else()
-        set(QTPLUGINS ${QTPLUGINS_RELEASE})
-      endif()
+  # Assign either the debug or release plugin list to the QTPLUGINS variable on NON msvc platforms.
+  if(NOT MSVC_IDE)
+    if( ${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+        set(QTPLUGINS ${QTPLUGINS_DEBUG})
     else()
-        # Create the qt.conf file so that the image plugins will be loaded correctly
-        FILE(WRITE ${PROJECT_BINARY_DIR}/qt.conf "[Paths]\nPlugins = Plugins")
-        install(FILES ${PROJECT_BINARY_DIR}/qt.conf
-                DESTINATION .
-                COMPONENT Applications)
+        set(QTPLUGINS ${QTPLUGINS_RELEASE})
     endif()
-    file(APPEND ${pluginfile} "${QTPLUGINS};")
-    file(APPEND ${libdirsearchfile} "${QT_PLUGINS_DIR}/${plugintype};")
+  else()
+      # Create the qt.conf file so that the image plugins will be loaded correctly
+      FILE(WRITE ${PROJECT_BINARY_DIR}/qt.conf "[Paths]\nPlugins = Plugins")
+      install(FILES ${PROJECT_BINARY_DIR}/qt.conf
+              DESTINATION .
+              COMPONENT Applications)
+  endif()
 
-endmacro(FindQt5Plugins pluginlist)
+  file(APPEND ${P_PLUGIN_FILE} "${QTPLUGINS};")
+  file(APPEND ${P_LIBRARY_SEARCH_FILE} "${QT_PLUGINS_DIR}/${plugintype};")
+endfunction()
+
+
+
 
 # --------------------------------------------------------------------
 #-- Copy all the Qt5 dependent DLLs into the current build directory so that
@@ -619,88 +539,110 @@ endmacro(FindQt5Plugins pluginlist)
 #-- the least intrusive way to deal with the PATH issues is to just copy all
 #-- the dependend DLL libraries into the build directory. Note that this is
 #-- NOT needed for static libraries.
-macro(CMP_COPY_QT5_RUNTIME_LIBRARIES QTLIBLIST)
-    # message(STATUS "CMP_COPY_QT5_RUNTIME_LIBRARIES")
-    set(SUPPORT_LIB_OPTION 1)
-    if(MSVC_IDE)
-      set(SUPPORT_LIB_OPTION 0)
-    elseif(APPLE) # Apple systems do NOT need this so just skip this entirely
-      set(SUPPORT_LIB_OPTION 2)
-    elseif(UNIX AND NOT MSVC)
-      set(SUPPORT_LIB_OPTION 3)
-    endif()
+function(CopyQt5RunTimeLibraries)
 
-	if(NOT Qt5Core_FOUND)
-      message(FATAL_ERROR "Qt 5 is REQUIRED to use this Function or macro. Make sure Qt is found on your system.")
-    endif()
+  set(options)
+  set(oneValueArgs)
+  set(multiValueArgs LIBRARIES)
 
-    if(SUPPORT_LIB_OPTION EQUAL 0)
-      #message(STATUS "SUPPORT_LIB_OPTION = 0")
-      set(TYPE "d")
-      FOREACH(qtlib ${QTLIBLIST})
-        GET_FILENAME_COMPONENT(QT_DLL_PATH_tmp ${QT_QMAKE_EXECUTABLE} PATH)
-        # message(STATUS "Copy Rule for Qt library ${qtlib}${TYPE}.dll")
-        # We need to copy both the Debug and Release versions of the libraries into their respective
-        # subfolders for Visual Studio builds
-        add_custom_target(ZZ_${qtlib}-Debug-Copy ALL
-                            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${QT_DLL_PATH_tmp}/${qtlib}${TYPE}.dll
-                            ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug/
-                            COMMENT "Copying ${qtlib}${TYPE}.dll to ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug/")
-        set_target_properties(ZZ_${qtlib}-Debug-Copy PROPERTIES FOLDER ZZ_COPY_FILES)
-      #   message(STATUS "Generating Copy Rule for Qt Release DLL Library ${QT_DLL_PATH_tmp}/${qtlib}d.dll")
-        add_custom_target(ZZ_${qtlib}-Release-Copy ALL
-                            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${QT_DLL_PATH_tmp}/${qtlib}.dll
-                            ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release/
-                            COMMENT "Copying ${qtlib}.dll to ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release/")
-        set_target_properties(ZZ_${qtlib}-Release-Copy PROPERTIES FOLDER ZZ_COPY_FILES)
+  cmake_parse_arguments(P "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
+  # message(STATUS "QTLIBLIST: ${QTLIBLIST}")
+  set(SUPPORT_LIB_OPTION 1)
+  if(MSVC_IDE)
+    set(SUPPORT_LIB_OPTION 0)
+  elseif(APPLE) # Apple systems do NOT need this so just skip this entirely
+    set(SUPPORT_LIB_OPTION 2)
+  elseif(UNIX AND NOT MSVC)
+    set(SUPPORT_LIB_OPTION 3)
+  endif()
 
-      ENDFOREACH(qtlib)
-    elseif(SUPPORT_LIB_OPTION EQUAL 1)
-      message(STATUS "SUPPORT_LIB_OPTION = 1")
-      set(TYPE "")
+  if(SUPPORT_LIB_OPTION EQUAL 0)
+    #message(STATUS "SUPPORT_LIB_OPTION = 0")
+    set(TYPE "d")
+    FOREACH(qtlib ${P_LIBRARIES})
+      GET_FILENAME_COMPONENT(QT_DLL_PATH_tmp ${QT_QMAKE_EXECUTABLE} PATH)
+      # message(STATUS "Copy Rule for Qt library ${qtlib}${TYPE}.dll")
+      # We need to copy both the Debug and Release versions of the libraries into their respective
+      # subfolders for Visual Studio builds
+      add_custom_target(ZZ_${qtlib}-Debug-Copy ALL
+                          COMMAND ${CMAKE_COMMAND} -E copy_if_different ${QT_DLL_PATH_tmp}/${qtlib}${TYPE}.dll
+                          ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug/
+                          COMMENT "Copying ${qtlib}${TYPE}.dll to ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug/")
+      set_target_properties(ZZ_${qtlib}-Debug-Copy PROPERTIES FOLDER ZZ_COPY_FILES)
+    #   message(STATUS "Generating Copy Rule for Qt Release DLL Library ${QT_DLL_PATH_tmp}/${qtlib}d.dll")
+      add_custom_target(ZZ_${qtlib}-Release-Copy ALL
+                          COMMAND ${CMAKE_COMMAND} -E copy_if_different ${QT_DLL_PATH_tmp}/${qtlib}.dll
+                          ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release/
+                          COMMENT "Copying ${qtlib}.dll to ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release/")
+      set_target_properties(ZZ_${qtlib}-Release-Copy PROPERTIES FOLDER ZZ_COPY_FILES)
+
+    ENDFOREACH(qtlib)
+  elseif(SUPPORT_LIB_OPTION EQUAL 1)
+    # This will get hit if Ninja, MinGW, MSYS, Cygwin is used for the build system
+    # message(STATUS "SUPPORT_LIB_OPTION = 1")
+
+    FOREACH(qtlib ${P_LIBRARIES})
+
       if( ${CMAKE_BUILD_TYPE} STREQUAL "Debug")
-          set(TYPE "d")
+          get_target_property(Qt${qtlib}_location Qt5::${qtlib} LOCATION_Debug)
+      else()
+          get_target_property(Qt${qtlib}_location Qt5::${qtlib} LOCATION_Release)
       endif()
-      FOREACH(qtlib ${QTLIBLIST})
-          GET_FILENAME_COMPONENT(QT_DLL_PATH_tmp ${QT_QMAKE_EXECUTABLE} PATH)
-          #message(STATUS "Generating Copy Rule for Qt DLL: ${QT_DLL_PATH_tmp}/${qtlib}d4.dll")
-          add_custom_target(ZZ_${qtlib}-Debug-Copy ALL
-                      COMMAND ${CMAKE_COMMAND} -E copy_if_different ${QT_DLL_PATH_tmp}/${qtlib}${TYPE}.dll
-                      ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/
-                      COMMENT "Copying ${qtlib}${TYPE}.dll to ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/")
-          set_target_properties(ZZ_${qtlib}-Debug-Copy PROPERTIES FOLDER ZZ_COPY_FILES)
-      ENDFOREACH(qtlib)
-    endif()
-endmacro()
+
+      # message(STATUS "Qt${qtlib}_location: ${Qt${qtlib}_location}")
+      message(STATUS "Generating Copy Rule for Qt DLL: Qt${qtlib}")
+      add_custom_target(ZZ_${qtlib}-Debug-Copy ALL
+                  COMMAND ${CMAKE_COMMAND} -E copy_if_different ${Qt${qtlib}_location}
+                  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/
+                  COMMENT "Copying ${Qt${qtlib}_location}.dll to ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/")
+      set_target_properties(ZZ_${qtlib}-Debug-Copy PROPERTIES FOLDER ZZ_COPY_FILES)
+    ENDFOREACH(qtlib)
+  endif()
+endfunction()
 
 # --------------------------------------------------------------------
 #
 #
-macro (CMP_QT_LIBRARIES_INSTALL_RULES QTLIBLIST destination)
-   # message(STATUS "CMP_QT_LIBRARIES_INSTALL_RULES")
-	if(NOT Qt5Core_FOUND)
-      message(FATAL_ERROR "Qt 5 is REQUIRED to use this Function or macro. Make sure Qt is found on your system.")
-    endif()
+# --------------------------------------------------------------------
+function(AddQt5LibraryInstallRule)
+  set(options)
+  set(oneValueArgs)
+  set(multiValueArgs LIBRARIES)
 
-    if(MSVC)
-      set(TYPE "d")
-      FOREACH(qtlib ${QTLIBLIST})
-        # message(STATUS "Generating Install Rules for Qt DLL: ${QT_DLL_PATH_tmp}/${qtlib}d4.dll")
-        GET_FILENAME_COMPONENT(QT_DLL_PATH_tmp ${QT_QMAKE_EXECUTABLE} PATH)
-        install(FILES ${QT_DLL_PATH_tmp}/${qtlib}${type}d.dll
-            DESTINATION "${destination}"
-            CONFIGURATIONS Debug
-            COMPONENT Applications)
-   #    message(STATUS "Generating Install Rule for Qt Release DLL Library ${QT_DLL_PATH_tmp}/${qtlib}4.dll")
-        install(FILES ${QT_DLL_PATH_tmp}/${qtlib}5.dll
-            DESTINATION "${destination}"
-            CONFIGURATIONS Release
-            COMPONENT Applications)
-      ENDFOREACH(qtlib)
-    endif()
+  cmake_parse_arguments(P "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
+
+  set(build_types "Debug;Release")
+  if(WIN32)
+    set(qt_plugin_prefix "")
+    set(qt_plugin_DEBUG_suffix "d")
+    set(qt_plugin_RELEASE_suffix "")
+    set(destination "./")
+  else ()
+    set(qt_plugin_prefix "lib")
+    set(qt_plugin_DEBUG_suffix "_debug")
+    set(qt_plugin_RELEASE_suffix "")
+    set(destination "lib")
+  endif()
+
+  FOREACH(qtlib ${P_LIBRARIES})
+    message(STATUS "Install Rule for ${qtlib}")
+    foreach(build_type ${build_types})
+
+      get_target_property(${build_type}_loc Qt5::${qtlib} LOCATION_${build_type})
+
+      install(FILES ${${build_type}_loc}
+              DESTINATION "${destination}"
+              CONFIGURATIONS ${build_type}
+              COMPONENT Applications)
+
+    endforeach()
+  endforeach()
+
+
 
 #-- This will create install rules for the dylibs on linux hopefully creating
 #-- a stand alone .zip or .tgz file
+  if(0)
     if(UNIX AND NOT APPLE)
       GET_FILENAME_COMPONENT(QT_LIB_PATH ${QT_QMAKE_EXECUTABLE} PATH)
       GET_FILENAME_COMPONENT(QT_LIB_PATH ${QT_LIB_PATH} PATH)
@@ -713,7 +655,8 @@ macro (CMP_QT_LIBRARIES_INSTALL_RULES QTLIBLIST destination)
               COMPONENT Applications)
       ENDFOREACH(qtlib)
     endif(UNIX AND NOT APPLE)
-endmacro()
+  endif()
+endfunction()
 
 # --------------------------------------------------------------------
 #-- Copy all the dependent DLLs into the current build directory so that the test

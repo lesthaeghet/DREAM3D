@@ -128,61 +128,33 @@ endif(BUILD_SHARED_LIBS)
 # Find includes in corresponding build directories
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 # Find the QtWidgets library
-find_package(Qt5Core)
-get_target_property(QtCore_location Qt5::Core LOCATION)
-if(Qt5Core_FOUND)
-  message(STATUS "Qt5Core Found at ${QtCore_location}")
-  CMP_COPY_QT5_RUNTIME_LIBRARIES( "Qt5Core")
-  CMP_QT_LIBRARIES_INSTALL_RULES( "Qt5Core" "./")
-else()
-  message(FATAL_ERROR "Qt Version 5.x was NOT found and is required")
+set(Qt5_COMPONENTS Core Widgets Network Gui Concurrent Script Svg Xml OpenGL PrintSupport)
+find_package(Qt5 COMPONENTS ${Qt5_COMPONENTS})
+if(NOT Qt5_FOUND)
+  message(FATAL_ERROR "Qt5 is Required for DREAM3D to build. Please install it.")
 endif()
 
+CopyQt5RunTimeLibraries( LIBRARIES ${Qt5_COMPONENTS})
+AddQt5LibraryInstallRule( LIBRARIES ${Qt5_COMPONENTS})
 
-find_package(Qt5Widgets)
-get_target_property(Qt5Widgets_location Qt5::Widgets LOCATION)
-if(Qt5Widgets_FOUND)
-  message(STATUS "Qt5Widgets Found at ${Qt5Widgets_location}")
-  CMP_COPY_QT5_RUNTIME_LIBRARIES( "Qt5Widgets")
-  CMP_QT_LIBRARIES_INSTALL_RULES( "Qt5Widgets" "./")
-endif()
-
-find_package(Qt5Network)
-get_target_property(Qt5Network_location Qt5::Network LOCATION)
-if(Qt5Network_FOUND)
-  message(STATUS "Qt5Network Found at ${Qt5Network_location}")
-  CMP_COPY_QT5_RUNTIME_LIBRARIES( "Qt5Network")
-  CMP_QT_LIBRARIES_INSTALL_RULES( "Qt5Network" "./")
-endif()
-
-find_package(Qt5Gui)
-get_target_property(Qt5Gui_location Qt5::Gui LOCATION)
-if(Qt5Gui_FOUND)
-  message(STATUS "Qt5Gui Found at ${Qt5Gui_location}")
-  CMP_COPY_QT5_RUNTIME_LIBRARIES( "Qt5Gui")
-  CMP_QT_LIBRARIES_INSTALL_RULES( "Qt5Gui" "./")
-endif()
-
-find_package(Qt5Concurrent)
-get_target_property(Qt5Concurrent_location Qt5::Concurrent LOCATION)
-if(Qt5Concurrent_FOUND)
-  message(STATUS "Qt5Concurrent Found at ${Qt5Concurrent_location}")
-  CMP_COPY_QT5_RUNTIME_LIBRARIES( "Qt5Concurrent")
-  CMP_QT_LIBRARIES_INSTALL_RULES( "Qt5Concurrent" "./")
-endif()
-
+#-- Let CMake determine which files need to have 'moc' run on them
 set(CMAKE_AUTOMOC TRUE)
-
+#-- Make sure we include the proper Qt5 include directories
 include_directories(${Qt5Core_INCLUDE_DIRS})
-
 
 # --------------------------------------------------------------------
 # We need the Qt Image Plugins (Most likley) for either the DREAM3D application
 # or the pipeline runner which might load images through one of the plugins
 # so we are just going to look for the plugins here and include them.
-FindQt5Plugins("qgif;qjpeg;qtiff" "${DREAM3DProj_BINARY_DIR}/Qt_Plugins.txt"
-                "${DREAM3DProj_BINARY_DIR}/LibSearchDirs.txt"
-                "imageformats" )
+#FindQt5Plugins("qgif;qjpeg;qtiff" "${DREAM3DProj_BINARY_DIR}/Qt_Plugins.txt"
+#                "${DREAM3DProj_BINARY_DIR}/LibSearchDirs.txt"
+#                "imageformats" )
+
+AddQt5Plugins(PLUGIN_NAMES QJpeg QGif QTiff QWbmp QWebp
+              PLUGIN_FILE "${DREAM3DProj_BINARY_DIR}/Qt_Plugins.txt"
+              LIBRARY_SEARCH_FILE "${DREAM3DProj_BINARY_DIR}/LibSearchDirs.txt"
+              PLUGIN_TYPE imageformats)
+
 
 # Append the locations of the Qt libraries to our Library Search Paths
 list(APPEND CMP_LIB_SEARCH_DIRS ${QT_BINARY_DIR} ${QT_LIBRARY_DIR} )

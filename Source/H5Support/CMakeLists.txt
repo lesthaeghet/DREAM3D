@@ -126,9 +126,7 @@ set(PROJECT_SRCS
 )
 
 add_library(${PROJECT_NAME} ${LIB_TYPE} ${PROJECT_SRCS})
-target_link_libraries(${PROJECT_NAME} ${HDF5_LIBRARIES})
-qt5_use_modules(${PROJECT_NAME} Core)
-
+target_link_libraries(${PROJECT_NAME} ${HDF5_LIBRARIES} Qt5::Core)
 LibraryProperties( ${PROJECT_NAME}  ${EXE_DEBUG_EXTENSION} )
 
 set(install_dir "tools")

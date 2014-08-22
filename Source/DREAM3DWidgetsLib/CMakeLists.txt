@@ -181,11 +181,13 @@ endif()
 
 add_library(DREAM3DWidgetsLib ${LIB_TYPE} ${Project_SRCS})
 target_link_libraries(DREAM3DWidgetsLib
-                    QtSupport
-                    DREAM3DLib
-)
-qt5_use_modules(${PROJECT_NAME} Core Gui Widgets Network)
-
+                        Qt5::Core
+                        Qt5::Gui
+                        Qt5::Widgets
+                        H5Support
+                        EbsdLib
+                        DREAM3DLib 
+                        QtSupport)
 LibraryProperties( DREAM3DWidgetsLib ${EXE_DEBUG_EXTENSION})
 
 
