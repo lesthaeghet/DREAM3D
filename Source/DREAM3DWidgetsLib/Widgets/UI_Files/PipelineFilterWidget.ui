@@ -38,17 +38,18 @@
    <enum>Qt::CustomContextMenu</enum>
   </property>
   <property name="styleSheet">
-   <string notr="true">QFrame#QFilterWidget {
+   <string notr="true">QFrame#PipelineFilterWidget {
 	background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 rgba(185, 185, 185, 255), stop:0.5 rgba(226, 226, 226, 255), stop:1 rgba(150, 150, 150, 255));
 border: 1px solid #515151;
 border-radius: 10px;
 padding: 0 0 0 0px;
-font: 100 italic 12pt &quot;Arial&quot;;
-font-weight: bold;
 color: rgb(255, 255, 255);
 }
 
-</string>
+QLabel#filterName {
+font: 100 italic 12pt &quot;Arial&quot;;
+font-weight: bold;
+}</string>
   </property>
   <property name="frameShape">
    <enum>QFrame::Box</enum>
@@ -115,10 +116,10 @@ color: rgb(255, 255, 255);
      <property name="font">
       <font>
        <family>Arial</family>
-       <weight>50</weight>
-       <italic>false</italic>
-       <bold>false</bold>
-       <stylestrategy>PreferAntialias</stylestrategy>
+       <pointsize>12</pointsize>
+       <weight>75</weight>
+       <italic>true</italic>
+       <bold>true</bold>
       </font>
      </property>
      <property name="styleSheet">

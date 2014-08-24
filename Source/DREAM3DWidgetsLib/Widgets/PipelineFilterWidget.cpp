@@ -130,6 +130,9 @@ void PipelineFilterWidget::initialize(AbstractFilter::Pointer filter)
 
   setupUi(this);
 
+  // Do this to get the CSS style to take hold.
+  setIsSelected(m_IsSelected);
+
   if ( m_OpenDialogLastDirectory.isEmpty() )
   {
     m_OpenDialogLastDirectory = QDir::homePath();
@@ -502,14 +505,7 @@ bool PipelineFilterWidget::isSelected()
 void PipelineFilterWidget::changeStyle()
 {
   QString style;
-  //  int m_CurrentBorderColorFactor = 0;
-  //  int m_BorderIncrement = 16;
 
-  /*  if (m_HasPreflightErrors == true)
-  {
-    style.append("border: 2px solid rgb(255, 0, 0);");
-  }
-  else*/
   if(m_HasPreflightWarnings)
   {
     style.append("border: 2px solid rgb(172, 168, 0);");
@@ -517,7 +513,6 @@ void PipelineFilterWidget::changeStyle()
   else if(m_IsSelected == true )
   {
     style.append("border: 3px solid purple;");
-    //  style.append("background-color: palette(highlight);");
   }
   else
   {
@@ -528,6 +523,20 @@ void PipelineFilterWidget::changeStyle()
   updateWidgetStyle();
 }
 
+#if 0
+QFrame#PipelineFilterWidget {
+  background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 rgba(185, 185, 185, 255), stop:0.5 rgba(226, 226, 226, 255), stop:1 rgba(150, 150, 150, 255));
+border: 1px solid #515151;
+border-radius: 10px;
+padding: 0 0 0 0px;
+color: rgb(255, 255, 255);
+}
+
+QLabel#filterName {
+font: 100 italic 12pt "Arial";
+font-weight: bold;
+}
+#endif
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
@@ -558,9 +567,9 @@ void PipelineFilterWidget::updateWidgetStyle()
 
   style.append("QLabel\n {\n");
 
-#if defined(Q_WS_WIN)
+#if defined(Q_OS_WIN)
   style.append("font: 75 10pt \"Arial\";");
-#elif defined(Q_WS_MAC)
+#elif defined(Q_OS_MAC)
   style.append("font: 100 italic 12pt \"Arial\";");
 #else
   style.append("font: 85 italic 9pt \"Arial\";");
