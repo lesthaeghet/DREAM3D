@@ -1,16 +1,18 @@
 # -----------------------------------------------------------------------------------
-# This file was auto generated from the template file "CompleteBundle.cmake.in", if you 
-# need to make changes edit the template file NOT this one. Your changes will be 
+# This file was auto generated from the template file "CompleteBundle.cmake.in", if you
+# need to make changes edit the template file NOT this one. Your changes will be
 # lost the next time CMake is run. You have been warned.
 #   This file is called from CMake's installation generated scripts. It is added
-# via a CMake call 
+# via a CMake call
 #   install(SCRIPT "${OSX_MAKE_STANDALONE_BUNDLE_CMAKE_SCRIPT}")
 # which can be sometime found in the macro 'MakeOSXBundleApp' which is sometimes located
 # in the file OSX_BundleTools.cmake
 # -----------------------------------------------------------------------------------
 
-message (STATUS "#------------ Starting OS X Bundle Fixup --------------------------")
-cmake_minimum_required(VERSION 2.8)
+message (STATUS "#------------ Starting OS X App Bundle Fixup --------------------------")
+cmake_minimum_required(VERSION 3.0)
+
+include (CMakeParseArguments)
 
 #-- Need this for link line stuff?
 if(COMMAND cmake_policy)
@@ -57,14 +59,14 @@ function(gp_item_default_embedded_path_override item default_embedded_path_var)
   # then looking through each list for the currect library being fixed up.
   # Embed .dylibs right next to the main bundle executable:
   #
-  
+
   # First look for plugins that have a ".plugin" extension
   if(item MATCHES "\\.plugin$")
     #message(STATUS "Just a Plugin")
     set(path "@executable_path/../plugins")
     set(overridden 1)
   endif(item MATCHES "\\.plugin$")
-  
+
   # Next look for the Qt Image Format Plugins in case those are needed
   if ( item MATCHES "imageformats/libq?")
     #message(STATUS "^^^^^^==> Qt Image Format Plugin Found")
@@ -75,7 +77,7 @@ function(gp_item_default_embedded_path_override item default_embedded_path_var)
     set(path "@executable_path/../lib")
     set(overridden 1)
   endif()
-  
+
   # Embed frameworks in the embedded "Frameworks" directory (sibling of MacOS):
   #
   if(NOT overridden)
@@ -99,36 +101,96 @@ foreach(plugin ${DREAM3D_PLUGINS})
   get_filename_component(d3d_plugin_name "${plugin}" NAME)
   set(d3d_plugins "${d3d_plugins};${CMAKE_INSTALL_PREFIX}/@osx_app_name@.app/Contents/Plugins/${d3d_plugin_name}")
 endforeach(plugin $DREAM3D_PLUGINS)
- 
-# -- These are actual Qt ImageFormat Plugins
-file(READ "@DREAM3DProj_BINARY_DIR@/Qt_Plugins.txt" DREAM3D_QT_PLUGINS)
-set(d3d_qt_plugins "")
-foreach(plugin ${DREAM3D_QT_PLUGINS})
-  message(STATUS "Copying file ${plugin} into ${CMAKE_INSTALL_PREFIX}/@osx_app_name@.app/Contents/plugins/imageformats/")
-  file(COPY ${plugin} DESTINATION "${CMAKE_INSTALL_PREFIX}/@osx_app_name@.app/Contents/plugins/imageformats")
-  get_filename_component(d3d_plugin_name "${plugin}" NAME)
-  set(d3d_qt_plugins "${d3d_qt_plugins};${CMAKE_INSTALL_PREFIX}/@osx_app_name@.app/Contents/plugins/imageformats/${d3d_plugin_name}")
-endforeach(plugin $DREAM3D_QT_PLUGINS)
 
+
+#-- We are going to use the same logic from the Qt5 'macdeployqt' utility to grab required Qt5 plugins
+function(CopyQt5Plugin)
+  set(options )
+  set(oneValueArgs QT5_PLUGIN_DIR PLUGIN_GROUP PLUGIN_NAME)
+  set(multiValueArgs )
+  cmake_parse_arguments(P "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
+
+  set(ORIG_PLUGIN "${P_QT5_PLUGIN_DIR}/${P_PLUGIN_GROUP}/${P_PLUGIN_NAME}")
+  message(STATUS "Copying file ${P_QT5_PLUGIN_DIR}/${P_PLUGIN_GROUP}/${P_PLUGIN_NAME} into ${CMAKE_INSTALL_PREFIX}/@osx_app_name@.app/Contents/plugins/${P_PLUGIN_GROUP}/")
+  file(COPY "${ORIG_PLUGIN}" DESTINATION "${CMAKE_INSTALL_PREFIX}/@osx_app_name@.app/Contents/plugins/${P_PLUGIN_GROUP}")
+  set(d3d_qt_plugins "${d3d_qt_plugins};${CMAKE_INSTALL_PREFIX}/@osx_app_name@.app/Contents/plugins/${P_PLUGIN_GROUP}/${P_PLUGIN_NAME}" PARENT_SCOPE)
+endfunction()
+
+# This is our list of plugins to install
+set(d3d_qt_plugins "")
+# First get the path to the Qt5 Plugins directory
+execute_process(
+  COMMAND "@QT_QMAKE_EXECUTABLE@" -query QT_INSTALL_PLUGINS
+  OUTPUT_VARIABLE qtPluginsPath
+  OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_STRIP_TRAILING_WHITESPACE
+)
+# This gets populated from the 'configure_file' stage of cmake
+set(Qt5_MODULES "@QAB_QT5_MODULES@")
+
+# If we link against Qt5Gui then we need this plugin
+list(FIND Qt5_MODULES "Qt5::Gui" moduleFound)
+if(moduleFound GREATER -1)
+  CopyQt5Plugin(QT5_PLUGIN_DIR "${qtPluginsPath}" PLUGIN_GROUP "platforms" PLUGIN_NAME "libqcocoa.dylib")
+  CopyQt5Plugin(QT5_PLUGIN_DIR "${qtPluginsPath}" PLUGIN_GROUP "printsupport" PLUGIN_NAME "libcocoaprintersupport.dylib")
+endif()
+
+
+# If we link against Qt5Widgets then we need this plugin
+list(FIND Qt5_MODULES "Qt5::Widgets" moduleFound)
+if(moduleFound GREATER -1)
+  CopyQt5Plugin(QT5_PLUGIN_DIR "${qtPluginsPath}" PLUGIN_GROUP "accessible" PLUGIN_NAME "libqtaccessiblewidgets.dylib")
+endif()
+
+# If we link against Quick then we need this plugin
+list(FIND Qt5_MODULES "Qt5::Quick" moduleFound)
+if(moduleFound GREATER -1)
+  CopyQt5Plugin(QT5_PLUGIN_DIR "${qtPluginsPath}" PLUGIN_GROUP "accessible" PLUGIN_NAME "libqtaccessiblequick.dylib")
+endif()
+
+# We are going to grab ALL the image plugins
+file(GLOB imagePlugins "${qtPluginsPath}/imageformats/*.dylib")
+
+# This section basically says that if we are using the Qt5::Svg framework then we need to make sure
+# we have the qsvg plugin installed properly otherwise just delete it from our list
+list(FIND Qt5_MODULES "Qt5::Svg" moduleFound)
+if(moduleFound GREATER -1)
+  CopyQt5Plugin(QT5_PLUGIN_DIR "${qtPluginsPath}" PLUGIN_GROUP "imageformats" PLUGIN_NAME "libqsvg.dylib")
+endif()
+
+list(REMOVE_ITEM imagePlugins "libqsvg.dylib" "libqsvg_debug.dylib")
+
+# Now loop over each ImageFormat plugin copying it into the app bundle ONLY if it is NOT the debug version
+foreach(imagePlugin ${imagePlugins})
+  string(FIND "${imagePlugin}" "_debug" FOUND)
+  if(FOUND EQUAL -1)
+    # This is a non _debug version of the dylib and we want it included in our package
+    get_filename_component(imagePlugin "${imagePlugin}" NAME)
+    CopyQt5Plugin(QT5_PLUGIN_DIR "${qtPluginsPath}" PLUGIN_GROUP "imageformats" PLUGIN_NAME ${imagePlugin})
+  endif()
+endforeach()
+
+
+# ----------------------------------------------------
+# This is where the actual patching of the install_names is going to take place.
 include(BundleUtilities)
-fixup_bundle("${CMAKE_INSTALL_PREFIX}/@osx_app_name@.app" 
+fixup_bundle("${CMAKE_INSTALL_PREFIX}/@osx_app_name@.app"
              # Plugins to Install
              "${d3d_plugins};${d3d_qt_plugins}"
              # Directories to Search for Libraries
              "@lib_search_dirs@")
 
-file(WRITE "${CMAKE_INSTALL_PREFIX}/@osx_app_name@.app/Contents/Resources/qt.conf")
-if("@write_qt_plugins_in_qtconf@" STREQUAL "1")
-  file(APPEND "${CMAKE_INSTALL_PREFIX}/@osx_app_name@.app/Contents/Resources/qt.conf" "[Paths]\nPlugins = plugins\n")
-endif()
-file(MAKE_DIRECTORY "${CMAKE_INSTALL_PREFIX}/Frameworks")
-file(MAKE_DIRECTORY "${CMAKE_INSTALL_PREFIX}/lib")
 
-# Now we need to fix up the package to have a shared Frameworks and lib directory
+# ----------------------------------------------------
+# Create a qt.conf file in the app bundle
+file(WRITE "${CMAKE_INSTALL_PREFIX}/@osx_app_name@.app/Contents/Resources/qt.conf")
+file(APPEND "${CMAKE_INSTALL_PREFIX}/@osx_app_name@.app/Contents/Resources/qt.conf" "[Paths]\nPlugins = plugins\n")
+
+
+# Now we need to fix up the package to have a shared Frameworks, Plugins & Lib directory
 list(APPEND @osx_app_name@archs "@CMAKE_OSX_ARCHITECTURES@" )
 list(LENGTH @osx_app_name@archs @osx_app_name@archLength )
 message(STATUS "@osx_app_name@archLength: ${@osx_app_name@archLength}")
-if (@osx_app_name@archLength EQUAL 1 OR @osx_app_name@archLength EQUAL 0)    
+if (@osx_app_name@archLength EQUAL 1 OR @osx_app_name@archLength EQUAL 0)
     # Move the frameworks from the contents of the .app bundle out to top level of the install directory
     execute_process(COMMAND /bin/bash @OPTIMIZE_BUNDLE_SHELL_SCRIPT@ ${CMAKE_INSTALL_PREFIX})
 endif()

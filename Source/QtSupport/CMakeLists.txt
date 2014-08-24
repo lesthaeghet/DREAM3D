@@ -102,15 +102,16 @@ include_directories(${QtSupport_BINARY_DIR}/..)
 add_definitions(-DQT_CORE_LIB)
 
 if(UNIX AND NOT APPLE)
-set_source_files_properties(${Project_SRCS} PROPERTIES COMPILE_FLAGS -fPIC)
+    set_source_files_properties(${Project_SRCS} PROPERTIES COMPILE_FLAGS -fPIC)
 endif()
 
-add_library(QtSupport STATIC ${Project_SRCS})
+add_library(QtSupport ${LIB_TYPE} ${Project_SRCS})
 target_link_libraries(QtSupport
                         Qt5::Core
                         Qt5::Gui
                         Qt5::Network
-                        Qt5::Widgets)
+                        Qt5::Widgets
+                        DREAM3DLib)
 LibraryProperties( QtSupport ${EXE_DEBUG_EXTENSION})
 
 

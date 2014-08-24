@@ -9,8 +9,8 @@ include (CMakeParseArguments)
 # include(${CMP_OSX_TOOLS_SOURCE_DIR}/ToolUtilities.cmake)
 
 #-------------------------------------------------------------------------------
-macro (cmp_IDE_GENERATED_PROPERTIES SOURCE_PATH HEADERS SOURCES)
-    STRING(REPLACE "/" "\\\\" source_group_path ${SOURCE_PATH}  )
+macro(cmp_IDE_GENERATED_PROPERTIES SOURCE_PATH HEADERS SOURCES)
+    string(REPLACE "/" "\\\\" source_group_path ${SOURCE_PATH}  )
     source_group(${source_group_path} FILES ${HEADERS} ${SOURCES})
 
   #-- The following is needed if we ever start to use OS X Frameworks but only
@@ -19,18 +19,18 @@ macro (cmp_IDE_GENERATED_PROPERTIES SOURCE_PATH HEADERS SOURCES)
   #             PROPERTY MACOSX_PACKAGE_LOCATION Headers/${NAME}
   #)
 
-ENDmacro (cmp_IDE_GENERATED_PROPERTIES SOURCE_PATH HEADERS SOURCES)
+endmacro(cmp_IDE_GENERATED_PROPERTIES SOURCE_PATH HEADERS SOURCES)
 
 #-------------------------------------------------------------------------------
 
-macro (cmp_IDE_SOURCE_PROPERTIES SOURCE_PATH HEADERS SOURCES INSTALL_FILES)
+macro(cmp_IDE_SOURCE_PROPERTIES SOURCE_PATH HEADERS SOURCES INSTALL_FILES)
     if(${INSTALL_FILES} EQUAL "1")
         INSTALL (FILES ${HEADERS}
                  DESTINATION include/${SOURCE_PATH}
                  COMPONENT Headers
         )
     endif()
-    STRING(REPLACE "/" "\\\\" source_group_path ${SOURCE_PATH}  )
+    string(REPLACE "/" "\\\\" source_group_path ${SOURCE_PATH}  )
     source_group(${source_group_path} FILES ${HEADERS} ${SOURCES})
 
   #-- The following is needed if we ever start to use OS X Frameworks but only
@@ -39,7 +39,7 @@ macro (cmp_IDE_SOURCE_PROPERTIES SOURCE_PATH HEADERS SOURCES INSTALL_FILES)
   #             PROPERTY MACOSX_PACKAGE_LOCATION Headers/${NAME}
   #)
 
-ENDmacro (cmp_IDE_SOURCE_PROPERTIES NAME HEADERS SOURCES INSTALL_FILES)
+endmacro(cmp_IDE_SOURCE_PROPERTIES NAME HEADERS SOURCES INSTALL_FILES)
 
 #-------------------------------------------------------------------------------
 # This macro will set all the variables necessary to have a "good" OS X Application
@@ -103,7 +103,7 @@ function(BuildQtAppBundle)
     set(options )
     set(oneValueArgs TARGET DEBUG_EXTENSION ICON_FILE VERSION_MAJOR VERSION_MINOR VERSION_PATCH
                      BINARY_DIR COMPONENT INSTALL_DEST PLUGIN_LIST_FILE)
-    set(multiValueArgs SOURCES LINK_LIBRARIES LIB_SEARCH_DIRS QT_PLUGINS OTHER_PLUGINS QT5_MODULES)
+    set(multiValueArgs SOURCES LINK_LIBRARIES LIB_SEARCH_DIRS OTHER_PLUGINS QT5_MODULES)
     cmake_parse_arguments(QAB "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
 
     # Default GUI type is blank
@@ -112,36 +112,6 @@ function(BuildQtAppBundle)
     #-- Configure the OS X Bundle Plist
     if(APPLE)
         SET(GUI_TYPE MACOSX_BUNDLE)
-        if(0)
-          #-- Make sure the qt_menu.nib is copied if we are using Qt Cocoa by setting the
-          # source files properties of the qt_menu.nib package
-          if(QT_MAC_USE_COCOA)
-              GET_FILENAME_COMPONENT(qt_menu_nib
-                "${QT_QTGUI_LIBRARY_RELEASE}/Resources/qt_menu.nib"
-                REALPATH)
-              set(qt_menu_nib_sources
-                "${qt_menu_nib}/classes.nib"
-                "${qt_menu_nib}/info.nib"
-                "${qt_menu_nib}/keyedobjects.nib"
-                )
-              SET_SOURCE_FILES_PROPERTIES(
-                ${qt_menu_nib_sources}
-                PROPERTIES
-                MACOSX_PACKAGE_LOCATION Resources/qt_menu.nib
-              )
-          ELSE(QT_MAC_USE_COCOA)
-              set(qt_menu_nib_sources)
-          endif(QT_MAC_USE_COCOA)
-        endif()
-#-- Write out a qt.conf file to place in our App bundle
-#        set(qt_conf_file ${${QAB_TARGET}_BINARY_DIR}/qt.conf)
-#        file(WRITE ${qt_conf_file})
-#        set_source_files_properties(${qt_conf_file}
-#                                PROPERTIES
-#                                MACOSX_PACKAGE_LOCATION Resources)
-#
-#        list(APPEND QAB_SOURCES ${qt_menu_nib_sources} ${qt_conf_file})
-         list(APPEND QAB_SOURCES ${qt_menu_nib_sources})
     elseif(WIN32)
         SET(GUI_TYPE WIN32)
         FILE (WRITE "${CMAKE_CURRENT_BINARY_DIR}/Icon.rc"
@@ -157,7 +127,7 @@ function(BuildQtAppBundle)
 
 #-- Add and Link our executable
     add_executable( ${QAB_TARGET} ${GUI_TYPE} ${QAB_SOURCES} )
-    target_link_libraries( ${QAB_TARGET} ${QAB_LINK_LIBRARIES} ${QAB_QT5_MODULES})
+    target_link_libraries( ${QAB_TARGET} ${QAB_QT5_MODULES} ${QAB_LINK_LIBRARIES} )
 
 #-- Make sure we have a proper bundle icon. This must occur AFTER the add_executable command
     if(APPLE)
@@ -176,11 +146,12 @@ function(BuildQtAppBundle)
     set(pi_dest ${QAB_INSTALL_DEST}/Plugins)
     # if we are on OS X then we set the plugin installation location to inside the App bundle
     if(APPLE)
-        set(pi_dest ${QAB_TARGET}.app/Contents/Plugins)
-        set(osx_app_name ${QAB_TARGET})
         if(CMAKE_BUILD_TYPE MATCHES "Debug")
-            set(pi_dest ${QAB_TARGET}${QAB_DEBUG_EXTENSION}.app/Contents/Plugins)
-            set(osx_app_name ${QAB_TARGET}${QAB_DEBUG_EXTENSION})
+          set(pi_dest ${QAB_TARGET}${QAB_DEBUG_EXTENSION}.app/Contents/Plugins)
+          set(osx_app_name ${QAB_TARGET}${QAB_DEBUG_EXTENSION})
+        else()
+          set(pi_dest ${QAB_TARGET}.app/Contents/Plugins)
+          set(osx_app_name ${QAB_TARGET})
         endif()
     endif()
 
@@ -200,10 +171,7 @@ function(BuildQtAppBundle)
         get_filename_component(qt_plugin_name "${pi}" NAME)
         get_filename_component(qt_plugin_type_path "${pi}" PATH)
         get_filename_component(qt_plugin_type "${qt_plugin_type_path}" NAME)
-        #install(PROGRAMS ${pi}
-        #        DESTINATION "${pi_dest}/${qt_plugin_type}"
-        #        COMPONENT ${QAB_COMPONENT}
-        #)
+
         list(APPEND app_plugin_list "\${CMAKE_INSTALL_PREFIX}/${pi_dest}/${qt_plugin_type}/${qt_plugin_name}")
     endforeach()
     list(REMOVE_DUPLICATES lib_search_dirs)
@@ -244,11 +212,11 @@ function(BuildQtAppBundle)
             "${QAB_BINARY_DIR}/OSX_Scripts/${QAB_TARGET}_OptimizeBundle.sh")
 
         configure_file("${CMP_OSX_TOOLS_SOURCE_DIR}/CompleteBundle.cmake.in"
-                "${OSX_MAKE_STANDALONE_BUNDLE_CMAKE_SCRIPT}" @ONLY IMMEDIATE)
+                        "${OSX_MAKE_STANDALONE_BUNDLE_CMAKE_SCRIPT}" @ONLY IMMEDIATE)
 
         set(PROJECT_INSTALL_DIR ${osx_app_name}.app)
         configure_file("${CMP_OSX_TOOLS_SOURCE_DIR}/ThinAndShareLibraries.sh.in"
-                "${OPTIMIZE_BUNDLE_SHELL_SCRIPT}" @ONLY IMMEDIATE)
+                        "${OPTIMIZE_BUNDLE_SHELL_SCRIPT}" @ONLY IMMEDIATE)
 
         install(SCRIPT "${OSX_MAKE_STANDALONE_BUNDLE_CMAKE_SCRIPT}" COMPONENT ${QAB_COMPONENT})
     endif(APPLE)
@@ -269,13 +237,13 @@ function(BuildQtAppBundle)
             set(lib_suffix "_debug")
         endif()
 
-      set(LINUX_INSTALL_LIBS_CMAKE_SCRIPT
+        set(LINUX_INSTALL_LIBS_CMAKE_SCRIPT
                 "${QAB_BINARY_DIR}/LINUX_Scripts/${QAB_TARGET}_CompleteBundle.cmake")
         set(OPTIMIZE_BUNDLE_SHELL_SCRIPT
                 "${QAB_BINARY_DIR}/LINUX_Scripts/${QAB_TARGET}_InstallLibraries.sh")
 
-      configure_file("${CMP_LINUX_TOOLS_SOURCE_DIR}/CompleteBundle.cmake.in"
-      "${LINUX_INSTALL_LIBS_CMAKE_SCRIPT}" @ONLY IMMEDIATE)
+        configure_file("${CMP_LINUX_TOOLS_SOURCE_DIR}/CompleteBundle.cmake.in"
+                        "${LINUX_INSTALL_LIBS_CMAKE_SCRIPT}" @ONLY IMMEDIATE)
         set(PROJECT_INSTALL_DIR ${linux_app_name}.app)
         configure_file("${CMP_LINUX_TOOLS_SOURCE_DIR}/InstallLibraries.sh.in"
                 "${OPTIMIZE_BUNDLE_SHELL_SCRIPT}" @ONLY IMMEDIATE)
@@ -473,21 +441,22 @@ endmacro()
 
 #-------------------------------------------------------------------------------
 # Finds plugins from the Qt installation. The pluginlist argument should be
-# something like "qgif;qjpeg;qtiff"
+# something like "QDDS QGif QICNS QICO QJp2 QJpeg QMng QTga QTiff QWbmp QWebp"
 #-------------------------------------------------------------------------------
 function(AddQt5Plugins)
-
   set(options)
-  set(oneValueArgs PLUGIN_FILE LIBRARY_SEARCH_FILE PLUGIN_TYPE)
+  set(oneValueArgs PLUGIN_FILE PLUGIN_FILE_TEMPLATE LIBRARY_SEARCH_FILE PLUGIN_TYPE PLUGIN_SUFFIX)
   set(multiValueArgs PLUGIN_NAMES)
-
+  if("${CMAKE_BUILD_TYPE}" STREQUAL "")
+    set(CMAKE_BUILD_TYPE "Release")
+  endif()
   cmake_parse_arguments(P "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
   set(build_types "Debug;Release")
   if(WIN32)
     set(qt_plugin_prefix "")
     set(qt_plugin_DEBUG_suffix "d")
     set(qt_plugin_RELEASE_suffix "")
-  else ()
+  else()
     set(qt_plugin_prefix "lib")
     set(qt_plugin_DEBUG_suffix "_debug")
     set(qt_plugin_RELEASE_suffix "")
@@ -499,13 +468,16 @@ function(AddQt5Plugins)
     # message(STATUS "build_type: ${build_type}")
     foreach(plugin ${P_PLUGIN_NAMES})
 
-      get_target_property(${build_type}_loc Qt5::${plugin}Plugin LOCATION_${build_type})
-      # message("${plugin}: ${${build_type}_loc}")
+      get_target_property(${build_type}_loc Qt5::${plugin}${P_PLUGIN_SUFFIX} LOCATION_${build_type})
+      # We only use install rules for Linux/Windows.
+      # OS X will get its own installation script that moves the Plugins correctly into the bundle
+      if(NOT APPLE)
+        install(FILES ${${build_type}_loc}
+            DESTINATION ./Plugins/${P_PLUGIN_TYPE}
+            CONFIGURATIONS ${build_type}
+            COMPONENT Applications)
+      endif()
 
-      install(FILES ${${build_type}_loc}
-          DESTINATION ./Plugins/${P_PLUGIN_TYPE}
-          CONFIGURATIONS ${build_type}
-          COMPONENT Applications)
     endforeach()
   endforeach()
 
@@ -524,7 +496,7 @@ function(AddQt5Plugins)
               COMPONENT Applications)
   endif()
 
-  file(APPEND ${P_PLUGIN_FILE} "${QTPLUGINS};")
+
   file(APPEND ${P_LIBRARY_SEARCH_FILE} "${QT_PLUGINS_DIR}/${plugintype};")
 endfunction()
 
@@ -546,7 +518,7 @@ function(CopyQt5RunTimeLibraries)
   set(multiValueArgs LIBRARIES)
 
   cmake_parse_arguments(P "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
-  # message(STATUS "QTLIBLIST: ${QTLIBLIST}")
+  message(STATUS "Copying Qt5 Runtime Libraries: ${P_LIBRARIES}")
   set(SUPPORT_LIB_OPTION 1)
   if(MSVC_IDE)
     set(SUPPORT_LIB_OPTION 0)
@@ -610,6 +582,7 @@ function(AddQt5LibraryInstallRule)
   set(multiValueArgs LIBRARIES)
 
   cmake_parse_arguments(P "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
+  message(STATUS "Install Rules Qt5 Libraries: ${P_LIBRARIES}")
 
   set(build_types "Debug;Release")
   if(WIN32)
@@ -617,24 +590,22 @@ function(AddQt5LibraryInstallRule)
     set(qt_plugin_DEBUG_suffix "d")
     set(qt_plugin_RELEASE_suffix "")
     set(destination "./")
-  else ()
+  else()
     set(qt_plugin_prefix "lib")
     set(qt_plugin_DEBUG_suffix "_debug")
     set(qt_plugin_RELEASE_suffix "")
     set(destination "lib")
   endif()
 
-  FOREACH(qtlib ${P_LIBRARIES})
-    message(STATUS "Install Rule for ${qtlib}")
+  foreach(qtlib ${P_LIBRARIES})
     foreach(build_type ${build_types})
-
       get_target_property(${build_type}_loc Qt5::${qtlib} LOCATION_${build_type})
-
-      install(FILES ${${build_type}_loc}
-              DESTINATION "${destination}"
-              CONFIGURATIONS ${build_type}
-              COMPONENT Applications)
-
+      if(NOT APPLE)
+        install(FILES ${${build_type}_loc}
+                DESTINATION "${destination}"
+                CONFIGURATIONS ${build_type}
+                COMPONENT Applications)
+      endif()
     endforeach()
   endforeach()
 
@@ -690,13 +661,13 @@ macro(CMP_COPY_DEPENDENT_LIBRARIES _libraryList)
 
     FOREACH(lib ${_libraryList})
 
-      STRING(TOUPPER ${lib} upperlib)
+      string(TOUPPER ${lib} upperlib)
      # message(STATUS "upperlib: ${upperlib}")
      # message(STATUS "${upperlib}_IS_SHARED: ${${upperlib}_IS_SHARED}")
       if(${upperlib}_IS_SHARED)
         FOREACH(BTYPE ${TYPES})
         #  message(STATUS "Looking for ${BTYPE} DLL Version of ${lib}")
-          STRING(TOUPPER ${BTYPE} TYPE)
+          string(TOUPPER ${BTYPE} TYPE)
           get_filename_component(lib_path ${${upperlib}_LIBRARY_${TYPE}} PATH)
           get_filename_component(lib_name ${${upperlib}_LIBRARY_${TYPE}} NAME_WE)
           #message(STATUS "lib_path: ${lib_path}")
@@ -743,10 +714,10 @@ macro(CMP_LIBRARIES_INSTALL_RULES _libraryList destination)
   set(TYPES Debug Release)
   if(MSVC)
     FOREACH(lib ${_libraryList})
-        STRING(TOUPPER ${lib} upperlib)
+        string(TOUPPER ${lib} upperlib)
 
         FOREACH(BTYPE ${TYPES} )
-          STRING(TOUPPER ${BTYPE} TYPE)
+          string(TOUPPER ${BTYPE} TYPE)
           get_filename_component(lib_path ${${upperlib}_LIBRARY_${TYPE}} PATH)
           get_filename_component(lib_name ${${upperlib}_LIBRARY_${TYPE}} NAME_WE)
 
@@ -778,10 +749,10 @@ macro(CMP_LIBRARIES_INSTALL_RULES _libraryList destination)
 #-- a stand alone .zip or .tgz file
     if(UNIX AND NOT APPLE)
       FOREACH(lib ${_libraryList})
-        STRING(TOUPPER ${lib} upperlib)
+        string(TOUPPER ${lib} upperlib)
 
         set(BTYPE "RELEASE" )
-          STRING(TOUPPER ${BTYPE} TYPE)
+          string(TOUPPER ${BTYPE} TYPE)
           get_filename_component(lib_path ${${upperlib}_LIBRARY_${TYPE}} PATH)
           get_filename_component(lib_name ${${upperlib}_LIBRARY_${TYPE}} NAME_WE)
 
@@ -805,7 +776,7 @@ macro(CMP_LIBRARIES_INSTALL_RULES _libraryList destination)
           endif()
       ENDFOREACH(lib ${_libraryList})
     endif()
-ENDmacro()
+endmacro()
 
 #-------------------------------------------------------------------------------
 # This macro will attempt a try_run command in order to compile and then
@@ -868,9 +839,9 @@ macro(cmpGenerateVersionString GENERATED_HEADER_PATH GENERATED_SOURCE_PATH NAMES
       endif()
 
       # and now the version string given by qmake
-      STRING(REGEX REPLACE "^([0-9]+)\\.[0-9]+\\.[0-9]+.*" "\\1" VERSION_GEN_VER_MAJOR "${VERSION_RUN_OUTPUT}")
-      STRING(REGEX REPLACE "^[0-9]+\\.([0-9]+)\\.[0-9]+.*" "\\1" VERSION_GEN_VER_MINOR "${VERSION_RUN_OUTPUT}")
-      STRING(REGEX REPLACE "^[0-9]+\\.[0-9]+\\.([0-9]+).*" "\\1" VERSION_GEN_VER_PATCH "${VERSION_RUN_OUTPUT}")
+      string(REGEX REPLACE "^([0-9]+)\\.[0-9]+\\.[0-9]+.*" "\\1" VERSION_GEN_VER_MAJOR "${VERSION_RUN_OUTPUT}")
+      string(REGEX REPLACE "^[0-9]+\\.([0-9]+)\\.[0-9]+.*" "\\1" VERSION_GEN_VER_MINOR "${VERSION_RUN_OUTPUT}")
+      string(REGEX REPLACE "^[0-9]+\\.[0-9]+\\.([0-9]+).*" "\\1" VERSION_GEN_VER_PATCH "${VERSION_RUN_OUTPUT}")
 
       set(VERSION_GEN_COMPLETE ${VERSION_RUN_OUTPUT} )
       set(VERSION_GEN_NAME "${cmpProjectName}")
@@ -997,7 +968,7 @@ function(cmpVersionStringsFromGit)
 
         #-- Make sure that actually worked and if not just generate some dummy values
         if(DVERS STREQUAL "")
-            cmpGenerateVersionString( ${GVS_GENERATED_HEADER_FILE_PATH} ${GVS_GENERATED_SOURCE_FILE_PATH} ${GVS_NAMESPACE} ${GVS_cmpProjectName} )
+            cmpGenerateVersionstring( ${GVS_GENERATED_HEADER_FILE_PATH} ${GVS_GENERATED_SOURCE_FILE_PATH} ${GVS_NAMESPACE} ${GVS_cmpProjectName} )
         else()
             string(STRIP ${DVERS} DVERS)
             string(REPLACE  "-" ";" VERSION_LIST ${DVERS})
@@ -1038,7 +1009,7 @@ function(cmpVersionStringsFromGit)
 
         endif()
     else()
-       cmpGenerateVersionString( ${GVS_GENERATED_HEADER_FILE_PATH} ${GVS_GENERATED_SOURCE_FILE_PATH} ${GVS_NAMESPACE} ${GVS_cmpProjectName})
+       cmpGenerateVersionstring( ${GVS_GENERATED_HEADER_FILE_PATH} ${GVS_GENERATED_SOURCE_FILE_PATH} ${GVS_NAMESPACE} ${GVS_cmpProjectName})
     endif()
 
 endfunction()

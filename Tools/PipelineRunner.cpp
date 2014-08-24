@@ -156,6 +156,15 @@ int main (int argc, char  *argv[])
 
   // Sanity Check the filepath to make sure it exists, Report an error and bail if it does not
   QFileInfo fi(pipelineFile);
+  std::cout << "Pipeline File Path: " << pipelineFile.toStdString() << std::endl;
+  if(fi.isRelative() )
+  {
+    // We need this because Apple (in their infinite wisdom) changed how the current working directory is set in OS X 10.9 and above. Thanks Apple.
+    //chdir(app.applicationDirPath().toLatin1().constData());
+    std::cout << "Pipeline File Path was Relative. Adjusting to absolute path." << std::endl;
+    pipelineFile = app.applicationDirPath() + "/" + pipelineFile;
+    std::cout << "Pipeline File Path: " << pipelineFile.toStdString() << std::endl;
+  }
   if(fi.exists() == false)
   {
     std::cout << "The input file '" << pipelineFile.toStdString() << "' does not exist" << std::endl;

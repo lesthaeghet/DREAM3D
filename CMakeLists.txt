@@ -145,20 +145,24 @@ foreach(qtlib ${Qt5_COMPONENTS})
 endforeach()
 
 
+set(QT_PLUGINS_FILE_TEMPLATE "${DREAM3DProj_BINARY_DIR}/Qt_Plugins.cmake.in")
+set(QT_PLUGINS_FILE "${DREAM3DProj_BINARY_DIR}/Qt_Plugins.txt")
 
-# --------------------------------------------------------------------
-# We need the Qt Image Plugins (Most likley) for either the DREAM3D application
-# or the pipeline runner which might load images through one of the plugins
-# so we are just going to look for the plugins here and include them.
-#FindQt5Plugins("qgif;qjpeg;qtiff" "${DREAM3DProj_BINARY_DIR}/Qt_Plugins.txt"
-#                "${DREAM3DProj_BINARY_DIR}/LibSearchDirs.txt"
-#                "imageformats" )
+file(WRITE ${QT_PLUGINS_FILE_TEMPLATE} "")
+file(WRITE ${QT_PLUGINS_FILE} "")
 
-AddQt5Plugins(PLUGIN_NAMES QJpeg QGif QTiff QWbmp QWebp
-              PLUGIN_FILE "${DREAM3DProj_BINARY_DIR}/Qt_Plugins.txt"
+AddQt5Plugins(PLUGIN_NAMES QDDS QGif QICNS QICO QJp2 QJpeg QMng QTga QTiff QWbmp QWebp
+              PLUGIN_FILE "${QT_PLUGINS_FILE}"
+              PLUGIN_FILE_TEMPLATE "${QT_PLUGINS_FILE_TEMPLATE}"
               LIBRARY_SEARCH_FILE "${DREAM3DProj_BINARY_DIR}/LibSearchDirs.txt"
+              PLUGIN_SUFFIX Plugin
               PLUGIN_TYPE imageformats)
 
+AddQt5Plugins(PLUGIN_NAMES AccessibleFactory
+              PLUGIN_FILE "${QT_PLUGINS_FILE}"
+              PLUGIN_FILE_TEMPLATE "${QT_PLUGINS_FILE_TEMPLATE}"
+              LIBRARY_SEARCH_FILE "${DREAM3DProj_BINARY_DIR}/LibSearchDirs.txt"
+              PLUGIN_TYPE accessible)
 
 # Append the locations of the Qt libraries to our Library Search Paths
 list(APPEND CMP_LIB_SEARCH_DIRS ${QT_BINARY_DIR} ${QT_LIBRARY_DIR} )
@@ -400,7 +404,10 @@ set(DREAM3D_PLUGIN_LIST
 
 # --- Look for user defined external Plugins that the user has entered
 # into CMake-GUI or through CCMake by the user.
-set(DREAM3D_EXTRA_PLUGINS "" CACHE LIST "Semicolon delimited list of Extra External Plugins that you want to build into DREAM.3D")
+#message(STATUS "${DREAM3D_EXTRA_PLUGINS}")
+if("${DREAM3D_EXTRA_PLUGINS}" STREQUAL "")
+  set(DREAM3D_EXTRA_PLUGINS "" CACHE LIST "Semicolon delimited list of Extra External Plugins that you want to build into DREAM.3D")
+endif()
 #message(STATUS "*** Configuring User Defined Plugins ***")
 
 set(DREAM3D_PLUGIN_LIST ${DREAM3D_PLUGIN_LIST} ${DREAM3D_EXTRA_PLUGINS} )

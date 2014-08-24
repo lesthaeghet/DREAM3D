@@ -143,7 +143,7 @@ if(DOX_GENERATE_HTML)
                      GENERATE_RTF "NO"
                      TEMPLATE_DIR "${DOCUMENTATION_RESOURCES_DIR}"
                      IMAGE_DIR "${DOXYGEN_IMAGE_DIRS}"
-                     OUTPUT_DIR "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/Help"
+                     OUTPUT_DIR "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Help"
                      OUTPUT_SUB_DIR "DREAM3D")
 endif()
 

@@ -53,7 +53,7 @@ function(COMPILE_TOOL)
     cmake_parse_arguments(D3DTOOL "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
 
     if( ${D3DTOOL_DEFINITION} )
-    add_definitions(-D${DEFINITION})
+      add_definitions(-D${DEFINITION})
     endif()
 
     BuildToolBundle(
@@ -64,7 +64,7 @@ function(COMPILE_TOOL)
         VERSION_MINOR ${D3DTOOL_DREAM3D_VER_MINOR}
         VERSION_PATCH ${D3DTOOL_DREAM3D_VER_PATCH}
         BINARY_DIR    ${D3DTOOL_BINARY_DIR}
-        LINK_LIBRARIES ${QT_QTCORE_LIBRARY} EbsdLib DREAM3DLib "${D3DTOOL_LINK_LIBRARIES}"
+        LINK_LIBRARIES "${D3DTOOL_LINK_LIBRARIES}"
         LIB_SEARCH_DIRS ${CMAKE_LIBRARY_OUTPUT_DIRECTORY} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
         COMPONENT     Applications
         INSTALL_DEST  "${D3DTOOL_INSTALL_DEST}"
@@ -87,7 +87,7 @@ COMPILE_TOOL(
     BINARY_DIR    ${${PROJECT_NAME}_BINARY_DIR}
     COMPONENT     Applications
     INSTALL_DEST  "${install_dir}"
-    LINK_LIBRARIES DREAM3DLib
+    LINK_LIBRARIES Qt5::Core DREAM3DLib
 )
 
 
@@ -101,7 +101,7 @@ COMPILE_TOOL(
     VERSION_PATCH ${DREAM3D_VER_PATCH}
     BINARY_DIR    ${${PROJECT_NAME}_BINARY_DIR}
     COMPONENT     Applications
-    LINK_LIBRARIES DREAM3DLib
+    LINK_LIBRARIES Qt5::Core DREAM3DLib
 )
 
 # Create a Command line tool for the MATLAB_CodeGen
@@ -114,22 +114,8 @@ COMPILE_TOOL(
     VERSION_PATCH ${DREAM3D_VER_PATCH}
     BINARY_DIR    ${${PROJECT_NAME}_BINARY_DIR}
     COMPONENT     Applications
-    LINK_LIBRARIES DREAM3DLib
+    LINK_LIBRARIES Qt5::Core DREAM3DLib
 )
-
-#COMPILE_TOOL(
-#    TARGET ModifiedLambertTest
-#    SOURCES ${DREAM3DTools_SOURCE_DIR}/ModifiedLambertTest.cpp
-#    DEBUG_EXTENSION ${EXE_DEBUG_EXTENSION}
-#    VERSION_MAJOR ${DREAM3D_VER_MAJOR}
-#    VERSION_MINOR ${DREAM3D_VER_MINOR}
-#    VERSION_PATCH ${DREAM3D_VER_PATCH}
-#    BINARY_DIR    ${${PROJECT_NAME}_BINARY_DIR}
-#    COMPONENT     Applications
-#    INSTALL_DEST  "${install_dir}"
-#    LINK_LIBRARIES ${QT_QTGUI_LIBRARY}
-#)
-
 
 # --------------------------------------------------------------------
 # Run Qts automoc program to generate some source files that get compiled
@@ -145,7 +131,7 @@ COMPILE_TOOL(
     VERSION_PATCH ${DREAM3D_VER_PATCH}
     BINARY_DIR    ${${PROJECT_NAME}_BINARY_DIR}
     COMPONENT     Applications
-    LINK_LIBRARIES ${QT_QTGUI_LIBRARY}
+    LINK_LIBRARIES Qt5::Core Qt5::Gui Qt5::Widgets DREAM3DLib
 )
 
 option(COMPILE_EBSD_TO_TIFF "Compile the EbsdToTiff program" OFF)

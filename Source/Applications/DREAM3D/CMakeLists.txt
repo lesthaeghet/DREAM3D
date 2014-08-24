@@ -150,9 +150,9 @@ BuildQtAppBundle(
     VERSION_PATCH ${DREAM3D_VER_PATCH}
     BINARY_DIR    ${${PROJECT_NAME}_BINARY_DIR}
     LINK_LIBRARIES  H5Support EbsdLib DREAM3DLib QtSupport DREAM3DWidgetsLib
-	  QT5_MODULES     Qt5::Core Qt5::Gui Qt5::Widgets Qt5::Network
+    QT5_MODULES     Qt5::Core Qt5::Gui Qt5::Widgets Qt5::Network
     LIB_SEARCH_DIRS ${CMAKE_LIBRARY_OUTPUT_DIRECTORY} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-    QT_PLUGINS    ${QT_PLUGINS}
+#   QT_PLUGINS    ${QT_PLUGINS}
     OTHER_PLUGINS ${DREAM3D_PLUGINS}
     PLUGIN_LIST_FILE ${CMP_PLUGIN_LIST_FILE}
     COMPONENT     Applications
@@ -163,10 +163,10 @@ BuildQtAppBundle(
 #-------------------------------------------------------------------------------
 #- This copies all the Prebuilt Pipeline files into the Build directory so the help
 #- works from the Build Tree
-file(MAKE_DIRECTORY ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/PrebuiltPipelines/)
+file(MAKE_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/PrebuiltPipelines/)
 add_custom_target(PrebuiltPipelinesCopy ALL
             COMMAND ${CMAKE_COMMAND} -E copy_directory ${DREAM3D_SUPPORT_DIR}/PrebuiltPipelines/
-            ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/PrebuiltPipelines/
+            ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/PrebuiltPipelines/
             COMMENT "Copying Prebuilt Pipelines into Binary Directory")
 set_target_properties(PrebuiltPipelinesCopy PROPERTIES FOLDER ZZ_COPY_FILES)
 
@@ -186,7 +186,7 @@ install(DIRECTORY ${DREAM3D_SUPPORT_DIR}/PrebuiltPipelines
 # Copy the Data Folder to the build directory
 add_custom_target(DataFolderCopy ALL
             COMMAND ${CMAKE_COMMAND} -E copy_directory ${DREAM3D_DATA_DIR}/Data/
-            ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/Data/
+            ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Data/
             COMMENT "Copying Data Folder into Binary Directory")
 set_target_properties(DataFolderCopy PROPERTIES FOLDER ZZ_COPY_FILES)
 

@@ -44,12 +44,12 @@ SET(PluginMaker_HDRS
 
 SET(PluginMaker_MOC_HDRS
     ${PluginMaker_SOURCE_DIR}/PluginMaker.h
-  ${PluginMaker_SOURCE_DIR}/HelpWidget.h
+    ${PluginMaker_SOURCE_DIR}/HelpWidget.h
     ${PluginMaker_SOURCE_DIR}/PMDirGenerator.h
     ${PluginMaker_SOURCE_DIR}/PMFileGenerator.h
     ${PluginMaker_SOURCE_DIR}/PMFilterGenerator.h
 #    ${DREAM3DProj_SOURCE_DIR}/Source/QtSupport/ApplicationAboutBoxDialog.h
-  ${PluginMaker_SOURCE_DIR}/AddFilterWidget.h
+    ${PluginMaker_SOURCE_DIR}/AddFilterWidget.h
   )
 cmp_IDE_SOURCE_PROPERTIES( "PluginMaker" "${PluginMaker_HDRS};${PluginMaker_MOC_HDRS}" "${PluginMaker_SRCS}" "${PROJECT_INSTALL_HEADERS}")
 
@@ -121,7 +121,7 @@ BuildQtAppBundle(
     VERSION_PATCH ${DREAM3D_VER_PATCH}
     BINARY_DIR    ${${PROJECT_NAME}_BINARY_DIR}
     LINK_LIBRARIES ${QT_LIBRARIES} QtSupport
-	  QT5_MODULES Qt5::Core Qt5::Gui Qt5::Widgets
+    QT5_MODULES Qt5::Core Qt5::Gui Qt5::Widgets
     LIB_SEARCH_DIRS ${CMAKE_LIBRARY_OUTPUT_DIRECTORY} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
     COMPONENT     Applications
     INSTALL_DEST  ${DEST_DIR}
@@ -133,7 +133,7 @@ BuildQtAppBundle(
 #- works from the Build Tree
 add_custom_target(TemplateFileCopy ALL
             COMMAND ${CMAKE_COMMAND} -E copy_directory ${PluginMaker_SOURCE_DIR}/Template/
-            ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/Template/
+            ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Template/
             COMMENT "Copying PluginMakeTemplate into Binary Directory")
 set_target_properties(TemplateFileCopy PROPERTIES FOLDER ZZ_COPY_FILES)
 
