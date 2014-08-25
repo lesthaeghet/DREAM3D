@@ -10,7 +10,7 @@
 #--////////////////////////////////////////////////////////////////////////////
 # set project's name
 PROJECT( DREAM3D )
-cmake_minimum_required(VERSION 2.8.10)
+cmake_minimum_required(VERSION 3.0.0)
 
 if(${CMAKE_MAJOR_VERSION} STREQUAL "3")
   # CMake 3.0 introduces VERSION variables for each Project. We do our own version numbering so we need to have
@@ -145,9 +145,9 @@ BuildQtAppBundle(
     SOURCES ${${PROJECT_NAME}_PROJECT_SRCS}
     DEBUG_EXTENSION ${EXE_DEBUG_EXTENSION}
     ICON_FILE  ${APPLICATION_ICON}
-    VERSION_MAJOR ${DREAM3D_VER_MAJOR}
-    VERSION_MINOR ${DREAM3D_VER_MINOR}
-    VERSION_PATCH ${DREAM3D_VER_PATCH}
+    VERSION_MAJOR ${DREAM3DLib_VER_MAJOR}
+    VERSION_MINOR ${DREAM3DLib_VER_MINOR}
+    VERSION_PATCH ${DREAM3DLib_VER_PATCH}
     BINARY_DIR    ${${PROJECT_NAME}_BINARY_DIR}
     LINK_LIBRARIES  H5Support EbsdLib DREAM3DLib QtSupport DREAM3DWidgetsLib
     QT5_MODULES     Qt5::Core Qt5::Gui Qt5::Widgets Qt5::Network
@@ -200,6 +200,6 @@ install(FILES ${DREAM3D_DATA_DIR}/Data/Composite.dream3d
               ${DREAM3D_DATA_DIR}/Data/CubicSingleRolled.dream3d
               ${DREAM3D_DATA_DIR}/Data/HexagonalSingleEquiaxed.dream3d
               ${DREAM3D_DATA_DIR}/Data/TwoPhaseCubicHexParticlesEquiaxed.dream3d
-        DESTINATION ./Data/
-        COMPONENT Applications )
+              DESTINATION ./Data/
+              COMPONENT Applications )
 
