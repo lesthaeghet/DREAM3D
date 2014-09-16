@@ -177,11 +177,13 @@ namespace DREAM3D
     const DREAM3D_STRING ConfidenceIndex("Confidence Index");
     const DREAM3D_STRING CAxisLocation("CAxisLocation");
     const DREAM3D_STRING ConfidenceIndexNoSpace("ConfidenceIndex");
+    const DREAM3D_STRING Current("Current");
     const DREAM3D_STRING DislocationTensors("DislocationTensors");
     const DREAM3D_STRING EulerAngles("EulerAngles");
     const DREAM3D_STRING EulerColor("EulerColor");
     const DREAM3D_STRING FarFeatureQuats("FarFeatureQuats");
     const DREAM3D_STRING FarFeatureZoneIds("FarFeatureZoneIds");
+    const DREAM3D_STRING FitQuality("FitQuality");
     const DREAM3D_STRING FlatImageData("FlatImageData");
     const DREAM3D_STRING GBEuclideanDistances("GBEuclideanDistances");
     const DREAM3D_STRING GlobAlpha("GlobAlpha");
@@ -212,6 +214,7 @@ namespace DREAM3D
     const DREAM3D_STRING RodriguesColor("RodriguesColor");
     const DREAM3D_STRING SolidMeshNodes("SolidMeshNodes");
     const DREAM3D_STRING SolidMeshTetrahedrons("SolidMeshTetrahedrons");
+    const DREAM3D_STRING Speed("Speed");
     const DREAM3D_STRING SurfaceMeshCells("SurfaceMeshCells");
     const DREAM3D_STRING BoundaryCells("BoundaryCells");
     const DREAM3D_STRING TJEuclideanDistances("TJEuclideanDistances");
@@ -239,6 +242,7 @@ namespace DREAM3D
     const DREAM3D_STRING ElasticStrains("ElasticStrains");
     const DREAM3D_STRING EquivalentDiameters("EquivalentDiameters");
     const DREAM3D_STRING EulerAngles("EulerAngles");
+    const DREAM3D_STRING AvgEulerAngles("AvgEulerAngles");
     const DREAM3D_STRING F1List("F1List");
     const DREAM3D_STRING F1sptList("F1sptList");
     const DREAM3D_STRING F7List("F7List");
@@ -702,6 +706,12 @@ namespace DREAM3D
 
   }
 
+  namespace Layout
+  {
+    const signed int Horizontal = 0;
+    const signed int Vertical = 1;
+    const signed int Square = 2;
+  }
 
 }
 

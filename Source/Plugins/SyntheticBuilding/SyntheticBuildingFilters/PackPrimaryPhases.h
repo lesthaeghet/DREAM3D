@@ -38,6 +38,7 @@
 #define _PackPrimaryPhases_H_
 
 #include <vector>
+#include <map>
 #include <QtCore/QString>
 
 #include <boost/shared_array.hpp>
@@ -54,13 +55,13 @@
 #include "SyntheticBuilding/SyntheticBuildingConstants.h"
 typedef struct
 {
-  float m_Volumes;
-  float m_EquivalentDiameters;
-  float m_AxisLengths[3];
-  float m_AxisEulerAngles[3];
-  float m_Omega3s;
-  int m_FeaturePhases;
-  int m_Neighborhoods;
+    float m_Volumes;
+    float m_EquivalentDiameters;
+    float m_AxisLengths[3];
+    float m_AxisEulerAngles[3];
+    float m_Omega3s;
+    int m_FeaturePhases;
+    int m_Neighborhoods;
 } Feature;
 
 /**
@@ -134,14 +135,22 @@ class PackPrimaryPhases : public AbstractFilter
     DREAM3D_FILTER_PARAMETER(DataArrayPath, InputShapeTypesArrayPath)
     Q_PROPERTY(DataArrayPath InputShapeTypesArrayPath READ getInputShapeTypesArrayPath WRITE setInputShapeTypesArrayPath)
 
+    DREAM3D_FILTER_PARAMETER(bool, HaveFeatures)
+    Q_PROPERTY(bool HaveFeatures READ getHaveFeatures WRITE setHaveFeatures)
+    DREAM3D_FILTER_PARAMETER(QString, FeatureInputFile)
+    Q_PROPERTY(QString FeatureInputFile READ getFeatureInputFile WRITE setFeatureInputFile)
     DREAM3D_FILTER_PARAMETER(QString, CsvOutputFile)
     Q_PROPERTY(QString CsvOutputFile READ getCsvOutputFile WRITE setCsvOutputFile)
-
     DREAM3D_FILTER_PARAMETER(bool, PeriodicBoundaries)
     Q_PROPERTY(bool PeriodicBoundaries READ getPeriodicBoundaries WRITE setPeriodicBoundaries)
-
     DREAM3D_FILTER_PARAMETER(bool, WriteGoalAttributes)
     Q_PROPERTY(bool WriteGoalAttributes READ getWriteGoalAttributes WRITE setWriteGoalAttributes)
+
+    // THESE SHOULD GO AWAY THEY ARE FOR DEBUGGING ONLY
+    DREAM3D_FILTER_PARAMETER(QString, ErrorOutputFile)
+    Q_PROPERTY(QString ErrorOutputFile READ getErrorOutputFile WRITE setErrorOutputFile)
+    DREAM3D_FILTER_PARAMETER(QString, VtkOutputFile)
+    Q_PROPERTY(QString VtkOutputFile READ getVtkOutputFile WRITE setVtkOutputFile)
 
     virtual const QString getCompiledLibraryName();
     virtual AbstractFilter::Pointer newFilterInstance(bool copyFilterParameters);
@@ -170,9 +179,7 @@ class PackPrimaryPhases : public AbstractFilter
      */
     virtual void execute();
 
-// THESE SHOULD GO AWAY THEY ARE FOR DEBUGGING ONLY
-    DREAM3D_INSTANCE_STRING_PROPERTY(ErrorOutputFile)
-    DREAM3D_INSTANCE_STRING_PROPERTY(VtkOutputFile)
+
 
   signals:
     void updateFilterParameters(AbstractFilter* filter);
@@ -183,9 +190,12 @@ class PackPrimaryPhases : public AbstractFilter
   protected:
     PackPrimaryPhases();
 
-    void initialize_packinggrid();
+    Int32ArrayType::Pointer initialize_packinggrid();
 
+    void place_features(Int32ArrayType::Pointer featureOwnersPtr);
     void generate_feature(int phase, int Seed, Feature* feature, unsigned int shapeclass);
+    void load_features();
+
 
     void transfer_attributes(int gnum, Feature* feature);
     void insert_feature(size_t featureNum);
@@ -196,7 +206,8 @@ class PackPrimaryPhases : public AbstractFilter
     void determine_neighbors(size_t featureNum, int add);
     float check_neighborhooderror(int gadd, int gremove);
 
-    float check_fillingerror(int gadd, int gremove, Int32ArrayType::Pointer featureOwnersPtr, BoolArrayType::Pointer exclusionZonesPtr);
+    float check_fillingerror(int gadd, int gremove, Int32ArrayType::Pointer featureOwnersPtr, Int32ArrayType::Pointer exclusionOwnersPtr);
+    void update_availablepoints(std::map<size_t,size_t> &availablePoints, std::map<size_t,size_t> &availablePointsInv);
     void assign_voxels();
     void assign_gaps_only();
     void cleanup_features();
@@ -206,7 +217,7 @@ class PackPrimaryPhases : public AbstractFilter
     void compare_2Ddistributions(std::vector<std::vector<float> >, std::vector<std::vector<float> >, float& sqrerror);
     void compare_3Ddistributions(std::vector<std::vector<std::vector<float> > >, std::vector<std::vector<std::vector<float> > >, float& sqrerror);
 
-    int writeVtkFile(int32_t* featureOwners, bool* exclusionZonesPtr);
+    int writeVtkFile(int32_t* featureOwners, int32_t* exclusionZonesPtr);
     int estimate_numfeatures(int xpoints, int ypoints, int zpoints, float xres, float yres, float zres);
 
 
@@ -249,6 +260,9 @@ class PackPrimaryPhases : public AbstractFilter
     std::vector<std::vector<int> > planelist;
     std::vector<std::vector<float> > ellipfunclist;
 
+    std::vector<size_t> pointsToAdd;
+    std::vector<size_t> pointsToRemove;
+
     unsigned long long int m_Seed;
 
     int firstPrimaryFeature;
@@ -281,6 +295,7 @@ class PackPrimaryPhases : public AbstractFilter
     std::vector<int> primaryphases;
     std::vector<float> primaryphasefractions;
 
+    size_t availablePointsCount;
     float fillingerror, oldfillingerror;
     float currentneighborhooderror, oldneighborhooderror;
     float currentsizedisterror, oldsizedisterror;

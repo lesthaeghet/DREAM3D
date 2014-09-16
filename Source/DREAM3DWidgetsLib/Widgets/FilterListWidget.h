@@ -34,8 +34,8 @@
  *
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
-#ifndef _QFILTERLISTWIDGET_H_
-#define _QFILTERLISTWIDGET_H_
+#ifndef _FilterListWidget_H_
+#define _FilterListWidget_H_
 
 #include <QtCore/QPoint>
 #include <QtGui/QListWidget>
@@ -66,5 +66,5 @@ class DREAM3DWidgetsLib_EXPORT FilterListWidget: public QListWidget
     QPoint startPos;
 };
 
-#endif /* QFILTERLISTWIDGET_H_ */
+#endif /* _FilterListWidget_H_ */
 

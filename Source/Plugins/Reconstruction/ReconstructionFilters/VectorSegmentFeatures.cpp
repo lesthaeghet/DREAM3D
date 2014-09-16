@@ -346,23 +346,24 @@ bool VectorSegmentFeatures::determineGrouping(int64_t referencepoint, int64_t ne
     if(v2[2] < 0) { MatrixMath::Multiply3x1withConstant(v2, -1); }
     float w = GeometryMath::CosThetaBetweenVectors(v1, v2);
     w = acos(w);
+    if(w > DREAM3D::Constants::k_PiOver2) w = DREAM3D::Constants::k_Pi - w;
     if(w < angleTolerance)
     {
       group = true;
       m_FeatureIds[neighborpoint] = gnum;
     }
-    else
-    {
-      v2[0] *= -1;
-      v2[1] *= -1;
-      w = GeometryMath::CosThetaBetweenVectors(v1, v2);
-      w = acos(w);
-      if(w < angleTolerance)
-      {
-        group = true;
-        m_FeatureIds[neighborpoint] = gnum;
-      }
-    }
+    //else
+    //{
+    //  v2[0] *= -1;
+    //  v2[1] *= -1;
+    //  w = GeometryMath::CosThetaBetweenVectors(v1, v2);
+    //  w = acos(w);
+    //  if(w < angleTolerance)
+    //  {
+    //    group = true;
+    //    m_FeatureIds[neighborpoint] = gnum;
+    //  }
+    //}
   }
 
   return group;

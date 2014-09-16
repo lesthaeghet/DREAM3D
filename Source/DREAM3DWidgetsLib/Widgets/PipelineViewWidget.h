@@ -57,6 +57,7 @@
 class QScrollArea;
 class QContextMenuEvent;
 class QLabel;
+class QEvent;
 
 /*
  *
@@ -175,6 +176,7 @@ class DREAM3DWidgetsLib_EXPORT PipelineViewWidget : public QFrame
      */
     void setContextMenuActions(QList<QAction*> list);
 
+    bool eventFilter(QObject *, QEvent *);
 
   public slots:
 
@@ -242,6 +244,11 @@ class DREAM3DWidgetsLib_EXPORT PipelineViewWidget : public QFrame
      * @param pos
      */
     void on_customContextMenuRequested(const QPoint& pos);
+
+    /**
+     * @brief reindexWidgetTitles
+     */
+    void reindexWidgetTitles();
 
   signals:
     void addPlaceHolderFilter(QPoint p);

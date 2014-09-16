@@ -33,8 +33,10 @@
  *                           FA8650-07-D-5800
  *
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
-#ifndef _ImportImagesAsVector_H_
-#define _ImportImagesAsVector_H_
+#ifndef _WriteStatsGenOdfAngleFile_H_
+#define _WriteStatsGenOdfAngleFile_H_
+
+#include <QtCore/QString>
 
 #include <QtCore/QString>
 
@@ -43,54 +45,50 @@
 #include "DREAM3DLib/DataArrays/IDataArray.h"
 #include "DREAM3DLib/Common/AbstractFilter.h"
 
-#include "ImageImport/ImageImportConstants.h"
+#include "OrientationAnalysis/OrientationAnalysisConstants.h"
+
 /**
- * @class ImportImagesAsVector ImportImagesAsVector.h ImageImport/Code/ImageImportFilters/ImportImagesAsVector.h
+ * @class WriteStatsGenOdfAngleFile WriteStatsGenOdfAngleFile.h /IOFilters/WriteStatsGenOdfAngleFile.h
  * @brief
  * @author
  * @date
  * @version 1.0
  */
-class ImportImagesAsVector : public AbstractFilter
+class WriteStatsGenOdfAngleFile : public AbstractFilter
 {
     Q_OBJECT /* Need this for Qt's signals and slots mechanism to work */
   public:
-    DREAM3D_SHARED_POINTERS(ImportImagesAsVector)
-    DREAM3D_STATIC_NEW_MACRO(ImportImagesAsVector)
-    DREAM3D_TYPE_MACRO_SUPER(ImportImagesAsVector, AbstractFilter)
+    DREAM3D_SHARED_POINTERS(WriteStatsGenOdfAngleFile)
+    DREAM3D_STATIC_NEW_MACRO(WriteStatsGenOdfAngleFile)
+    DREAM3D_TYPE_MACRO_SUPER(WriteStatsGenOdfAngleFile, AbstractFilter)
 
-    virtual ~ImportImagesAsVector();
+    virtual ~WriteStatsGenOdfAngleFile();
 
-    DREAM3D_FILTER_PARAMETER(QString, DataContainerName)
-    Q_PROPERTY(QString DataContainerName READ getDataContainerName WRITE setDataContainerName)
-    DREAM3D_FILTER_PARAMETER(QString, CellAttributeMatrixName)
-    Q_PROPERTY(QString CellAttributeMatrixName READ getCellAttributeMatrixName WRITE setCellAttributeMatrixName)
+    /* Place your input parameters here. You can use some of the DREAM3D Macros if you want to */
 
-    DREAM3D_FILTER_PARAMETER(int64_t, StartIndex)
-    DREAM3D_FILTER_PARAMETER(int64_t, EndIndex)
-    DREAM3D_FILTER_PARAMETER(FloatVec3_t, Resolution)
-    DREAM3D_FILTER_PARAMETER(FloatVec3_t, Origin)
+    DREAM3D_FILTER_PARAMETER(QString, OutputFile)
+    Q_PROPERTY(QString OutputFile READ getOutputFile WRITE setOutputFile)
 
-    DREAM3D_FILTER_PARAMETER(QString, InputPath)
-    DREAM3D_FILTER_PARAMETER(QString, FilePrefix)
-    DREAM3D_FILTER_PARAMETER(QString, FileSuffix)
-    DREAM3D_FILTER_PARAMETER(QString, FileExtension)
-    DREAM3D_FILTER_PARAMETER(int, PaddingDigits)
+    DREAM3D_FILTER_PARAMETER(DataArrayPath, CellPhasesArrayPath)
+    Q_PROPERTY(DataArrayPath CellPhasesArrayPath READ getCellPhasesArrayPath WRITE setCellPhasesArrayPath)
 
-    DREAM3D_FILTER_PARAMETER(int, ImageVector)
-    Q_PROPERTY(int ImageVector READ getImageVector WRITE setImageVector)
+    DREAM3D_FILTER_PARAMETER(DataArrayPath, CellEulerAnglesArrayPath)
+    Q_PROPERTY(DataArrayPath CellEulerAnglesArrayPath READ getCellEulerAnglesArrayPath WRITE setCellEulerAnglesArrayPath)
 
-    /**
-    * @brief This returns the group that the filter belonds to. You can select
-    * a different group if you want. The string returned here will be displayed
-    * in the GUI for the filter
-    */
-    DREAM3D_FILTER_PARAMETER(QString, VectorDataArrayName)
-    Q_PROPERTY(QString VectorDataArrayName READ getVectorDataArrayName WRITE setVectorDataArrayName)
+    DREAM3D_FILTER_PARAMETER(bool, ConvertToDegrees)
+    Q_PROPERTY(bool ConvertToDegrees READ getConvertToDegrees WRITE setConvertToDegrees)
+
+    DREAM3D_FILTER_PARAMETER(bool, UseGoodVoxels)
+    Q_PROPERTY(bool UseGoodVoxels READ getUseGoodVoxels WRITE setUseGoodVoxels)
+
+    DREAM3D_FILTER_PARAMETER(DataArrayPath, GoodVoxelsArrayPath)
+    Q_PROPERTY(DataArrayPath GoodVoxelsArrayPath READ getGoodVoxelsArrayPath WRITE setGoodVoxelsArrayPath)
+
 
     virtual const QString getCompiledLibraryName();
     virtual AbstractFilter::Pointer newFilterInstance(bool copyFilterParameters);
     virtual const QString getGroupName();
+
     /**
      * @brief getSubGroupName This returns the subgroup within the main group for this filter.
      * @return
@@ -102,7 +100,6 @@ class ImportImagesAsVector : public AbstractFilter
     * and understandable by humans.
     */
     virtual const QString getHumanLabel();
-
 
     /**
     * @brief This method will instantiate all the end user settable options/parameters
@@ -123,8 +120,8 @@ class ImportImagesAsVector : public AbstractFilter
     virtual void readFilterParameters(AbstractFilterParametersReader* reader, int index);
 
     /**
-     * @brief Reimplemented from @see AbstractFilter class
-     */
+    * @brief Reimplemented from @see AbstractFilter class
+    */
     virtual void execute();
 
     /**
@@ -133,6 +130,7 @@ class ImportImagesAsVector : public AbstractFilter
     */
     virtual void preflight();
 
+
   signals:
     void updateFilterParameters(AbstractFilter* filter);
     void parametersChanged();
@@ -140,7 +138,7 @@ class ImportImagesAsVector : public AbstractFilter
     void preflightExecuted();
 
   protected:
-    ImportImagesAsVector();
+    WriteStatsGenOdfAngleFile();
 
     /**
     * @brief Checks for the appropriate parameter values and availability of
@@ -152,15 +150,25 @@ class ImportImagesAsVector : public AbstractFilter
     */
     void dataCheck();
 
-    void generateFileList();
+    int determineOutputLineCount(int64_t totalPoints, int32_t phase);
+    int writeOutputFile(QTextStream &out, int32_t lineCount, int64_t totalPoints, int32_t phase);
+
 
   private:
-    DEFINE_CREATED_DATAARRAY_VARIABLE(uint8_t, VectorData)
+    DEFINE_REQUIRED_DATAARRAY_VARIABLE(float, CellEulerAngles)
+    DEFINE_REQUIRED_DATAARRAY_VARIABLE(int32_t, CellPhases)
+    DEFINE_REQUIRED_DATAARRAY_VARIABLE(uint32_t, CrystalStructures)
+    DEFINE_REQUIRED_DATAARRAY_VARIABLE(bool, GoodVoxels)
 
-    ImportImagesAsVector(const ImportImagesAsVector&); // Copy Constructor Not Implemented
-    void operator=(const ImportImagesAsVector&); // Operator '=' Not Implemented
+    WriteStatsGenOdfAngleFile(const WriteStatsGenOdfAngleFile&); // Copy Constructor Not Implemented
+    void operator=(const WriteStatsGenOdfAngleFile&); // Operator '=' Not Implemented
 };
 
-#endif /* ImportImagesAsVector_H_ */
+#endif /* _WriteStatsGenOdfAngleFile_H_ */
+
+
+
+
+
 
 

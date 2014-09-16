@@ -56,9 +56,10 @@
 #include "DREAM3DLib/Common/IFilterFactory.hpp"
 #include "DREAM3DLib/Common/FilterFactory.hpp"
 
-
 #include "DREAM3DWidgetsLib/FilterWidgetManager.h"
 #include "DREAM3DWidgetsLib/FilterParameterWidgets/LinkedBooleanWidget.h"
+#include "DREAM3DWidgetsLib/Widgets/PipelineViewWidget.h"
+#include "DREAM3DWidgetsLib/Widgets/DataContainerArrayWidget.h"
 
 // -----------------------------------------------------------------------------
 // Include the "moc" file that was generated for this file
@@ -89,8 +90,10 @@ PipelineFilterWidget::PipelineFilterWidget(QWidget* parent) :
   m_HasPreflightWarnings(false),
   m_BasicVerticalLayout(NULL),
   m_AdvVerticalLayout(NULL),
+  m_CurrStrucVerticalLayout(NULL),
   m_BasicInputsWidget(NULL),
   m_AdvancedInputWidget(NULL),
+  m_CurrentStructureWidget(NULL),
   m_Observer(NULL)
 {
   initialize(AbstractFilter::NullPointer());
@@ -124,8 +127,6 @@ void PipelineFilterWidget::initialize(AbstractFilter::Pointer filter)
   connect(this, SIGNAL(customContextMenuRequested(const QPoint&)),
           this, SLOT(showCustomContextMenu(const QPoint&)));
 
-  setAttribute(Qt::WA_NoMousePropagation);
-
   setupUi(this);
 
   if ( m_OpenDialogLastDirectory.isEmpty() )
@@ -143,19 +144,6 @@ void PipelineFilterWidget::initialize(AbstractFilter::Pointer filter)
 
   // Layout the widgets in the parent widget
   layoutWidgets();
-
-#if 0
-  QAction* action = new QAction(NULL);
-  action->setObjectName(QString::fromUtf8("actionSomeAction"));
-  action->setText(QApplication::translate("DREAM3D_UI", "Some Action", 0, QApplication::UnicodeUTF8));
-  m_MenuActions << action;
-  //m_Menu->addAction(action);
-  //QKeySequence actionClearKeySeq(Qt::CTRL + Qt::Key_Delete);
-  //action->setShortcut(actionClearKeySeq);
-  //  connect(action, SIGNAL(triggered()),
-  //          this, SLOT( on_actionClearPipeline_triggered() ) );
-#endif
-
 }
 
 // -----------------------------------------------------------------------------
@@ -172,19 +160,19 @@ void PipelineFilterWidget::layoutWidgets()
   // If the filter is valid then instantiate all the FilterParameterWidgets
   // Create the Widget that will be placed into the Basic Inputs Scroll Area
   m_BasicInputsWidget = new QWidget(this);
-  QString basicname = QString::fromUtf8("basicInputsScrollWidget_") + m_Filter->getNameOfClass();
+  QString basicname = QString::fromUtf8("basicInputsScrollWidget1_") + m_Filter->getNameOfClass();
   m_BasicInputsWidget->setObjectName(basicname);
   m_BasicInputsWidget->setGeometry(QRect(0, 0, 250, 267));
   m_BasicVerticalLayout = new QVBoxLayout(m_BasicInputsWidget);
-  basicname = QString::fromUtf8("verticalLayout") + m_Filter->getNameOfClass();
+  basicname = QString::fromUtf8("verticalLayout1") + m_Filter->getNameOfClass();
   m_BasicVerticalLayout->setObjectName(basicname);
 
   m_AdvancedInputWidget = new QWidget(this);
-  QString advname = QString::fromUtf8("advancedInputsScrollWidget_") + m_Filter->getNameOfClass();
+  QString advname = QString::fromUtf8("advancedInputsScrollWidget2_") + m_Filter->getNameOfClass();
   m_AdvancedInputWidget->setObjectName(advname);
   m_AdvancedInputWidget->setGeometry(QRect(0, 0, 250, 267));
   m_AdvVerticalLayout = new QVBoxLayout(m_AdvancedInputWidget);
-  advname = QString::fromUtf8("verticalLayout") + m_Filter->getNameOfClass();
+  advname = QString::fromUtf8("verticalLayout2") + m_Filter->getNameOfClass();
   m_AdvVerticalLayout->setObjectName(advname);
 
   m_BasicParameterCount = 0;
@@ -234,6 +222,16 @@ void PipelineFilterWidget::layoutWidgets()
 
   // Now link any boolean widgets to any conditional Widgets that they might control.
   linkConditionalWidgets(filterParameters);
+
+
+  // Now layout the CurrenStructureWidget
+  m_CurrentStructureWidget = new DataContainerArrayWidget(m_Filter.get(), this);
+  QString curStructName = QString::fromUtf8("advancedInputsScrollWidget_CurrStructWidget");
+  m_CurrentStructureWidget->setObjectName(curStructName);
+  m_CurrentStructureWidget->setGeometry(QRect(0,0,250,267));
+//  m_CurrStrucVerticalLayout = new QVBoxLayout(m_CurrentStructureWidget);
+//  curStructName = QString::fromUtf8("verticalLayout3");
+//  m_CurrStrucVerticalLayout->setObjectName(curStructName);
 
 }
 
@@ -461,6 +459,14 @@ QWidget* PipelineFilterWidget::getAdvancedInputsWidget()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
+QWidget* PipelineFilterWidget::getCurrentStructureWidget()
+{
+  return m_CurrentStructureWidget;
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
 void PipelineFilterWidget::setHasPreflightErrors(bool hasErrors)
 {
   m_HasPreflightErrors = hasErrors;
@@ -557,7 +563,7 @@ void PipelineFilterWidget::updateWidgetStyle()
   style.append("QLabel\n {\n");
 
 #if defined(Q_WS_WIN)
-  style.append("font: 75 10pt \"Arial\";");
+  style.append("font: 9pt \"Arial\";");
 #elif defined(Q_WS_MAC)
   style.append("font: 100 italic 12pt \"Arial\";");
 #else
