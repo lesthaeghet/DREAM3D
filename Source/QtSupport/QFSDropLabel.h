@@ -1,6 +1,5 @@
 /* ============================================================================
- * Copyright (c) 2014 Michael A. Jackson (BlueQuartz Software)
- * Copyright (c) 2014 Dr. Michael A. Groeber (US Air Force Research Laboratories)
+ * Copyright (c) 2011, Michael A. Jackson (BlueQuartz Software)
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -13,10 +12,9 @@
  * list of conditions and the following disclaimer in the documentation and/or
  * other materials provided with the distribution.
  *
- * Neither the name of Michael A. Groeber, Michael A. Jackson, the US Air Force,
- * BlueQuartz Software nor the names of its contributors may be used to endorse
- * or promote products derived from this software without specific prior written
- * permission.
+ * Neither the name of Michael A. Jackson nor the names of its contributors may
+ * be used to endorse or promote products derived from this software without
+ * specific prior written permission.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -28,38 +26,44 @@
  * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  This code was written under United States Air Force Contract number
- *                           FA8650-10-D-5210
- *
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
-#ifndef _MontageBundle_H_
-#define _MontageBundle_H_
 
-#include <QtCore/QObject>
+#ifndef _QFSDropLabel_H
+#define _QFSDropLabel_H
 
-#include "DREAM3DLib/DREAM3DLib.h"
-#include "DREAM3DLib/DataContainers/GenericDataContainerBundle.h"
+#include <QtGui/QLabel>
 
-class DREAM3DLib_EXPORT MontageBundle : public GenericDataContainerBundle
+
+
+#define FS_STANDARD_STYLE 0
+#define FS_DRAGGING_STYLE 1
+#define FS_DOESNOTEXIST_STYLE 2
+
+/**
+* @class QFSDropLabel QFSDropLabel.h EmMpm/Common/Qt/QFSDropLabel.h
+* @brief
+* @author Michael A. Jackson for BlueQuartz Software
+* @date Feb 5, 2010
+* @version 1.0
+*/
+class QFSDropLabel : public QLabel
 {
-  Q_OBJECT
+    Q_OBJECT
 
   public:
-    DREAM3D_SHARED_POINTERS (MontageBundle)
-    DREAM3D_STATIC_NEW_MACRO (MontageBundle)
-    DREAM3D_TYPE_MACRO_SUPER(MontageBundle, GenericDataContainerBundle)
+    QFSDropLabel(QWidget* parent = NULL);
 
-    virtual ~MontageBundle();
+    void dragEnterEvent(QDragEnterEvent* event);
+    void dropEvent(QDropEvent* event);
+    void dragLeaveEvent(QDragLeaveEvent *event);
+    void changeStyleSheet(int style);
 
-  protected:
-    MontageBundle();
-
+  signals:
+    void fileDropped(const QString& file);
 
   private:
-    MontageBundle(const MontageBundle&); // Copy Constructor Not Implemented
-    void operator=(const MontageBundle&); // Operator '=' Not Implemented
+
 };
 
 
-#endif /* _MontageBundle_H_ */
+#endif

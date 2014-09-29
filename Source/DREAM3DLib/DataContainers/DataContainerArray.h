@@ -48,6 +48,7 @@
 #include "DREAM3DLib/DataContainers/EdgeDataContainer.h"
 #include "DREAM3DLib/DataContainers/DataArrayPath.h"
 #include "DREAM3DLib/DataContainers/IDataContainerBundle.h"
+#include "DREAM3DLib/DataContainers/DataContainerBundle.h"
 
 /**
  * @class DataContainerArray DataContainerArray.h DREAM3DLib/Common/DataContainerArray.h
@@ -72,6 +73,7 @@ class DREAM3DLib_EXPORT DataContainerArray : public QObject
     /**
      * @brief
      */
+    virtual void addDataContainer(DataContainer::Pointer f);
     virtual void pushFront(DataContainer::Pointer f);
     virtual void popFront();
     virtual void pushBack(DataContainer::Pointer f);
@@ -163,6 +165,12 @@ class DREAM3DLib_EXPORT DataContainerArray : public QObject
      * @param newName
      */
     bool renameDataContainerBundle(const QString &oldName, const QString newName);
+
+    /**
+     * @brief removeDataContainerFromBundle
+     * @param name
+     */
+    void removeDataContainerFromBundles(const QString &name);
 
 
 
@@ -408,7 +416,7 @@ class DREAM3DLib_EXPORT DataContainerArray : public QObject
     typename ArrayType::Pointer createNonPrereqArrayFromPath(Filter* filter,
                                                              const DataArrayPath& path,
                                                              T initValue,
-                                                             QVector<size_t> dims,
+                                                             QVector<size_t> compDims,
                                                              const QString property = "")
     {
       typename ArrayType::Pointer dataArray = ArrayType::NullPointer();
@@ -450,7 +458,7 @@ class DREAM3DLib_EXPORT DataContainerArray : public QObject
 
       // If something goes wrong at this point the error message will be directly set in the 'filter' object so we just
       // simply return what ever is given to us.
-      dataArray = attrMat->createNonPrereqArray<ArrayType, Filter, T>(filter, path.getDataArrayName(), initValue, dims);
+      dataArray = attrMat->createNonPrereqArray<ArrayType, Filter, T>(filter, path.getDataArrayName(), initValue, compDims);
       return dataArray;
     }
 

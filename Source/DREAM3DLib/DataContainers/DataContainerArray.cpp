@@ -58,6 +58,8 @@ void DataContainerArray::pushFront(DataContainer::Pointer f)
 // -----------------------------------------------------------------------------
 void DataContainerArray::popFront()
 {
+  QString dcName = m_Array.front()->getName();
+  removeDataContainerFromBundles(dcName);
   m_Array.pop_front();
 }
 // -----------------------------------------------------------------------------
@@ -67,11 +69,23 @@ void DataContainerArray::pushBack(DataContainer::Pointer f)
 {
   m_Array.push_back(f);
 }
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void DataContainerArray::addDataContainer(DataContainer::Pointer f)
+{
+  m_Array.push_back(f);
+}
+
+
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
 void DataContainerArray::popBack()
 {
+  QString dcName = m_Array.back()->getName();
+  removeDataContainerFromBundles(dcName);
   m_Array.pop_back();
 }
 // -----------------------------------------------------------------------------
@@ -96,6 +110,8 @@ void DataContainerArray::erase(size_t index)
   {
     ++it;
   }
+  QString dcName = (*it)->getName();
+  removeDataContainerFromBundles(dcName);
   m_Array.erase(it);
 }
 // -----------------------------------------------------------------------------
@@ -104,6 +120,7 @@ void DataContainerArray::erase(size_t index)
 void DataContainerArray::clear()
 {
   m_Array.clear();
+  m_DataContainerBundles.clear();
 }
 // -----------------------------------------------------------------------------
 //
@@ -125,6 +142,7 @@ bool DataContainerArray::empty()
 // -----------------------------------------------------------------------------
 DataContainer::Pointer DataContainerArray::removeDataContainer(const QString& name)
 {
+  removeDataContainerFromBundles(name);
   DataContainer::Pointer f = DataContainer::NullPointer();
   for(QList<DataContainer::Pointer>::iterator it = m_Array.begin(); it != m_Array.end(); ++it)
   {
@@ -417,6 +435,28 @@ void DataContainerArray::addDataContainerBundle(IDataContainerBundle::Pointer da
 int DataContainerArray::removeDataContainerBundle(const QString &name)
 {
   return m_DataContainerBundles.remove(name);
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void DataContainerArray::removeDataContainerFromBundles(const QString &name)
+{
+  for(QMap<QString, IDataContainerBundle::Pointer>::iterator iter = m_DataContainerBundles.begin(); iter != m_DataContainerBundles.end(); ++iter)
+  {
+    IDataContainerBundle::Pointer dcbPtr = iter.value();
+    if (dcbPtr.get() != NULL)
+    {
+      QVector<QString> dcbNames = dcbPtr->getDataContainerNames();
+      for (size_t i=0;i<dcbNames.size();i++)
+      {
+        if (dcbNames[i].compare(name) == 0)
+        {
+          dcbPtr->remove(name);
+        }
+      }
+    }
+  }
 }
 
 
