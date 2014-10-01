@@ -151,6 +151,38 @@ void ImagesToMM3DWidget::setupGui()
   QObject::connect( com1, SIGNAL(activated(const QString&)),
                     this, SLOT(on_m_OutputFile_textChanged(const QString&)));
 
+  QTabWidget* tabWidget = new QTabWidget(this);
+  tabWidget->setObjectName(QString::fromUtf8("tabWidget"));
+  QWidget* tab_1 = new QWidget();
+  tab_1->setObjectName(QString::fromUtf8("tab_1"));
+  tabWidget->addTab(tab_1, "tab1");
+  QWidget* tab_2 = new QWidget();
+  tab_2->setObjectName(QString::fromUtf8("tab_2"));
+  tabWidget->addTab(tab_2, "tab2");
+  QWidget* tab_3 = new QWidget();
+  tab_3->setObjectName(QString::fromUtf8("tab_3"));
+  tabWidget->addTab(tab_3, "tab3");
+  QListWidget* m_FileListView3 = new QListWidget(tab_3);
+  m_FileListView3->setObjectName(QString::fromUtf8("m_FileListView3"));
+  m_FileListView3->setGeometry(QRect(0, 0, 641, 211));
+
+
+  gridLayout_3->addWidget(tabWidget, 10, 0, 1, 1);
+
+
+//          tabWidget = new QTabWidget(ImagesToMM3DWidget);
+//          tabWidget->setObjectName(QString::fromUtf8("tabWidget"));
+//          tab_3 = new QWidget();
+//          tab_3->setObjectName(QString::fromUtf8("tab_3"));
+//          m_FileListView = new QListWidget(tab_3);
+//          m_FileListView->setObjectName(QString::fromUtf8("m_FileListView"));
+//          m_FileListView->setGeometry(QRect(0, 0, 641, 211));
+//          tabWidget->addTab(tab_3, QString());
+//          tab_4 = new QWidget();
+//          tab_4->setObjectName(QString::fromUtf8("tab_4"));
+//          tabWidget->addTab(tab_4, QString());
+
+
   m_WidgetList << m_InputDir << m_InputDirBtn << m_OutputFile << m_OutputFileBtn;
   m_WidgetList << m_FileExt << m_ErrorMessage << m_TotalDigits;
   m_WidgetList << m_FilePrefix << m_TotalSlices << m_ZStartIndex << m_ZEndIndex << m_zSpacing;
