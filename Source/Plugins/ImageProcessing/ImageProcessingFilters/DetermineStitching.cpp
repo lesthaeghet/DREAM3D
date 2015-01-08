@@ -37,6 +37,9 @@
 
 #include "ItkBridge.h"
 
+#include "itkImage.h"
+#include "itkImageFileWriter.h"
+
 
 #include "ImageProcessing/ImageProcessingHelpers.hpp"
 
@@ -151,8 +154,49 @@ void DetermineStitching::execute()
   typedef itk::MaskedFFTNormalizedCorrelationImageFilter< ImageProcessing::DefaultImageType, ImageProcessing::FloatImageType, ImageProcessing::DefaultImageType > XCFilterType;
   XCFilterType::Pointer xCorrFilter = XCFilterType::New();
 
+
+  std::cout << "Image largest region: " << filterRegion.GetSize() << std::endl;
+
+  ImageProcessing::UInt8ImageType::RegionType cropRegion;
+
+  cropRegion.SetSize(0, 50);
+  cropRegion.SetSize(1, 600);
+  cropRegion.SetSize(2, 1);
+
+  cropRegion.SetIndex(0, 0);
+  cropRegion.SetIndex(1, 0);
+  cropRegion.SetIndex(2, 0);
+
+  typedef itk::ExtractImageFilter< ImageProcessing::UInt8ImageType, ImageProcessing::UInt8ImageType > exImFilterType;
+  exImFilterType::Pointer exImfilter = exImFilterType::New();
+  exImfilter->SetExtractionRegion(cropRegion);
+  exImfilter->SetInput(inputImage);
+#if ITK_VERSION_MAJOR >= 4
+  exImfilter->SetDirectionCollapseToIdentity(); // This is required.
+#endif
+  exImfilter->Update();
+  ImageProcessing::UInt8ImageType* outputImage = exImfilter->GetOutput();
+
+
+  typedef itk::ImageFileWriter< ImageProcessing::UInt8ImageType > WriterType;
+  WriterType::Pointer writer = WriterType::New();
+  writer->SetFileName( "/Users/megnashah/Desktop/imageEXIm.tiff");
+  writer->SetInput( outputImage );
+  writer->Update();
+
+
+
   xCorrFilter->SetFixedImage(inputImage);
-  xCorrFilter->SetMovingImage(inputImage);
+  xCorrFilter->SetMovingImage(outputImage);
+  xCorrFilter->Update();
+  xCorrFilter->SetRequiredFractionOfOverlappingPixels(1);
+  ImageProcessing::FloatImageType* xcoutputImage = xCorrFilter->GetOutput();
+
+  typedef itk::ImageFileWriter< ImageProcessing::FloatImageType > nWriterType;
+  nWriterType::Pointer writer2 = nWriterType::New();
+  writer2->SetFileName( "/Users/megnashah/Desktop/imageXC.tiff");
+  writer2->SetInput( xcoutputImage );
+  writer2->Update();
 
 
 
