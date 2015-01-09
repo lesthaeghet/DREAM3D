@@ -39,6 +39,7 @@
 #include "DREAM3DLib/DREAM3DLib.h"
 #include "DREAM3DLib/Common/DREAM3DSetGetMacros.h"
 #include "DREAM3DLib/Common/AbstractFilter.h"
+#include "DREAM3DLib/DataArrays/IDataArray.h"
 
 #include "ImageProcessing/ImageProcessingConstants.h"
 
@@ -60,7 +61,10 @@ class DREAM3DLib_EXPORT DetermineStitching
      * @param numBins The number of bins to generate
      * @return An array of values that are the frequency values for the histogram
      */
-    static std::vector<float> GenerateRandomDistribution(float minDistance, float maxDistance, int numBins, std::vector<float> boxdims, std::vector<float> boxres);
+
+
+
+    static FloatArrayType::Pointer DetermineStitching::FindGlobalOrigins(size_t totalPoints, QVector<size_t> udims, float sampleOrigin, float voxelResolution, int tileDims, QVector<size_t> dataArrayList);
 
   protected:
     DetermineStitching();

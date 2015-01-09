@@ -33,13 +33,14 @@
 
 #include "itkMaskedFFTNormalizedCorrelationImageFilter.h"
 
-#include "ItkBridge.h"
+#include "ImageProcessing/ImageProcessingFilters/ItkBridge.h"
 
 #include "itkImage.h"
 #include "itkImageFileWriter.h"
 
 
 #include "ImageProcessing/ImageProcessingHelpers.hpp"
+
 
 
 
@@ -64,13 +65,19 @@ DetermineStitching::~DetermineStitching()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-std::vector<float> DetermineStitching::(float minDistance, float maxDistance, int numBins, std::vector<float> boxdims, std::vector<float> boxres)
+FloatArrayType::Pointer DetermineStitching::FindGlobalOrigins(size_t totalPoints, QVector<size_t> udims, float sampleOrigin, float voxelResolution, int tileDims, QVector<size_t> dataArrayList)
 {
-    VolumeDataContainer* m = getDataContainerArray()->getDataContainerAs<VolumeDataContainer>(getSelectedCellArrayPath().getDataContainerName());
-    QString attrMatName = getSelectedCellArrayPath().getAttributeMatrixName();
+
+    QVector<size_t> cDims(1, 2);
+    QVector<size_t> tDims(1);
+
+    tDims[0] = am->getNumTuples();
+
+    FloatArrayType::Pointer xyGlobalListPtr = FloatArrayType::CreateArray(tDims, cDims, "xyGlobalList");
+
 
     //get filter to convert m_RawImageData to itk::image
-    ImageProcessing::ImportUInt8FilterType::Pointer importFilter = ITKUtilitiesType::Dream3DtoITKImportFilter<ImageProcessing::DefaultPixelType>(m, attrMatName, m_SelectedCellArray);
+    ImageProcessing::ImportUInt8FilterType::Pointer importFilter = ITKUtilitiesType::Dream3DtoITKImportFilterDataArray<ImageProcessing::DefaultPixelType>(totalPoints, udims, sampleOrigin, voxelResolution, image);
 
     //get image from filter
     const ImageProcessing::UInt8ImageType* inputImage = importFilter->GetOutput();
@@ -123,5 +130,7 @@ std::vector<float> DetermineStitching::(float minDistance, float maxDistance, in
     writer2->SetFileName( "/Users/megnashah/Desktop/imageXC.tiff");
     writer2->SetInput( xcoutputImage );
     writer2->Update();
+
+    return xyGlobalListPtr;
 
 }
