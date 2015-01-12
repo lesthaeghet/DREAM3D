@@ -64,7 +64,7 @@ class DREAM3DLib_EXPORT DetermineStitching
 
 
 
-    static FloatArrayType::Pointer DetermineStitching::FindGlobalOrigins(size_t totalPoints, QVector<size_t> udims, float sampleOrigin, float voxelResolution, int tileDims, QVector<size_t> dataArrayList);
+  static FloatArrayType::Pointer FindGlobalOrigins(size_t totalPoints, QVector<size_t> udims, float sampleOrigin, float voxelResolution, int tileDims, QVector<size_t> dataArrayList);
 
   protected:
     DetermineStitching();

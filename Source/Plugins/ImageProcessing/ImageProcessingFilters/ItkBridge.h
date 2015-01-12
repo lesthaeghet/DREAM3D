@@ -368,7 +368,7 @@ class ItkBridge
      * @return
      */
     template<typename TPixel>
-    static typename itk::ImportImageFilter<TPixel, ImageProcessing::ImageDimension>::Pointer Dream3DtoITKImportFilterDataArray(size_t totalPoints, QVector<size_t> udims, float sampleOrigin,  float voxelResolution, ComponentType* data)
+    static typename itk::ImportImageFilter<TPixel, ImageProcessing::ImageDimension>::Pointer Dream3DtoITKImportFilterDataArray(size_t totalPoints, QVector<size_t> udims, float sampleOrigin[3],  float voxelResolution[3], ComponentType* data)
     {
 //      AttributeMatrix::Pointer attrMat = m->getAttributeMatrix(attrMatName);
 
@@ -394,7 +394,7 @@ class ItkBridge
       importFilter->SetRegion( region );
 
 //      float sampleOrigin[3] = {0.0f, 0.0f, 0.0f};
-      m->getOrigin(sampleOrigin);
+//      m->getOrigin(sampleOrigin);
       double origin[ ImageProcessing::ImageDimension ];
       origin[0] = sampleOrigin[0];    // X coordinate
       origin[1] = sampleOrigin[1];    // Y coordinate
@@ -402,7 +402,7 @@ class ItkBridge
       importFilter->SetOrigin( origin );
 
 //      float voxelResolution[3] = {0.0f, 0.0f, 0.0f};
-      m->getResolution(voxelResolution);
+//      m->getResolution(voxelResolution);
       double spacing[ ImageProcessing::ImageDimension ];
       spacing[0] = voxelResolution[0];    // along X direction
       spacing[1] = voxelResolution[1];    // along Y direction
