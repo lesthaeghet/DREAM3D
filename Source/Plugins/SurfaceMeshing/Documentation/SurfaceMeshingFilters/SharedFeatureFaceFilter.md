@@ -16,13 +16,17 @@ This filter generates all the unique **Feature** id to **Feature** id values. Fo
 SurfaceMesh - Valid Surface Mesh containing the shared vertex array and face list
 
 ## Required Arrays ##
-None
+| Type | Default Name | Comment |
+|------|--------------|---------|
+| Face | SurfaceMeshFaceLabels | The bounding features for each triangle |
 
 ## Created Arrays ##
 
 | Type | Default Name | Comment |
 |------|--------------|---------|
 | Face | SurfaceMeshGrainFaceId | The length of the array is the number of triangles for that unique face id value |
+| FaceFeature | SurfaceMeshFaceLabels | The volume feature id pair associated with each surface mesh face feature |
+| FaceFeature | NumTriangles | The number of faces with this feature id |
 
 ## Authors ##
 
