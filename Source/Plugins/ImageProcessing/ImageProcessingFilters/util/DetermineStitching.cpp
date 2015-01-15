@@ -65,7 +65,8 @@ DetermineStitching::~DetermineStitching()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-FloatArrayType::Pointer DetermineStitching::FindGlobalOrigins(size_t totalPoints, QVector<size_t> udims, float sampleOrigin, float voxelResolution, int tileDims, QVector<size_t> dataArrayList)
+//FloatArrayType::Pointer DetermineStitching::FindGlobalOrigins(size_t totalPoints, QVector<size_t> udims, float sampleOrigin, float voxelResolution, int tileDims, QVector<size_t> dataArrayList)
+FloatArrayType::Pointer DetermineStitching::FindGlobalOrigins(size_t totalPoints, QVector<size_t> udims, float sampleOrigin[3],  float voxelResolution[3], QVector<ImageProcessing::DefaultPixelType* > dataArrayList)
 {
 
 //    QVector<size_t> cDims(1, 2);
@@ -75,61 +76,62 @@ FloatArrayType::Pointer DetermineStitching::FindGlobalOrigins(size_t totalPoints
 
 //    FloatArrayType::Pointer xyGlobalListPtr = FloatArrayType::CreateArray(tDims, cDims, "xyGlobalList");
 
-
-//    //get filter to convert m_RawImageData to itk::image
-//    ImageProcessing::ImportUInt8FilterType::Pointer importFilter = ITKUtilitiesType::Dream3DtoITKImportFilterDataArray<ImageProcessing::DefaultPixelType>(totalPoints, udims, sampleOrigin, voxelResolution, image);
-
-//    //get image from filter
-//    const ImageProcessing::UInt8ImageType* inputImage = importFilter->GetOutput();
-//    ImageProcessing::UInt8ImageType::RegionType filterRegion = inputImage->GetBufferedRegion();
-//    ImageProcessing::UInt8ConstIteratorType it(inputImage, filterRegion);
-
-//    typedef itk::MaskedFFTNormalizedCorrelationImageFilter< ImageProcessing::DefaultImageType, ImageProcessing::FloatImageType, ImageProcessing::DefaultImageType > XCFilterType;
-//    XCFilterType::Pointer xCorrFilter = XCFilterType::New();
+    //get filter to convert m_RawImageData to itk::image
 
 
-//    std::cout << "Image largest region: " << filterRegion.GetSize() << std::endl;
+    ImageProcessing::ImportUInt8FilterType::Pointer importFilter = ITKUtilitiesType::Dream3DtoITKImportFilterDataArray<ImageProcessing::DefaultPixelType>(totalPoints, udims, sampleOrigin, voxelResolution, dataArrayList[0]);
 
-//    ImageProcessing::UInt8ImageType::RegionType cropRegion;
+    //get image from filter
+    const ImageProcessing::UInt8ImageType* inputImage = importFilter->GetOutput();
+    ImageProcessing::UInt8ImageType::RegionType filterRegion = inputImage->GetBufferedRegion();
+    ImageProcessing::UInt8ConstIteratorType it(inputImage, filterRegion);
 
-//    cropRegion.SetSize(0, 50);
-//    cropRegion.SetSize(1, 600);
-//    cropRegion.SetSize(2, 1);
-
-//    cropRegion.SetIndex(0, 0);
-//    cropRegion.SetIndex(1, 0);
-//    cropRegion.SetIndex(2, 0);
-
-//    typedef itk::ExtractImageFilter< ImageProcessing::UInt8ImageType, ImageProcessing::UInt8ImageType > exImFilterType;
-//    exImFilterType::Pointer exImfilter = exImFilterType::New();
-//    exImfilter->SetExtractionRegion(cropRegion);
-//    exImfilter->SetInput(inputImage);
-//  #if ITK_VERSION_MAJOR >= 4
-//    exImfilter->SetDirectionCollapseToIdentity(); // This is required.
-//  #endif
-//    exImfilter->Update();
-//    ImageProcessing::UInt8ImageType* outputImage = exImfilter->GetOutput();
+    typedef itk::MaskedFFTNormalizedCorrelationImageFilter< ImageProcessing::DefaultImageType, ImageProcessing::FloatImageType, ImageProcessing::DefaultImageType > XCFilterType;
+    XCFilterType::Pointer xCorrFilter = XCFilterType::New();
 
 
-//    typedef itk::ImageFileWriter< ImageProcessing::UInt8ImageType > WriterType;
-//    WriterType::Pointer writer = WriterType::New();
-//    writer->SetFileName( "/Users/megnashah/Desktop/imageEXIm.tiff");
-//    writer->SetInput( outputImage );
-//    writer->Update();
+    std::cout << "Image largest region: " << filterRegion.GetSize() << std::endl;
+
+    ImageProcessing::UInt8ImageType::RegionType cropRegion;
+
+    cropRegion.SetSize(0, 50);
+    cropRegion.SetSize(1, 600);
+    cropRegion.SetSize(2, 1);
+
+    cropRegion.SetIndex(0, 0);
+    cropRegion.SetIndex(1, 0);
+    cropRegion.SetIndex(2, 0);
+
+    typedef itk::ExtractImageFilter< ImageProcessing::UInt8ImageType, ImageProcessing::UInt8ImageType > exImFilterType;
+    exImFilterType::Pointer exImfilter = exImFilterType::New();
+    exImfilter->SetExtractionRegion(cropRegion);
+    exImfilter->SetInput(inputImage);
+  #if ITK_VERSION_MAJOR >= 4
+    exImfilter->SetDirectionCollapseToIdentity(); // This is required.
+  #endif
+    exImfilter->Update();
+    ImageProcessing::UInt8ImageType* outputImage = exImfilter->GetOutput();
+
+
+    typedef itk::ImageFileWriter< ImageProcessing::UInt8ImageType > WriterType;
+    WriterType::Pointer writer = WriterType::New();
+    writer->SetFileName( "/Users/megnashah/Desktop/imageEXIm.tiff");
+    writer->SetInput( outputImage );
+    writer->Update();
 
 
 
-//    xCorrFilter->SetFixedImage(inputImage);
-//    xCorrFilter->SetMovingImage(outputImage);
-//    xCorrFilter->Update();
-//    xCorrFilter->SetRequiredFractionOfOverlappingPixels(1);
-//    ImageProcessing::FloatImageType* xcoutputImage = xCorrFilter->GetOutput();
+    xCorrFilter->SetFixedImage(inputImage);
+    xCorrFilter->SetMovingImage(outputImage);
+    xCorrFilter->Update();
+    xCorrFilter->SetRequiredFractionOfOverlappingPixels(1);
+    ImageProcessing::FloatImageType* xcoutputImage = xCorrFilter->GetOutput();
 
-//    typedef itk::ImageFileWriter< ImageProcessing::FloatImageType > nWriterType;
-//    nWriterType::Pointer writer2 = nWriterType::New();
-//    writer2->SetFileName( "/Users/megnashah/Desktop/imageXC.tiff");
-//    writer2->SetInput( xcoutputImage );
-//    writer2->Update();
+    typedef itk::ImageFileWriter< ImageProcessing::FloatImageType > nWriterType;
+    nWriterType::Pointer writer2 = nWriterType::New();
+    writer2->SetFileName( "/Users/megnashah/Desktop/imageXC.tiff");
+    writer2->SetInput( xcoutputImage );
+    writer2->Update();
 
 //    return xyGlobalListPtr;
 
