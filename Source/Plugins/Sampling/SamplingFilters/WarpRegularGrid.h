@@ -34,50 +34,62 @@
  *
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
+#ifndef _WarpRegularGrid_H_
+#define _WarpRegularGrid_H_
 
-#ifndef _UniWestEddyCurrentReader_H_
-#define _UniWestEddyCurrentReader_H_
-
-#include <QtCore/QFile>
 #include <QtCore/QString>
-#include <vector>
 
 #include "DREAM3DLib/DREAM3DLib.h"
 #include "DREAM3DLib/Common/DREAM3DSetGetMacros.h"
-#include "DREAM3DLib/DataArrays/DataArray.hpp"
-#include "DREAM3DLib/Common/AbstractFilter.h"
-#include "DREAM3DLib/Common/Constants.h"
-#include "IO/IOFilters/util/GenericDataParser.hpp"
+#include "DREAM3DLib/DataArrays/IDataArray.h"
 
+#include "DREAM3DLib/Common/AbstractFilter.h"
+#include "DREAM3DLib/DataContainers/VolumeDataContainer.h"
+
+#include "Sampling/SamplingConstants.h"
 /**
- * @class UniWestEddyCurrentReader UniWestEddyCurrentReader.h DREAM3DLib/IO/UniWestEddyCurrentReader.h
+ * @class WarpRegularGrid WarpRegularGrid.h DREAM3DLib/SamplingFilters/WarpRegularGrid.h
  * @brief
- * @author mjackson
- * @date Sep 28, 2011
- * @version $Revision$
+ * @author
+ * @date Jun 10, 2014
+ * @version 1.0
  */
-class  UniWestEddyCurrentReader : public AbstractFilter
+class WarpRegularGrid : public AbstractFilter
 {
     Q_OBJECT /* Need this for Qt's signals and slots mechanism to work */
   public:
-    DREAM3D_SHARED_POINTERS(UniWestEddyCurrentReader)
-    DREAM3D_STATIC_NEW_MACRO(UniWestEddyCurrentReader)
-    DREAM3D_TYPE_MACRO_SUPER(UniWestEddyCurrentReader, AbstractFilter)
+    DREAM3D_SHARED_POINTERS(WarpRegularGrid)
+    DREAM3D_STATIC_NEW_MACRO(WarpRegularGrid)
+    DREAM3D_TYPE_MACRO_SUPER(WarpRegularGrid, AbstractFilter)
 
-    virtual ~UniWestEddyCurrentReader();
-    DREAM3D_FILTER_PARAMETER(QString, VolumeDataContainerName)
-    Q_PROPERTY(QString VolumeDataContainerName READ getVolumeDataContainerName WRITE setVolumeDataContainerName)
-    DREAM3D_FILTER_PARAMETER(QString, CellAttributeMatrixName)
-    Q_PROPERTY(QString CellAttributeMatrixName READ getCellAttributeMatrixName WRITE setCellAttributeMatrixName)
+    virtual ~WarpRegularGrid();
+    DREAM3D_FILTER_PARAMETER(QString, NewDataContainerName)
+    Q_PROPERTY(QString NewDataContainerName READ getNewDataContainerName WRITE setNewDataContainerName)
+    DREAM3D_FILTER_PARAMETER(DataArrayPath, CellAttributeMatrixPath)
+    Q_PROPERTY(DataArrayPath CellAttributeMatrixPath READ getCellAttributeMatrixPath WRITE setCellAttributeMatrixPath)
 
-    /* Input Parameters */
-    DREAM3D_FILTER_PARAMETER(QString, InputFile)
-    Q_PROPERTY(QString InputFile READ getInputFile WRITE setInputFile)
+    DREAM3D_FILTER_PARAMETER(int, PolyOrder)
+    Q_PROPERTY(int PolyOrder READ getPolyOrder WRITE setPolyOrder)
+
+    DREAM3D_FILTER_PARAMETER(Float2ndOrderPoly_t, SecondOrderACoeff)
+    Q_PROPERTY(Float2ndOrderPoly_t SecondOrderACoeff READ getSecondOrderACoeff WRITE setSecondOrderACoeff)
+    DREAM3D_FILTER_PARAMETER(Float2ndOrderPoly_t, SecondOrderBCoeff)
+    Q_PROPERTY(Float2ndOrderPoly_t SecondOrderBCoeff READ getSecondOrderBCoeff WRITE setSecondOrderBCoeff)
+    DREAM3D_FILTER_PARAMETER(Float3rdOrderPoly_t, ThirdOrderACoeff)
+    Q_PROPERTY(Float3rdOrderPoly_t ThirdOrderACoeff READ getThirdOrderACoeff WRITE setThirdOrderACoeff)
+    DREAM3D_FILTER_PARAMETER(Float3rdOrderPoly_t, ThirdOrderBCoeff)
+    Q_PROPERTY(Float3rdOrderPoly_t ThirdOrderBCoeff READ getThirdOrderBCoeff WRITE setThirdOrderBCoeff)
+    DREAM3D_FILTER_PARAMETER(Float4thOrderPoly_t, FourthOrderACoeff)
+    Q_PROPERTY(Float4thOrderPoly_t FourthOrderACoeff READ getFourthOrderACoeff WRITE setFourthOrderACoeff)
+    DREAM3D_FILTER_PARAMETER(Float4thOrderPoly_t, FourthOrderBCoeff)
+    Q_PROPERTY(Float4thOrderPoly_t FourthOrderBCoeff READ getFourthOrderBCoeff WRITE setFourthOrderBCoeff)
+    DREAM3D_FILTER_PARAMETER(bool, SaveAsNewDataContainer)
+    Q_PROPERTY(bool SaveAsNewDataContainer READ getSaveAsNewDataContainer WRITE setSaveAsNewDataContainer)
 
     virtual const QString getCompiledLibraryName();
     virtual AbstractFilter::Pointer newFilterInstance(bool copyFilterParameters);
     virtual const QString getGroupName();
-    virtual const QString getSubGroupName();
+    virtual const QString getSubGroupName()  { return DREAM3D::FilterSubGroups::ResolutionFilters; }
     virtual const QString getHumanLabel();
 
     virtual void setupFilterParameters();
@@ -93,8 +105,11 @@ class  UniWestEddyCurrentReader : public AbstractFilter
     */
     virtual void readFilterParameters(AbstractFilterParametersReader* reader, int index);
 
-    virtual void preflight();
+    /**
+     * @brief Reimplemented from @see AbstractFilter class
+     */
     virtual void execute();
+    virtual void preflight();
 
   signals:
     void updateFilterParameters(AbstractFilter* filter);
@@ -103,28 +118,19 @@ class  UniWestEddyCurrentReader : public AbstractFilter
     void preflightExecuted();
 
   protected:
-    UniWestEddyCurrentReader();
+    WarpRegularGrid();
 
-    virtual int readHeader(QFile &reader);
-    virtual int readFile(QFile &reader);
+    void determine_warped_coordinates(float x, float y, float &newX, float &newY);
+
+  private:
 
     void dataCheck();
 
-  private:
-    QFile m_InStream;
-    QMap<QString, GenericDataParser::Pointer> m_NamePointerMap;
-
-    size_t m_DataPointCount;
-
-    UniWestEddyCurrentReader(const UniWestEddyCurrentReader&); //Not Implemented
-    void operator=(const UniWestEddyCurrentReader&); //Not Implemented
-
+    WarpRegularGrid(const WarpRegularGrid&); // Copy Constructor Not Implemented
+    void operator=(const WarpRegularGrid&); // Operator '=' Not Implemented
 };
 
-#endif //_UniWestEddyCurrentReader_h_
-
-
-
+#endif /* WarpRegularGrid_H_ */
 
 
 

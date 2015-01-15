@@ -35,7 +35,7 @@
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
 
-#include "UniWestEddyCurrentReader.h"
+#include "EddyCurrentDataReader.h"
 
 #include <QtCore/QtDebug>
 #include <fstream>
@@ -44,6 +44,7 @@
 #include <QtCore/QFileInfo>
 
 #include "DREAM3DLib/DataArrays/DataArray.hpp"
+#include "DREAM3DLib/DataArrays/StringDataArray.hpp"
 
 #include "IO/IOConstants.h"
 
@@ -51,10 +52,13 @@
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-UniWestEddyCurrentReader::UniWestEddyCurrentReader() :
+EddyCurrentDataReader::EddyCurrentDataReader() :
   AbstractFilter(),
   m_VolumeDataContainerName(DREAM3D::Defaults::VolumeDataContainerName),
+  m_MetaDataAttributeMatrixName(DREAM3D::StringConstants::MetaData),
   m_CellAttributeMatrixName(DREAM3D::Defaults::CellAttributeMatrixName),
+  m_HasMultipleValues("False"),
+  m_AverageMultipleValues(false),
   m_InputFile("")
 {
   setupFilterParameters();
@@ -63,7 +67,7 @@ UniWestEddyCurrentReader::UniWestEddyCurrentReader() :
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-UniWestEddyCurrentReader::~UniWestEddyCurrentReader()
+EddyCurrentDataReader::~EddyCurrentDataReader()
 {
 
 }
@@ -71,12 +75,16 @@ UniWestEddyCurrentReader::~UniWestEddyCurrentReader()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void UniWestEddyCurrentReader::setupFilterParameters()
+void EddyCurrentDataReader::setupFilterParameters()
 {
   FilterParameterVector parameters;
   parameters.push_back(FileSystemFilterParameter::New("Input File", "InputFile", FilterParameterWidgetType::InputFileWidget, getInputFile(), false, "", "*.*"));
+  parameters.push_back(FilterParameter::New("Has Multiple Values", "HasMultipleValues", FilterParameterWidgetType::PreflightUpdatedValueWidget, getHasMultipleValues(), false, ""));
+  parameters.back()->setReadOnly(true);
+  parameters.push_back(FilterParameter::New("Average Multiple Values", "AverageMultipleValues", FilterParameterWidgetType::BooleanWidget, getAverageMultipleValues(), false, ""));
   parameters.push_back(FilterParameter::New("Created Information", "", FilterParameterWidgetType::SeparatorWidget, "", true));
   parameters.push_back(FilterParameter::New("Volume Data Container", "VolumeDataContainerName", FilterParameterWidgetType::StringWidget, getVolumeDataContainerName(), true, ""));
+  parameters.push_back(FilterParameter::New("Meta Data Attribute Matrix", "MetaDataAttributeMatrixName", FilterParameterWidgetType::StringWidget, getMetaDataAttributeMatrixName(), true, ""));
   parameters.push_back(FilterParameter::New("Cell Attribute Matrix", "CellAttributeMatrixName", FilterParameterWidgetType::StringWidget, getCellAttributeMatrixName(), true, ""));
   setFilterParameters(parameters);
 }
@@ -84,10 +92,11 @@ void UniWestEddyCurrentReader::setupFilterParameters()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void UniWestEddyCurrentReader::readFilterParameters(AbstractFilterParametersReader* reader, int index)
+void EddyCurrentDataReader::readFilterParameters(AbstractFilterParametersReader* reader, int index)
 {
   reader->openFilterGroup(this, index);
   setVolumeDataContainerName(reader->readString("VolumeDataContainerName", getVolumeDataContainerName() ) );
+  setMetaDataAttributeMatrixName(reader->readString("MetaDataAttributeMatrixName", getMetaDataAttributeMatrixName() ) );
   setCellAttributeMatrixName(reader->readString("CellAttributeMatrixName", getCellAttributeMatrixName() ) );
   setInputFile( reader->readString( "InputFile", getInputFile() ) );
   reader->closeFilterGroup();
@@ -96,10 +105,11 @@ void UniWestEddyCurrentReader::readFilterParameters(AbstractFilterParametersRead
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-int UniWestEddyCurrentReader::writeFilterParameters(AbstractFilterParametersWriter* writer, int index)
+int EddyCurrentDataReader::writeFilterParameters(AbstractFilterParametersWriter* writer, int index)
 {
   writer->openFilterGroup(this, index);
   DREAM3D_FILTER_WRITE_PARAMETER(VolumeDataContainerName)
+  DREAM3D_FILTER_WRITE_PARAMETER(MetaDataAttributeMatrixName)
   DREAM3D_FILTER_WRITE_PARAMETER(CellAttributeMatrixName)
   DREAM3D_FILTER_WRITE_PARAMETER(InputFile)
   writer->closeFilterGroup();
@@ -109,7 +119,7 @@ int UniWestEddyCurrentReader::writeFilterParameters(AbstractFilterParametersWrit
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void UniWestEddyCurrentReader::dataCheck()
+void EddyCurrentDataReader::dataCheck()
 {
   DataArrayPath tempPath;
   setErrorCondition(0);
@@ -117,6 +127,10 @@ void UniWestEddyCurrentReader::dataCheck()
   if(getErrorCondition() < 0) { return; }
   QVector<size_t> tDims(3, 0);
   AttributeMatrix::Pointer attrMat = m->createNonPrereqAttributeMatrix<AbstractFilter>(this, getCellAttributeMatrixName(), tDims, DREAM3D::AttributeMatrixType::Cell);
+  if(getErrorCondition() < 0) { return; }
+  tDims.resize(1);
+  tDims[0] = 1;
+  AttributeMatrix::Pointer metaAttrMat = m->createNonPrereqAttributeMatrix<AbstractFilter>(this, getMetaDataAttributeMatrixName(), tDims, DREAM3D::AttributeMatrixType::MetaData);
   if(getErrorCondition() < 0) { return; }
 
   m_InStream.setFileName(getInputFile());
@@ -144,38 +158,12 @@ void UniWestEddyCurrentReader::dataCheck()
   //read the header to create the necessary arrays
   readHeader(m_InStream);
   m_InStream.close();
-
-  //resize the attribute matrix with the number of points (which we now know from reading the header
-  //Note that the tDims should actually be a vector of 3 for the x, y and z dims....but this will atleast 
-  //size the arrays to the right size and we will figure out the x, y and z dims later
-  tDims.resize(1);
-  tDims[0] = m_DataPointCount;
-  attrMat->resizeAttributeArrays(tDims);
-
-  // Make sure we did not have any errors
-  if(getErrorCondition() < 0)
-  {
-    QString ss = QObject::tr("Error reading header information from file: '%1'").arg(getInputFile());
-    setErrorCondition(-389);
-    notifyErrorMessage(getHumanLabel(), ss, getErrorCondition());
-    return;
-  }
-
-  QMapIterator<QString, GenericDataParser::Pointer> parserIter(m_NamePointerMap);
-  while(parserIter.hasNext())
-  {
-    parserIter.next();
-    QString name = parserIter.key();
-    GenericDataParser::Pointer parser = parserIter.value();
-    IDataArray::Pointer dataPtr = parser->initializeNewDataArray(m_DataPointCount, name, !getInPreflight()) ; // Get a copy of the DataArray
-    attrMat->addAttributeArray(dataPtr->getName(), dataPtr);
-  }
 }
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void UniWestEddyCurrentReader::preflight()
+void EddyCurrentDataReader::preflight()
 {
   setInPreflight(true);
   emit preflightAboutToExecute();
@@ -183,6 +171,14 @@ void UniWestEddyCurrentReader::preflight()
   dataCheck();
   emit preflightExecuted();
   setInPreflight(false);
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+QString EddyCurrentDataReader::getHasMultipleValues()
+{
+  return m_HasMultipleValues;
 }
 
 // -----------------------------------------------------------------------------
@@ -206,19 +202,14 @@ void shuffleArray(IDataArray::Pointer inputData, IDataArray::Pointer inputDataCo
     size_t row = i%yDim;
     size_t col = i/yDim;
     size_t newPos = (row*xDim) + col;
-    if(newPos >= m_DataPointCount)
-    {
-      int stop = 0;
-    }
     copyPtr[newPos] = inPtr[i];
   }
  }
 
-
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void UniWestEddyCurrentReader::execute()
+void EddyCurrentDataReader::execute()
 {
   dataCheck();
   if(getErrorCondition() < 0) { return; }
@@ -230,8 +221,12 @@ void UniWestEddyCurrentReader::execute()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-int UniWestEddyCurrentReader::readHeader(QFile &reader)
+int EddyCurrentDataReader::readHeader(QFile &reader)
 {
+  VolumeDataContainer* m = getDataContainerArray()->getDataContainerAs<VolumeDataContainer>(getVolumeDataContainerName());
+  AttributeMatrix::Pointer cellAttrMat = m->getAttributeMatrix(getCellAttributeMatrixName());
+  AttributeMatrix::Pointer metaAttrMat = m->getAttributeMatrix(getMetaDataAttributeMatrixName());
+
   m_InStream.setFileName(getInputFile());
   if (!m_InStream.open(QIODevice::ReadOnly | QIODevice::Text))
   {
@@ -244,13 +239,48 @@ int UniWestEddyCurrentReader::readHeader(QFile &reader)
   QByteArray buf;
   QList<QByteArray> tokens; /* vector to store the split data */
 
-  for(int i = 0; i < 13; i++)
+  bool ok = true;
+  int32_t startFreq = 0;
+  int32_t stopFreq = 0;
+  int32_t numPtsSweep = 0;
+  bool keepGoing = true;
+  QList<QByteArray> words;
+  QVector<size_t> tDims(1, 1);
+  QVector<size_t> cDims(1, 1);
+  while(keepGoing == true)
   {
     buf = m_InStream.readLine();
+    buf = buf.trimmed();
+    buf = buf.simplified();
+    words = buf.split(',');
+    if(words.size() > 1) keepGoing = false;
+    if(words.size() == 1)
+    {
+      words = buf.split(':');
+      if(words.size() == 2)
+      {
+        QString word(words.at(0));
+        if(word.compare("Comments") != 0)
+        {
+          //do some comparisons to get the values of the start and stop frequencies and the number of points in the swwep
+          if(word.compare("Start Freq (Hz)") == 0) startFreq = words[1].toInt(&ok);
+          else if(word.compare("Stop Freq (Hz)") == 0) stopFreq = words[1].toInt(&ok);
+          else if(word.compare("No. of Pts Per Sweep") == 0) numPtsSweep = words[1].toInt(&ok);
+          Int32ArrayType::Pointer data = Int32ArrayType::CreateArray(tDims, cDims, word);
+          metaAttrMat->addAttributeArray(word, data);
+        }
+        else
+        {
+          StringDataArray::Pointer dataS = StringDataArray::CreateArray(1, word);
+          metaAttrMat->addAttributeArray(word, dataS);
+        }
+      }
+    }
   }
-  buf = buf.trimmed();
-  buf = buf.simplified();
-  QList<QByteArray> words = buf.split(',');
+
+  //do logic check to see if there are multiple values at the frequency
+  if(startFreq == stopFreq && numPtsSweep > 1) m_HasMultipleValues = "True";
+  else m_HasMultipleValues = "False";
 
   for(int i=0;i<words.size();i++)
   {
@@ -273,16 +303,43 @@ int UniWestEddyCurrentReader::readHeader(QFile &reader)
     GenericFloatParser::Pointer dparser = GenericFloatParser::New(data, words[i], i);
     m_NamePointerMap.insert(words[i], dparser);
   }
+
+  //resize the attribute matrix with the number of points (which we now know from reading the header
+  //Note that the tDims should actually be a vector of 3 for the x, y and z dims....but this will atleast 
+  //size the arrays to the right size and we will figure out the x, y and z dims later
+  tDims[0] = m_DataPointCount;
+  cellAttrMat->resizeAttributeArrays(tDims);
+
+  // Make sure we did not have any errors
+  if(getErrorCondition() < 0)
+  {
+    QString ss = QObject::tr("Error reading header information from file: '%1'").arg(getInputFile());
+    setErrorCondition(-389);
+    notifyErrorMessage(getHumanLabel(), ss, getErrorCondition());
+    return -1;
+  }
+
+  QMapIterator<QString, GenericDataParser::Pointer> parserIter(m_NamePointerMap);
+  while(parserIter.hasNext())
+  {
+    parserIter.next();
+    QString name = parserIter.key();
+    GenericDataParser::Pointer parser = parserIter.value();
+    IDataArray::Pointer dataPtr = parser->initializeNewDataArray(m_DataPointCount, name, !getInPreflight()) ; // Get a copy of the DataArray
+    cellAttrMat->addAttributeArray(dataPtr->getName(), dataPtr);
+  }
+
   return 0;
 }
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-int UniWestEddyCurrentReader::readFile(QFile &reader)
+int EddyCurrentDataReader::readFile(QFile &reader)
 {
   VolumeDataContainer* m = getDataContainerArray()->getDataContainerAs<VolumeDataContainer>(getVolumeDataContainerName());
   AttributeMatrix::Pointer cellAttrMat = m->getAttributeMatrix(getCellAttributeMatrixName());
+  AttributeMatrix::Pointer metaAttrMat = m->getAttributeMatrix(getMetaDataAttributeMatrixName());
 
   QByteArray buf;
   QList<QByteArray> tokens;
@@ -293,16 +350,16 @@ int UniWestEddyCurrentReader::readFile(QFile &reader)
   GenericDataParser::Pointer parser;
 
   float x, y;
-  float xMin = 100000000000.0;
-  float yMin = 100000000000.0;
-  float xMax = -100000000000.0;
-  float yMax = -100000000000.0;
-  float xStep = 0.0;
-  float yStep = 0.0;
+  float xMin = 100000000000.0f;
+  float yMin = 100000000000.0f;
+  float xMax = -100000000000.0f;
+  float yMax = -100000000000.0f;
+  float xStep = 0.0f;
+  float yStep = 0.0f;
   size_t xDim = 0;
   size_t yDim = 0;
-  float lastXcoord = -1000000000000.0;
-  float lastYcoord = -1000000000000.0;
+  float lastXcoord = -1000000000000.0f;
+  float lastYcoord = -1000000000000.0f;
 
   while(parserIter.hasNext())
   {
@@ -319,10 +376,35 @@ int UniWestEddyCurrentReader::readFile(QFile &reader)
   parserIter.toFront();
 
   //reader header lines first
-  for(int i = 0; i < 13; i++)
+  bool keepGoing = true;
+  QList<QByteArray> words;
+  bool ok = true;
+  while(keepGoing == true)
   {
-    buf = reader.readLine();
-    tokens = buf.trimmed().simplified().split(',');
+    buf = m_InStream.readLine();
+    buf = buf.trimmed();
+    buf = buf.simplified();
+    words = buf.split(',');
+    if(words.size() > 1) keepGoing = false;
+    if(words.size() == 1)
+    {
+      words = buf.split(':');
+      if(words.size() == 2)
+      {
+        QString word(words[0]);
+        IDataArray::Pointer dataPtr = metaAttrMat->getAttributeArray(word);
+        if(word.compare("Comments") != 0)
+        {
+          Int32ArrayType::Pointer castDataPtr = boost::dynamic_pointer_cast<Int32ArrayType>(dataPtr);
+          castDataPtr->setValue(0, words[1].toInt(&ok));
+        }
+        else
+        {
+          StringDataArray::Pointer castDataPtr = boost::dynamic_pointer_cast<StringDataArray>(dataPtr);
+          castDataPtr->setValue(0, words[1]);
+        }
+      }
+    }
   }
 
   //now begin reading the data....assuming the file is orderd with x incrementing fastest....we will correct this later if it is wrong
@@ -477,9 +559,9 @@ int UniWestEddyCurrentReader::readFile(QFile &reader)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-AbstractFilter::Pointer UniWestEddyCurrentReader::newFilterInstance(bool copyFilterParameters)
+AbstractFilter::Pointer EddyCurrentDataReader::newFilterInstance(bool copyFilterParameters)
 {
-  UniWestEddyCurrentReader::Pointer filter = UniWestEddyCurrentReader::New();
+  EddyCurrentDataReader::Pointer filter = EddyCurrentDataReader::New();
   if(true == copyFilterParameters)
   {
     copyFilterParameterInstanceVariables(filter.get());
@@ -490,27 +572,27 @@ AbstractFilter::Pointer UniWestEddyCurrentReader::newFilterInstance(bool copyFil
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-const QString UniWestEddyCurrentReader::getCompiledLibraryName()
+const QString EddyCurrentDataReader::getCompiledLibraryName()
 { return IO::IOBaseName; }
 
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-const QString UniWestEddyCurrentReader::getGroupName()
+const QString EddyCurrentDataReader::getGroupName()
 { return DREAM3D::FilterGroups::IOFilters; }
 
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-const QString UniWestEddyCurrentReader::getSubGroupName()
+const QString EddyCurrentDataReader::getSubGroupName()
 { return DREAM3D::FilterSubGroups::InputFilters; }
 
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-const QString UniWestEddyCurrentReader::getHumanLabel()
-{ return "Read UniWest Eddy Current File"; }
+const QString EddyCurrentDataReader::getHumanLabel()
+{ return "Read Eddy Current Data"; }
 

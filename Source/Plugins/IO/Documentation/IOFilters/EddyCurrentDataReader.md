@@ -1,4 +1,4 @@
-Read UniWest UltraSound File {#uniwestultrasoundreader}
+Read Eddy Current Data {#eddycurrentdatareader}
 ======
 
 ## Group (Subgroup) ##
