@@ -66,19 +66,15 @@ DetermineStitching::~DetermineStitching()
 //
 // -----------------------------------------------------------------------------
 //FloatArrayType::Pointer DetermineStitching::FindGlobalOrigins(size_t totalPoints, QVector<size_t> udims, float sampleOrigin, float voxelResolution, int tileDims, QVector<size_t> dataArrayList)
-FloatArrayType::Pointer DetermineStitching::FindGlobalOrigins(size_t totalPoints, QVector<size_t> udims, float sampleOrigin[3],  float voxelResolution[3], QVector<ImageProcessing::DefaultPixelType* > dataArrayList)
+FloatArrayType::Pointer DetermineStitching::FindGlobalOrigins(size_t totalPoints, QVector<size_t> udims, float sampleOrigin[3],  float voxelResolution[3], QVector<ImageProcessing::DefaultPixelType* > dataArrayList, QVector<float> xGlobCoordsList, QVector<float> yGlobCoordsList, QVector<size_t> xTileList, QVector<size_t> yTileList)
 {
-
-//    QVector<size_t> cDims(1, 2);
-//    QVector<size_t> tDims(1);
-
-//    //tDims[0] = am->getNumTuples();
-
 //    FloatArrayType::Pointer xyGlobalListPtr = FloatArrayType::CreateArray(tDims, cDims, "xyGlobalList");
 
+    size_t numXtiles = FindMaxValue(xTileList) + 1;
+    size_t numYtiles = FindMaxValue(yTileList) + 1;
+
+
     //get filter to convert m_RawImageData to itk::image
-
-
     ImageProcessing::ImportUInt8FilterType::Pointer importFilter = ITKUtilitiesType::Dream3DtoITKImportFilterDataArray<ImageProcessing::DefaultPixelType>(totalPoints, udims, sampleOrigin, voxelResolution, dataArrayList[0]);
 
     //get image from filter
@@ -134,5 +130,40 @@ FloatArrayType::Pointer DetermineStitching::FindGlobalOrigins(size_t totalPoints
     writer2->Update();
 
 //    return xyGlobalListPtr;
+
+}
+
+size_t DetermineStitching::FindMaxValue(QVector<size_t> inputVector)
+{
+
+    QVector<size_t>::iterator it = std::max_element(inputVector.begin(), inputVector.end());
+
+    return *it;
+
+}
+
+QVector<size_t> DetermineStitching::ReturnIndexForCombOrder(QVector<size_t> xTileList, QVector<size_t> yTileList, size_t numXtiles, size_t numYtiles)
+{
+
+    QVector<size_t> newIndices(xTileList.size(), 0);
+    size_t count;
+
+    for (size_t iter = 0; iter < xTileList.size(); iter++)
+    {
+        count = 0;
+        for (size_t j=0; j<numYtiles; j++)
+        {
+            for (size_t i=0; i<numXtiles; i++)
+            {
+                if (xTileList[iter] == i && yTileList[iter] == j)
+                {
+                    newIndices[iter] = count;
+                }
+                count ++;
+            }
+        }
+    }
+
+    return newIndices;
 
 }

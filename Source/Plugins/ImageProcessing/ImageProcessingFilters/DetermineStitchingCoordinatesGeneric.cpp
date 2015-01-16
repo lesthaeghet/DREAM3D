@@ -186,10 +186,14 @@ void DetermineStitchingCoordinatesGeneric::execute()
   QVector<size_t> udims = attrMat->getTupleDimensions();
   size_t totalPoints = attrMat->getNumTuples();
 
+  QVector<size_t> xTileList;
+  QVector<size_t> yTileList;
+
+  QVector<float> xGlobCoordsList;
+  QVector<float> yGlobCoordsList;
 
 
-
-  DetermineStitching::FindGlobalOrigins(totalPoints, udims, sampleOrigin, voxelResolution, m_PointerList);
+  DetermineStitching::FindGlobalOrigins(totalPoints, udims, sampleOrigin, voxelResolution, m_PointerList, xGlobCoordsList, yGlobCoordsList, xTileList, yTileList);
 
 
 

@@ -64,7 +64,11 @@ class DREAM3DLib_EXPORT DetermineStitching
 
 
 
-  static FloatArrayType::Pointer FindGlobalOrigins(size_t totalPoints, QVector<size_t> udims, float sampleOrigin[], float voxelResolution[], QVector<ImageProcessing::DefaultPixelType *> dataArrayList);
+  static FloatArrayType::Pointer FindGlobalOrigins(size_t totalPoints, QVector<size_t> udims, float sampleOrigin[], float voxelResolution[], QVector<ImageProcessing::DefaultPixelType *> dataArrayList, QVector<float> xGlobCoordsList, QVector<float> yGlobCoordsList, QVector<size_t> xTileList, QVector<size_t> yTileList);
+
+  static size_t FindMaxValue(QVector<size_t> inputVector);
+
+  static QVector<size_t> ReturnIndexForCombOrder(QVector<size_t> xTileList, QVector<size_t> yTileList, size_t numXtiles, size_t numYtiles);
 
   protected:
     DetermineStitching();
