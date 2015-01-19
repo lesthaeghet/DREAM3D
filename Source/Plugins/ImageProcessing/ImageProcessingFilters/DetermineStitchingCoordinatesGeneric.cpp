@@ -186,11 +186,43 @@ void DetermineStitchingCoordinatesGeneric::execute()
   QVector<size_t> udims = attrMat->getTupleDimensions();
   size_t totalPoints = attrMat->getNumTuples();
 
-  QVector<size_t> xTileList;
-  QVector<size_t> yTileList;
+  QVector<size_t> xTileList(12);
+  QVector<size_t> yTileList(12);
+  QVector<size_t> newList(12);
 
   QVector<float> xGlobCoordsList;
   QVector<float> yGlobCoordsList;
+
+  xTileList[0] = 0;
+  xTileList[1] = 1;
+  xTileList[2] = 2;
+  xTileList[3] = 2;
+  xTileList[4] = 1;
+  xTileList[5] = 0;
+  xTileList[6] = 0;
+  xTileList[7] = 1;
+  xTileList[8] = 2;
+  xTileList[9] = 2;
+  xTileList[10] = 1;
+  xTileList[11] = 0;
+
+  yTileList[0] = 0;
+  yTileList[1] = 0;
+  yTileList[2] = 0;
+  yTileList[3] = 1;
+  yTileList[4] = 1;
+  yTileList[5] = 1;
+  yTileList[6] = 2;
+  yTileList[7] = 2;
+  yTileList[8] = 2;
+  yTileList[9] = 3;
+  yTileList[10] = 3;
+  yTileList[11] = 3;
+
+
+  newList = DetermineStitching::ReturnIndexForCombOrder(xTileList, yTileList, 3, 4);
+
+
 
 
   DetermineStitching::FindGlobalOrigins(totalPoints, udims, sampleOrigin, voxelResolution, m_PointerList, xGlobCoordsList, yGlobCoordsList, xTileList, yTileList);
