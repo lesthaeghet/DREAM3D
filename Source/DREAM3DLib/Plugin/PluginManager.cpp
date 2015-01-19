@@ -1,5 +1,6 @@
 /* ============================================================================
- * Copyright (c) 2011, Michael A. Jackson (BlueQuartz Software)
+ * Copyright (c) 2012 Michael A. Jackson (BlueQuartz Software)
+ * Copyright (c) 2012 Dr. Michael A. Groeber (US Air Force Research Laboratories)
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -12,9 +13,10 @@
  * list of conditions and the following disclaimer in the documentation and/or
  * other materials provided with the distribution.
  *
- * Neither the name of Michael A. Jackson nor the names of its contributors may
- * be used to endorse or promote products derived from this software without
- * specific prior written permission.
+ * Neither the name of Michael A. Groeber, Michael A. Jackson, the US Air Force,
+ * BlueQuartz Software nor the names of its contributors may be used to endorse
+ * or promote products derived from this software without specific prior written
+ * permission.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -26,93 +28,87 @@
  * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ *  This code was written under United States Air Force Contract number
+ *                           FA8650-07-D-5800
+ *
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
-#include "Observer.h"
+#include "PluginManager.h"
 
-#include <iostream>
+PluginManager* PluginManager::self = NULL;
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-Observer::Observer()
+PluginManager::PluginManager()
 {
+//  qDebug() << "PluginManager()" << this;
+  Q_ASSERT_X(!self, "PluginManager", "There should be only one PluginManager object");
+  PluginManager::self = this;
 }
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-Observer::~Observer()
+PluginManager::~PluginManager()
 {
+//  qDebug() << "~PluginManager()" << this;
 }
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void Observer::updateProgressAndMessage(const std::string &msg, int progress)
+PluginManager* PluginManager::Instance()
 {
-  std::cout << progress << "% " << msg << std::endl;
+
+  if (self == NULL)
+  {
+    //  qDebug() << "PluginManager::Instance self was NULL" << "\n";
+    self = new PluginManager();
+  }
+  return self;
 }
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void Observer::updateProgressAndMessage(const char* message, int progress)
+void PluginManager::printPluginNames()
 {
-  std::cout << progress << "% " << message << std::endl;
+  for(QVector<DREAM3DPluginInterface*>::iterator iter = plugins.begin(); iter != plugins.end(); ++iter)
+  {
+    qDebug() << "Name: " << *iter << "\n";
+  }
 }
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void Observer::pipelineProgress(int value)
+void PluginManager::addPlugin(DREAM3DPluginInterface* plugin)
 {
-  std::cout << value << "%" << std::endl;
+  plugins.push_back(plugin);
 }
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void Observer::pipelineProgressMessage(const std::string &msg)
+QList<QString> PluginManager::getPluginNames()
 {
-  pipelineProgressMessage(msg.c_str());
+  QList<QString> pluginNames;
+  for (QVector<DREAM3DPluginInterface*>::iterator iter = plugins.begin(); iter != plugins.end(); ++iter)
+  {
+    DREAM3DPluginInterface* plugin = *iter;
+    if(NULL != plugin)
+    {
+      pluginNames.push_back(plugin->getPluginName());
+    }
+  }
+  return pluginNames;
 }
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void Observer::pipelineProgressMessage(const char* message)
+QVector<DREAM3DPluginInterface*> PluginManager::getPluginsVector()
 {
-  std::cout << message << std::endl;
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void Observer::pipelineWarningMessage(const char* message)
-{
-  std::cout << "Warning Message: " << message << std::endl;
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void Observer::pipelineWarningMessage(const std::string &msg)
-{
-  std::cout << "Warning Message: " << msg << std::endl;
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void Observer::pipelineErrorMessage(const char* message)
-{
-  std::cout << "Error Message: " << message << std::endl;
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void Observer::pipelineErrorMessage(const std::string &msg)
-{
-  std::cout << "Error Message: " << msg << std::endl;
+  return plugins;
 }
