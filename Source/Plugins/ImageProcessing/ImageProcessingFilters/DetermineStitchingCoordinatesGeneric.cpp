@@ -220,7 +220,10 @@ void DetermineStitchingCoordinatesGeneric::execute()
   yTileList[11] = 3;
 
 
+
+
   newList = DetermineStitching::ReturnIndexForCombOrder(xTileList, yTileList, 3, 4);
+
 
 
 

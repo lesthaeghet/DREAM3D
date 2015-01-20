@@ -70,7 +70,7 @@ class DREAM3DLib_EXPORT DetermineStitching
 
   static QVector<size_t> ReturnIndexForCombOrder(QVector<size_t> xTileList, QVector<size_t> yTileList, size_t numXtiles, size_t numYtiles);
 
-  static std::vector<float> CropAndCrossCorrelate(std::vector<float> cropSpecsIm1Im2, const ImageProcessing::UInt8ImageType* currentImage, const ImageProcessing::UInt8ImageType* fixedImage);
+  static std::vector<float> CropAndCrossCorrelate(std::vector<float> cropSpecsIm1Im2, ImageProcessing::UInt8ImageType* currentImage, ImageProcessing::UInt8ImageType* fixedImage);
 
   protected:
     DetermineStitching();
