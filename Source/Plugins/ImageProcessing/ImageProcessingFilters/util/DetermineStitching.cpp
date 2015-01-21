@@ -39,6 +39,7 @@
 #include "itkImageFileWriter.h"
 #include "itkRegionOfInterestImageFilter.h"
 #include "itkChangeInformationImageFilter.h"
+#include "itkMinimumMaximumImageCalculator.h"
 
 
 #include "ImageProcessing/ImageProcessingHelpers.hpp"
@@ -93,6 +94,7 @@ FloatArrayType::Pointer DetermineStitching::FindGlobalOrigins(size_t totalPoints
     ImageProcessing::ImportUInt8FilterType::Pointer importFilter;
     ImageProcessing::ImportUInt8FilterType::Pointer importFilter2;
     std::vector<float> cropSpecsIm1Im2(12, 0);
+    std::vector<float> newXYOrigin(2,0);
     
     xyStitchedGlobalListPtr->setValue(0, 0);
     xyStitchedGlobalListPtr->setValue(1, 0);
@@ -131,7 +133,7 @@ FloatArrayType::Pointer DetermineStitching::FindGlobalOrigins(size_t totalPoints
             cropSpecsIm1Im2[10] = udims[1]; //current image Y Size
             cropSpecsIm1Im2[11] = 1; //current image Z Size
             
-            CropAndCrossCorrelate(cropSpecsIm1Im2, currentImage, leftImage);
+            newXYOrigin = CropAndCrossCorrelate(cropSpecsIm1Im2, currentImage, leftImage);
             
             //////TESTING////////
             
@@ -339,11 +341,38 @@ std::vector<float> DetermineStitching::CropAndCrossCorrelate(std::vector<float> 
     //        xCorrFilter->SetRequiredFractionOfOverlappingPixels(1);
     ImageProcessing::FloatImageType* xcoutputImage = xCorrFilter->GetOutput();
     
+    // Create and initialize the calculator
+    typedef itk::MinimumMaximumImageCalculator<ImageProcessing::FloatImageType>   MinMaxCalculatorType;
+    MinMaxCalculatorType::Pointer calculator = MinMaxCalculatorType::New();
+    calculator->SetImage( xcoutputImage );
+    calculator->Compute();
+
+    // Return minimum of intensity
+    float minimumResult = calculator->GetMinimum();
+    std::cout << "The Minimum intensity value is : " << minimumResult << std::endl;
+    std::cout << "Its index position is : " << calculator->GetIndexOfMinimum() << std::endl;
+
+    float maximumResult = calculator->GetMaximum();
+    std::cout << "The Maximum intensity value is : " << maximumResult << std::endl;
+    std::cout << "Its index position is : " << calculator->GetIndexOfMaximum() << std::endl;
+
+
+
+
+
+
+
+
     typedef itk::ImageFileWriter< ImageProcessing::FloatImageType > nWriterType;
     nWriterType::Pointer writer3 = nWriterType::New();
     writer3->SetFileName( "/Users/megnashah/Desktop/imageXC.tiff");
     writer3->SetInput( xcoutputImage );
     writer3->Update();
+
+    newXYOrigin[0] = calculator->GetIndexOfMaximum()[0];
+    newXYOrigin[1] = calculator->GetIndexOfMaximum()[1];
+
+
     return newXYOrigin;
 }
 
