@@ -37,6 +37,7 @@
 
 #include "itkImage.h"
 #include "itkImageFileWriter.h"
+#include "itkImageDuplicator.h"
 
 
 #include "ImageProcessing/ImageProcessingHelpers.hpp"
@@ -256,38 +257,52 @@ std::vector<float> DetermineStitching::CropAndCrossCorrelate(std::vector<float> 
 {
 
     std::vector<float> newXYOrigin(2, 0);
-//    //get image from filter
-//        const ImageProcessing::UInt8ImageType* inputImage = importFilter->GetOutput();
-//        ImageProcessing::UInt8ImageType::RegionType filterRegion = inputImage->GetBufferedRegion();
-//        ImageProcessing::UInt8ConstIteratorType it(inputImage, filterRegion);
+
+        typedef itk::ImageDuplicator< ImageProcessing::UInt8ImageType > DuplicatorType;
+        DuplicatorType::Pointer duplicator = DuplicatorType::New();
+        duplicator->SetInputImage(fixedImage);
+        duplicator->Update();
+        ImageProcessing::UInt8ImageType* fixedImageMask = duplicator->GetOutput();
+
+        typedef itk::ImageDuplicator< ImageProcessing::UInt8ImageType > DuplicatorType;
+        DuplicatorType::Pointer duplicator2 = DuplicatorType::New();
+        duplicator2->SetInputImage(currentImage);
+        duplicator2->Update();
+        ImageProcessing::UInt8ImageType* currentImageMask = duplicator2->GetOutput();
+
+        for(unsigned int x = 0; x < fixedImage->GetLargestPossibleRegion().GetSize()[0]; x++)
+        {
+            for(unsigned int y = 0; y < fixedImage->GetLargestPossibleRegion().GetSize()[1]; y++)
+            {
+
+                ImageProcessing::UInt8ImageType::IndexType pixelIndex;
+                pixelIndex[0] = x;
+                pixelIndex[1] = y;
+                pixelIndex[2] = 0;
+
+                if (x >= cropSpecsIm1Im2[0] && x < (cropSpecsIm1Im2[0] + cropSpecsIm1Im2[6]) && y >= cropSpecsIm1Im2[1] && y < (cropSpecsIm1Im2[1] + cropSpecsIm1Im2[7]))
+                {
+                    fixedImageMask->SetPixel(pixelIndex, 255);
+                }
+                else
+                {
+                    fixedImageMask->SetPixel(pixelIndex, 0);
+                }
+
+                if (x >= cropSpecsIm1Im2[3] && x < (cropSpecsIm1Im2[3] + cropSpecsIm1Im2[9]) && y >= cropSpecsIm1Im2[4] && y < (cropSpecsIm1Im2[4] + cropSpecsIm1Im2[10]))
+                {
+                    currentImageMask->SetPixel(pixelIndex, 255);
+                }
+                else
+                {
+                    currentImageMask->SetPixel(pixelIndex, 0);
+                }
 
 
 
 
-//        std::cout << "Image largest region: " << filterRegion.GetSize() << std::endl;
-
-
-        //////FIRST IMAGE CROP
-        ImageProcessing::UInt8ImageType::RegionType cropRegion;
-
-        cropRegion.SetIndex(0, cropSpecsIm1Im2[0]);
-        cropRegion.SetIndex(1, cropSpecsIm1Im2[1]);
-        cropRegion.SetIndex(2, cropSpecsIm1Im2[2]);
-
-        cropRegion.SetSize(0, cropSpecsIm1Im2[6]);
-        cropRegion.SetSize(1, cropSpecsIm1Im2[7]);
-        cropRegion.SetSize(2, cropSpecsIm1Im2[8]);
-
-        typedef itk::ExtractImageFilter< ImageProcessing::UInt8ImageType, ImageProcessing::UInt8ImageType > exImFilterType;
-        exImFilterType::Pointer exImfilter = exImFilterType::New();
-        exImfilter->SetExtractionRegion(cropRegion);
-        exImfilter->SetInput(fixedImage);
-      #if ITK_VERSION_MAJOR >= 4
-        exImfilter->SetDirectionCollapseToIdentity(); // This is required.
-      #endif
-        exImfilter->Update();
-
-        ImageProcessing::UInt8ImageType* fixedImageWindow = exImfilter->GetOutput();
+            }
+        }
 
 
 
@@ -295,24 +310,8 @@ std::vector<float> DetermineStitching::CropAndCrossCorrelate(std::vector<float> 
 
 
 
-        /////////////////////SECOND IMAGE CROP
-        ImageProcessing::UInt8ImageType::RegionType cropRegion2;
-        cropRegion2.SetIndex(0, cropSpecsIm1Im2[3]);
-        cropRegion2.SetIndex(1, cropSpecsIm1Im2[4]);
-        cropRegion2.SetIndex(2, cropSpecsIm1Im2[5]);
 
-        cropRegion2.SetSize(0, cropSpecsIm1Im2[9]);
-        cropRegion2.SetSize(1, cropSpecsIm1Im2[10]);
-        cropRegion2.SetSize(2, cropSpecsIm1Im2[11]);
 
-        exImFilterType::Pointer exImfilter2 = exImFilterType::New();
-        exImfilter2->SetExtractionRegion(cropRegion2);
-        exImfilter2->SetInput(currentImage);
-        #if ITK_VERSION_MAJOR >= 4
-          exImfilter2->SetDirectionCollapseToIdentity(); // This is required.
-        #endif
-          exImfilter2->Update();
-          ImageProcessing::UInt8ImageType* currentImageWindow = exImfilter2->GetOutput();
 
         /////WRITING THE IMAGES FOR TESTING
 
@@ -320,42 +319,24 @@ std::vector<float> DetermineStitching::CropAndCrossCorrelate(std::vector<float> 
 
         WriterType::Pointer writer = WriterType::New();
         writer->SetFileName( "/Users/megnashah/Desktop/fixedImageWindow.tiff");
-        writer->SetInput( fixedImageWindow );
+        writer->SetInput( fixedImageMask );
         writer->Update();
 
         WriterType::Pointer writer2 = WriterType::New();
         writer2->SetFileName( "/Users/megnashah/Desktop/CurrentImageWindow.tiff");
-        writer2->SetInput( currentImageWindow );
+        writer2->SetInput( currentImageMask );
         writer2->Update();
 
 
 
         typedef itk::MaskedFFTNormalizedCorrelationImageFilter< ImageProcessing::DefaultImageType, ImageProcessing::FloatImageType, ImageProcessing::DefaultImageType > XCFilterType;
         XCFilterType::Pointer xCorrFilter = XCFilterType::New();
-        fixedImageWindow->DisconnectPipeline();
-        fixedImageWindow->FillBuffer(2);
 
-        ImageProcessing::UInt8ImageType::RegionType resetOrigin;
-        resetOrigin.SetIndex(0, 0);
-        resetOrigin.SetIndex(1, 0);
-        resetOrigin.SetIndex(2, 0);
+        xCorrFilter->SetFixedImage(fixedImage);
+        xCorrFilter->SetMovingImage(currentImage);
+        xCorrFilter->SetFixedImageMask(fixedImageMask);
+        xCorrFilter->SetMovingImageMask(currentImageMask);
 
-        resetOrigin.SetSize(0, fixedImageWindow->GetLargestPossibleRegion().GetSize()[0]);
-        resetOrigin.SetSize(1, fixedImageWindow->GetLargestPossibleRegion().GetSize()[1]);
-        resetOrigin.SetSize(2, fixedImageWindow->GetLargestPossibleRegion().GetSize()[2]);
-
-        fixedImageWindow->SetLargestPossibleRegion(resetOrigin);
-        currentImageWindow->DisconnectPipeline();
-
-        xCorrFilter->SetFixedImage(fixedImageWindow);
-        xCorrFilter->SetMovingImage(currentImageWindow);
-
-        std::cout << "fixed" << fixedImageWindow->GetLargestPossibleRegion().GetSize()<< std::endl;
-        std::cout << "fixed" << fixedImageWindow->GetLargestPossibleRegion().GetIndex()<< std::endl;
-        std::cout << "fixed" << fixedImageWindow->GetBufferedRegion()<< std::endl;
-        std::cout << "current" << currentImageWindow->GetLargestPossibleRegion().GetSize()<< std::endl;
-        std::cout << "current" << currentImageWindow->GetLargestPossibleRegion().GetIndex()<< std::endl;
-        std::cout << "current" << currentImageWindow->GetBufferedRegion()<< std::endl;
         xCorrFilter->Update();
 //        xCorrFilter->SetRequiredFractionOfOverlappingPixels(1);
         ImageProcessing::FloatImageType* xcoutputImage = xCorrFilter->GetOutput();
