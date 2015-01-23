@@ -129,21 +129,21 @@ FloatArrayType::Pointer DetermineStitching::FindGlobalOrigins(size_t totalPoints
             
             
             
-            cropSpecsIm1Im2[0] = 1200; //(47369.25 - 47113.25)/0.2079867; //xGlobCoordsList[1] - xyStitchedGlobalListPtr->getValue(2*(i-1)); //left image X Origin
-            cropSpecsIm1Im2[1] = 0; //left image Y Origin
-            cropSpecsIm1Im2[2] = 0; //left image Z Origin
-            cropSpecsIm1Im2[3] = 0; //current image X Origin
-            cropSpecsIm1Im2[4] = 0; //current image Y Origin
-            cropSpecsIm1Im2[5] = 0; //current image Z Origin
+//            cropSpecsIm1Im2[0] = 1200; //(47369.25 - 47113.25)/0.2079867; //xGlobCoordsList[1] - xyStitchedGlobalListPtr->getValue(2*(i-1)); //left image X Origin
+//            cropSpecsIm1Im2[1] = 0; //left image Y Origin
+//            cropSpecsIm1Im2[2] = 0; //left image Z Origin
+//            cropSpecsIm1Im2[3] = 0; //current image X Origin
+//            cropSpecsIm1Im2[4] = 0; //current image Y Origin
+//            cropSpecsIm1Im2[5] = 0; //current image Z Origin
             
-            cropSpecsIm1Im2[6] = udims[0] - cropSpecsIm1Im2[0]; //left image X Size
-            cropSpecsIm1Im2[7] = udims[1]; //left image Y Size
-            cropSpecsIm1Im2[8] = 1; //left image Z Size
-            cropSpecsIm1Im2[9] = udims[0] - cropSpecsIm1Im2[0]; //current image X Size
-            cropSpecsIm1Im2[10] = udims[1]; //current image Y Size
-            cropSpecsIm1Im2[11] = 1; //current image Z Size
+//            cropSpecsIm1Im2[6] = udims[0] - cropSpecsIm1Im2[0]; //left image X Size
+//            cropSpecsIm1Im2[7] = udims[1]; //left image Y Size
+//            cropSpecsIm1Im2[8] = 1; //left image Z Size
+//            cropSpecsIm1Im2[9] = udims[0] - cropSpecsIm1Im2[0]; //current image X Size
+//            cropSpecsIm1Im2[10] = udims[1]; //current image Y Size
+//            cropSpecsIm1Im2[11] = 1; //current image Z Size
             
-            newXYOrigin = CropAndCrossCorrelate(cropSpecsIm1Im2, currentImage, leftImage);
+//            newXYOrigin = CropAndCrossCorrelate(cropSpecsIm1Im2, currentImage, leftImage);
             
             //////TESTING////////
             

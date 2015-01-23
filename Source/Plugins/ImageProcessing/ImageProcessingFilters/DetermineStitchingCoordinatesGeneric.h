@@ -44,7 +44,11 @@ class DetermineStitchingCoordinatesGeneric : public AbstractFilter
     DREAM3D_FILTER_PARAMETER(DataArrayPath, AttributeMatrixName)
     Q_PROPERTY(DataArrayPath AttributeMatrixName READ getAttributeMatrixName WRITE setAttributeMatrixName)
 
+    DREAM3D_FILTER_PARAMETER(DataArrayPath, MetaDataAttributeMatrixName)
+    Q_PROPERTY(DataArrayPath MetaDataAttributeMatrixName READ getMetaDataAttributeMatrixName WRITE setMetaDataAttributeMatrixName)
 
+    DREAM3D_FILTER_PARAMETER(bool, UseZeissMetaData)
+    Q_PROPERTY(bool UseZeissMetaData READ getUseZeissMetaData WRITE setUseZeissMetaData)
 
 
     /**
@@ -137,6 +141,9 @@ class DetermineStitchingCoordinatesGeneric : public AbstractFilter
 
   protected:
     DetermineStitchingCoordinatesGeneric();
+
+    QVector<size_t> extractTileIndices(QString DataArrayName);
+    QVector<float> extractGlobalIndices(QString DataArrayName, QString XResoultion, QString YResoultion);
 
     /**
     * @brief Checks for the appropriate parameter values and availability of arrays in the data container
