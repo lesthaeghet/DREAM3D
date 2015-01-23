@@ -77,16 +77,13 @@ FloatArrayType::Pointer DetermineStitching::FindGlobalOrigins(size_t totalPoints
     tDims[0] = xTileList.size();
     
     FloatArrayType::Pointer xyStitchedGlobalListPtr = FloatArrayType::CreateArray(tDims, cDims, "xyGlobalList");
-    
-    
-    
+
     size_t numXtiles = FindMaxValue(xTileList) + 1;
     size_t numYtiles = FindMaxValue(yTileList) + 1;
     
     QVector<size_t> combIndexList(xTileList.size());
     
     combIndexList = ReturnIndexForCombOrder(xTileList, yTileList, numXtiles, numYtiles);
-    size_t combIndex;
     
     ImageProcessing::UInt8ImageType* currentImage;
     ImageProcessing::UInt8ImageType* leftImage;
@@ -95,9 +92,22 @@ FloatArrayType::Pointer DetermineStitching::FindGlobalOrigins(size_t totalPoints
     ImageProcessing::ImportUInt8FilterType::Pointer importFilter2;
     std::vector<float> cropSpecsIm1Im2(12, 0);
     std::vector<float> newXYOrigin(2,0);
+    std::vector<float> newXYOrigin2(2,0);
     
     xyStitchedGlobalListPtr->setValue(0, 0);
     xyStitchedGlobalListPtr->setValue(1, 0);
+
+    float previousXleft = 0;
+    float previousYleft = 0;
+
+    float previousXtop = 0;
+    float previousYtop = 0;
+
+    float newXfromleft = 0;
+    float newYfromleft = 0;
+
+    float newXfromtop = 0;
+    float newYfromtop = 0;
     
     
     
@@ -151,8 +161,17 @@ FloatArrayType::Pointer DetermineStitching::FindGlobalOrigins(size_t totalPoints
             cropSpecsIm1Im2[9] = udims[0] - cropSpecsIm1Im2[0]; //current image X Size
             cropSpecsIm1Im2[10] = udims[1]; //current image Y Size
             cropSpecsIm1Im2[11] = 1; //current image Z Size
-            
-            
+
+            newXYOrigin = CropAndCrossCorrelate(cropSpecsIm1Im2, currentImage, leftImage);
+
+            previousXleft = xyStitchedGlobalListPtr->getValue(2*(i-1));
+            previousYleft = xyStitchedGlobalListPtr->getValue(2*(i-1)+1);
+
+            newXfromleft = previousXleft + newXYOrigin[0];
+            newYfromleft = previousYleft + newXYOrigin[1];
+
+            xyStitchedGlobalListPtr->setValue(i, newXfromleft);
+            xyStitchedGlobalListPtr->setValue(i + 1, newYfromleft);
             
             
             
@@ -182,6 +201,17 @@ FloatArrayType::Pointer DetermineStitching::FindGlobalOrigins(size_t totalPoints
             cropSpecsIm1Im2[10] = udims[1] - cropSpecsIm1Im2[1]; //current image Y Size
             cropSpecsIm1Im2[11] = 1; //current image Z Size
             
+            newXYOrigin2 = CropAndCrossCorrelate(cropSpecsIm1Im2, currentImage, aboveImage);
+
+            previousXtop = xyStitchedGlobalListPtr->getValue(2*(i-numXtiles));
+            previousYtop = xyStitchedGlobalListPtr->getValue(2*(i-numXtiles)+1);
+
+            newXfromtop = previousXtop + newXYOrigin2[0];
+            newYfromtop = previousYtop + newXYOrigin2[1];
+
+
+            xyStitchedGlobalListPtr->setValue(i, newXfromtop);
+            xyStitchedGlobalListPtr->setValue(i + 1, newYfromtop);
             
             
             
@@ -212,6 +242,14 @@ FloatArrayType::Pointer DetermineStitching::FindGlobalOrigins(size_t totalPoints
             cropSpecsIm1Im2[9] = udims[0]; //current image X Size
             cropSpecsIm1Im2[10] = udims[1] - cropSpecsIm1Im2[1]; //current image Y Size
             cropSpecsIm1Im2[11] = 1; //current image Z Size
+
+            newXYOrigin2 = CropAndCrossCorrelate(cropSpecsIm1Im2, currentImage, aboveImage);
+
+            previousXtop = xyStitchedGlobalListPtr->getValue(2*(i-numXtiles));
+            previousYtop = xyStitchedGlobalListPtr->getValue(2*(i-numXtiles)+1);
+
+            newXfromtop = previousXtop + newXYOrigin2[0];
+            newYfromtop = previousYtop + newXYOrigin2[1];
             
             
             importFilter = ITKUtilitiesType::Dream3DtoITKImportFilterDataArray<ImageProcessing::DefaultPixelType>(totalPoints, udims, sampleOrigin, voxelResolution, dataArrayList[combIndexList[i-1]]);
@@ -230,8 +268,23 @@ FloatArrayType::Pointer DetermineStitching::FindGlobalOrigins(size_t totalPoints
             cropSpecsIm1Im2[9] = udims[0] - cropSpecsIm1Im2[0]; //current image X Size
             cropSpecsIm1Im2[10] = udims[1]; //current image Y Size
             cropSpecsIm1Im2[11] = 1; //current image Z Size
+
+            newXYOrigin = CropAndCrossCorrelate(cropSpecsIm1Im2, currentImage, leftImage);
+
+            previousXleft = xyStitchedGlobalListPtr->getValue(2*(i-1));
+            previousYleft = xyStitchedGlobalListPtr->getValue(2*(i-1)+1);
+
+            newXfromleft = previousXleft + newXYOrigin[0];
+            newYfromleft = previousYleft + newXYOrigin[1];
+
+
+            //Average the two new locations
+            xyStitchedGlobalListPtr->setValue(i, (newXfromtop + newXfromleft)/2.0);
+            xyStitchedGlobalListPtr->setValue(i + 1, (newYfromtop + newYfromleft)/2.0);
             
         }
+
+
         
     }
     
@@ -249,8 +302,7 @@ FloatArrayType::Pointer DetermineStitching::FindGlobalOrigins(size_t totalPoints
 std::vector<float> DetermineStitching::CropAndCrossCorrelate(std::vector<float> cropSpecsIm1Im2,  ImageProcessing::UInt8ImageType* currentImage,  ImageProcessing::UInt8ImageType* fixedImage)
 {
     
-    std::vector<float> newXYOrigin(2, 0);
-    
+    std::vector<float> newXYOrigin(2, 0);  
     
     //////FIRST IMAGE CROP
     ImageProcessing::UInt8ImageType::RegionType cropRegion;
@@ -320,19 +372,19 @@ std::vector<float> DetermineStitching::CropAndCrossCorrelate(std::vector<float> 
     
     /////WRITING THE IMAGES FOR TESTING
     
-    typedef itk::ImageFileWriter< ImageProcessing::UInt8ImageType > WriterType;
+//    typedef itk::ImageFileWriter< ImageProcessing::UInt8ImageType > WriterType;
     
-    WriterType::Pointer writer = WriterType::New();
-    writer->SetFileName( "/Users/megnashah/Desktop/fixedImageWindow.tiff");
-    writer->SetInput( fixedImageWindow2 );
-    writer->Update();
+//    WriterType::Pointer writer = WriterType::New();
+//    writer->SetFileName( "/Users/megnashah/Desktop/fixedImageWindow.tiff");
+//    writer->SetInput( fixedImageWindow2 );
+//    writer->Update();
     
-    WriterType::Pointer writer2 = WriterType::New();
-    writer2->SetFileName( "/Users/megnashah/Desktop/CurrentImageWindow.tiff");
-    writer2->SetInput( currentImageWindow2 );
-    writer2->Update();
+//    WriterType::Pointer writer2 = WriterType::New();
+//    writer2->SetFileName( "/Users/megnashah/Desktop/CurrentImageWindow.tiff");
+//    writer2->SetInput( currentImageWindow2 );
+//    writer2->Update();
     
-    
+    //CROSS CORRELATE THE 2 IMAGES
     typedef itk::MaskedFFTNormalizedCorrelationImageFilter< ImageProcessing::DefaultImageType, ImageProcessing::FloatImageType, ImageProcessing::DefaultImageType > XCFilterType;
     XCFilterType::Pointer xCorrFilter = XCFilterType::New();
     xCorrFilter->SetFixedImage(fixedImageWindow2);
@@ -347,30 +399,24 @@ std::vector<float> DetermineStitching::CropAndCrossCorrelate(std::vector<float> 
     calculator->SetImage( xcoutputImage );
     calculator->Compute();
 
-    // Return minimum of intensity
-    float minimumResult = calculator->GetMinimum();
-    std::cout << "The Minimum intensity value is : " << minimumResult << std::endl;
-    std::cout << "Its index position is : " << calculator->GetIndexOfMinimum() << std::endl;
+//    // Return minimum of intensity
+//    float minimumResult = calculator->GetMinimum();
+//    std::cout << "The Minimum intensity value is : " << minimumResult << std::endl;
+//    std::cout << "Its index position is : " << calculator->GetIndexOfMinimum() << std::endl;
 
-    float maximumResult = calculator->GetMaximum();
-    std::cout << "The Maximum intensity value is : " << maximumResult << std::endl;
-    std::cout << "Its index position is : " << calculator->GetIndexOfMaximum() << std::endl;
-
-
+//    float maximumResult = calculator->GetMaximum();
+//    std::cout << "The Maximum intensity value is : " << maximumResult << std::endl;
+//    std::cout << "Its index position is : " << calculator->GetIndexOfMaximum() << std::endl;
 
 
+//    typedef itk::ImageFileWriter< ImageProcessing::FloatImageType > nWriterType;
+//    nWriterType::Pointer writer3 = nWriterType::New();
+//    writer3->SetFileName( "/Users/megnashah/Desktop/imageXC.tiff");
+//    writer3->SetInput( xcoutputImage );
+//    writer3->Update();
 
-
-
-
-    typedef itk::ImageFileWriter< ImageProcessing::FloatImageType > nWriterType;
-    nWriterType::Pointer writer3 = nWriterType::New();
-    writer3->SetFileName( "/Users/megnashah/Desktop/imageXC.tiff");
-    writer3->SetInput( xcoutputImage );
-    writer3->Update();
-
-    newXYOrigin[0] = calculator->GetIndexOfMaximum()[0];
-    newXYOrigin[1] = calculator->GetIndexOfMaximum()[1];
+    newXYOrigin[0] = float(calculator->GetIndexOfMaximum()[0]) - float(fixedImageWindow2->GetLargestPossibleRegion().GetSize()[0]);
+    newXYOrigin[1] = float(calculator->GetIndexOfMaximum()[1]) - float(fixedImageWindow2->GetLargestPossibleRegion().GetSize()[1]);
 
 
     return newXYOrigin;
