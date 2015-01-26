@@ -143,7 +143,7 @@ class DetermineStitchingCoordinatesGeneric : public AbstractFilter
     DetermineStitchingCoordinatesGeneric();
 
     QVector<size_t> extractTileIndices(QString DataArrayName);
-    QVector<float> extractGlobalIndices(QString DataArrayName, QString XResoultion, QString YResoultion);
+    QVector<float> extractGlobalIndices(QString DataArrayName, QString Resolution);
 
     /**
     * @brief Checks for the appropriate parameter values and availability of arrays in the data container
