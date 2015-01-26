@@ -45,6 +45,10 @@ void DetermineStitchingCoordinatesGeneric::setupFilterParameters()
   parameters.push_back(FilterParameter::New("Attribute Matrix Name", "AttributeMatrixName", FilterParameterWidgetType::AttributeMatrixSelectionWidget, getAttributeMatrixName(), false, ""));
   parameters.push_back(FilterParameter::New("Meta Data for Attribute Matrix", "MetaDataAttributeMatrixName", FilterParameterWidgetType::AttributeMatrixSelectionWidget, getMetaDataAttributeMatrixName(), false, ""));
   linkedProps.clear();
+
+  parameters.push_back(FilterParameter::New("Calculated Tile Info Attribute Matrix Name", "TileCalculatedInfoAttributeMatrixName", FilterParameterWidgetType::StringWidget, getTileCalculatedInfoAttributeMatrixName(), true, ""));
+  parameters.push_back(FilterParameter::New("Stiched Coordinates", "StitchedCoordinatesArrayName", FilterParameterWidgetType::StringWidget, getStitchedCoordinatesArrayName(), true, ""));
+
   setFilterParameters(parameters);
 }
 
@@ -67,6 +71,8 @@ int DetermineStitchingCoordinatesGeneric::writeFilterParameters(AbstractFilterPa
   writer->openFilterGroup(this, index);
   DREAM3D_FILTER_WRITE_PARAMETER(AttributeMatrixName)
   DREAM3D_FILTER_WRITE_PARAMETER(MetaDataAttributeMatrixName)
+  DREAM3D_FILTER_WRITE_PARAMETER(TileCalculatedInfoAttributeMatrixName)
+  DREAM3D_FILTER_WRITE_PARAMETER(StitchedCoordinatesArrayName)
   writer->closeFilterGroup();
   return ++index; // we want to return the next index that was just written to
 }
@@ -129,6 +135,21 @@ void DetermineStitchingCoordinatesGeneric::dataCheck()
         }
 
     }
+
+    VolumeDataContainer* m = getDataContainerArray()->getDataContainerAs<VolumeDataContainer>(getAttributeMatrixName().getDataContainerName());
+    if(getErrorCondition() < 0 || NULL == m) { return; }
+
+    QVector<size_t> tDims(1, m_PointerList.size());
+    AttributeMatrix::Pointer AttrMat = m->createNonPrereqAttributeMatrix<AbstractFilter>(this, getTileCalculatedInfoAttributeMatrixName(), tDims, DREAM3D::AttributeMatrixType::CellFeature);
+    if(getErrorCondition() < 0) { return; }
+
+    dims[0]=2;
+
+    tempPath.update(getAttributeMatrixName().getDataContainerName(), getTileCalculatedInfoAttributeMatrixName(), getStitchedCoordinatesArrayName() );
+    m_StitchedCoordinatesPtr = getDataContainerArray()->createNonPrereqArrayFromPath<DataArray<float>, AbstractFilter, int32_t>(this,  tempPath, 0, dims); /* Assigns the shared_ptr<> to an instance variable that is a weak_ptr<> */
+    if( NULL != m_StitchedCoordinatesPtr.lock().get() ) /* Validate the Weak Pointer wraps a non-NULL pointer to a DataArray<T> object */
+    { m_StitchedCoordinates = m_StitchedCoordinatesPtr.lock()->getPointer(0); } /* Now assign the raw pointer to data from the DataArray<T> object */
+
 
     return;
 
@@ -209,7 +230,6 @@ void DetermineStitchingCoordinatesGeneric::execute()
   QVector<size_t> yTileList(m_PointerList.size());
   QVector<float> xGlobCoordsList(m_PointerList.size());
   QVector<float> yGlobCoordsList(m_PointerList.size());
-  QVector<size_t> newList(m_PointerList.size());
 
   AttributeMatrix::Pointer attrMat = m->getAttributeMatrix(attrMatName);
 
@@ -229,40 +249,13 @@ void DetermineStitchingCoordinatesGeneric::execute()
 
 
 
+  FloatArrayType::Pointer temp = DetermineStitching::FindGlobalOrigins(totalPoints, udims, sampleOrigin, voxelResolution, m_PointerList, xGlobCoordsList, yGlobCoordsList, xTileList, yTileList);
 
 
-//  xTileList[0] = 0;
-//  xTileList[1] = 1;
-//  xTileList[2] = 2;
-//  xTileList[3] = 2;
-//  xTileList[4] = 1;
-//  xTileList[5] = 0;
-//  xTileList[6] = 0;
-//  xTileList[7] = 1;
-//  xTileList[8] = 2;
-//  xTileList[9] = 2;
-//  xTileList[10] = 1;
-//  xTileList[11] = 0;
-
-//  yTileList[0] = 0;
-//  yTileList[1] = 0;
-//  yTileList[2] = 0;
-//  yTileList[3] = 1;
-//  yTileList[4] = 1;
-//  yTileList[5] = 1;
-//  yTileList[6] = 2;
-//  yTileList[7] = 2;
-//  yTileList[8] = 2;
-//  yTileList[9] = 3;
-//  yTileList[10] = 3;
-//  yTileList[11] = 3;
-
-
-
-
-
-  DetermineStitching::FindGlobalOrigins(totalPoints, udims, sampleOrigin, voxelResolution, m_PointerList, xGlobCoordsList, yGlobCoordsList, xTileList, yTileList);
-
+  float* src = temp->getPointer(0);
+  float* dest = m_StitchedCoordinatesPtr.lock()->getPointer(0);
+  size_t totalBytes = (m_StitchedCoordinatesPtr.lock()->getNumberOfTuples() * m_StitchedCoordinatesPtr.lock()->getNumberOfComponents() * sizeof(float));
+  ::memcpy(dest, src, totalBytes);
 
 
   /* Let the GUI know we are done with this filter */

@@ -50,6 +50,12 @@ class DetermineStitchingCoordinatesGeneric : public AbstractFilter
     DREAM3D_FILTER_PARAMETER(bool, UseZeissMetaData)
     Q_PROPERTY(bool UseZeissMetaData READ getUseZeissMetaData WRITE setUseZeissMetaData)
 
+    DREAM3D_FILTER_PARAMETER(QString, TileCalculatedInfoAttributeMatrixName)
+    Q_PROPERTY(QString TileCalculatedInfoAttributeMatrixName READ getTileCalculatedInfoAttributeMatrixName WRITE setTileCalculatedInfoAttributeMatrixName)
+
+    DREAM3D_FILTER_PARAMETER(QString, StitchedCoordinatesArrayName)
+    Q_PROPERTY(QString StitchedCoordinatesArrayName READ getStitchedCoordinatesArrayName WRITE setStitchedCoordinatesArrayName)
+
 
     /**
      * @brief getCompiledLibraryName Returns the name of the Library that this filter is a part of
@@ -155,6 +161,7 @@ class DetermineStitchingCoordinatesGeneric : public AbstractFilter
 
     QVector<ImageProcessing::DefaultPixelType* > m_PointerList;
     DEFINE_CREATED_DATAARRAY_VARIABLE(ImageProcessing::DefaultPixelType, SelectedCellArray)
+    DEFINE_CREATED_DATAARRAY_VARIABLE(float, StitchedCoordinates)
 
 
 
