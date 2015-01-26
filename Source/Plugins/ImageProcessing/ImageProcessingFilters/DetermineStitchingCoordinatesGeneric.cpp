@@ -16,7 +16,8 @@
 // -----------------------------------------------------------------------------
 DetermineStitchingCoordinatesGeneric::DetermineStitchingCoordinatesGeneric() :
   AbstractFilter(),
-  m_AttributeMatrixName(DREAM3D::Defaults::VolumeDataContainerName, DREAM3D::Defaults::CellFeatureAttributeMatrixName, "")
+  m_AttributeMatrixName(DREAM3D::Defaults::VolumeDataContainerName, DREAM3D::Defaults::CellFeatureAttributeMatrixName, ""),
+  m_MetaDataAttributeMatrixName("")
 /* DO NOT FORGET TO INITIALIZE ALL YOUR DREAM3D Filter Parameters HERE */
 {
   setupFilterParameters();
@@ -35,8 +36,15 @@ DetermineStitchingCoordinatesGeneric::~DetermineStitchingCoordinatesGeneric()
 void DetermineStitchingCoordinatesGeneric::setupFilterParameters()
 {
   FilterParameterVector parameters;
-  parameters.push_back(FilterParameter::New("Attribute Matrix Name", "AttributeMatrixName", FilterParameterWidgetType::AttributeMatrixSelectionWidget, getAttributeMatrixName(), false, ""));
+  QStringList linkedProps;
 
+  linkedProps << "MetaDataAttributeMatrixName";
+
+  parameters.push_back(LinkedBooleanFilterParameter::New("Use Zeiss Meta Data", "UseZeissMetaData", getUseZeissMetaData(), linkedProps, false));
+
+  parameters.push_back(FilterParameter::New("Attribute Matrix Name", "AttributeMatrixName", FilterParameterWidgetType::AttributeMatrixSelectionWidget, getAttributeMatrixName(), false, ""));
+  parameters.push_back(FilterParameter::New("Meta Data for Attribute Matrix", "MetaDataAttributeMatrixName", FilterParameterWidgetType::AttributeMatrixSelectionWidget, getMetaDataAttributeMatrixName(), false, ""));
+  linkedProps.clear();
   setFilterParameters(parameters);
 }
 
@@ -47,7 +55,7 @@ void DetermineStitchingCoordinatesGeneric::readFilterParameters(AbstractFilterPa
 {
   reader->openFilterGroup(this, index);
   setAttributeMatrixName(reader->readDataArrayPath("AttributeMatrixName", getAttributeMatrixName()));
-
+  setMetaDataAttributeMatrixName(reader->readDataArrayPath("MetaDataAttributeMatrixName", getMetaDataAttributeMatrixName()));
   reader->closeFilterGroup();
 }
 
@@ -58,6 +66,7 @@ int DetermineStitchingCoordinatesGeneric::writeFilterParameters(AbstractFilterPa
 {
   writer->openFilterGroup(this, index);
   DREAM3D_FILTER_WRITE_PARAMETER(AttributeMatrixName)
+  DREAM3D_FILTER_WRITE_PARAMETER(MetaDataAttributeMatrixName)
   writer->closeFilterGroup();
   return ++index; // we want to return the next index that was just written to
 }
@@ -101,16 +110,31 @@ void DetermineStitchingCoordinatesGeneric::dataCheck()
 
         m_PointerList[i] = m_SelectedCellArray;
 
+    }
 
-//        imagePtr = boost::dynamic_pointer_cast<DataArray<uint8_t> >(m_SelectedCellArrayPtr);
-
-//        if(NULL == imagePtr)
-//        {
-//            setErrorCondition(-76001);
-//            notifyErrorMessage(getHumanLabel(), "The data was not found", -76001);
-//        }
+    if(m_UseZeissMetaData == true)
+    {
+        AttributeMatrix::Pointer MetaDataAm = getDataContainerArray()->getAttributeMatrix(m_MetaDataAttributeMatrixName);
+        if(NULL == MetaDataAm.get())
+        {
+            notifyErrorMessage(getHumanLabel(), "The Attribute Matrix was not found", -76001);
+            return;
+        }
+//        QString temp = "_META_DATA";
+        bool a = getMetaDataAttributeMatrixName().getAttributeMatrixName().contains("_META_DATA");
+        if (a == false)
+        {
+            notifyErrorMessage(getHumanLabel(), "The Attribute Matrix does not contain the Zeiss Meta Data", -76002);
+            return;
+        }
 
     }
+
+    return;
+
+
+
+
 
 
 }
@@ -174,9 +198,26 @@ void DetermineStitchingCoordinatesGeneric::execute()
   VolumeDataContainer* m = getDataContainerArray()->getDataContainerAs<VolumeDataContainer>(getAttributeMatrixName().getDataContainerName());
   QString attrMatName = getAttributeMatrixName().getAttributeMatrixName();
 
+  QString XTileIndexName = "ImageIndexU";
+  QString YTileIndexName = "ImageIndexV";
+  QString XGlobalIndexName = "StagePositionX";
+  QString YGlobalIndexName = "StagePositionY";
+  QString XScale = "ScaleFactorForX";
+  QString YScale = "ScaleFactorForY";
+
+  QVector<size_t> xTileList(m_PointerList.size());
+  QVector<size_t> yTileList(m_PointerList.size());
+  QVector<float> xGlobCoordsList(m_PointerList.size());
+  QVector<float> yGlobCoordsList(m_PointerList.size());
+  QVector<size_t> newList(m_PointerList.size());
 
   AttributeMatrix::Pointer attrMat = m->getAttributeMatrix(attrMatName);
 
+  xTileList = extractTileIndices(XTileIndexName);
+  yTileList = extractTileIndices(YTileIndexName);
+
+  xGlobCoordsList = extractGlobalIndices(XGlobalIndexName, XScale);
+  yGlobCoordsList = extractGlobalIndices(YGlobalIndexName, YScale);
 
   float sampleOrigin[3];
   float voxelResolution[3];
@@ -186,43 +227,35 @@ void DetermineStitchingCoordinatesGeneric::execute()
   QVector<size_t> udims = attrMat->getTupleDimensions();
   size_t totalPoints = attrMat->getNumTuples();
 
-  QVector<size_t> xTileList(12);
-  QVector<size_t> yTileList(12);
-  QVector<size_t> newList(12);
-
-  QVector<float> xGlobCoordsList;
-  QVector<float> yGlobCoordsList;
-
-  xTileList[0] = 0;
-  xTileList[1] = 1;
-  xTileList[2] = 2;
-  xTileList[3] = 2;
-  xTileList[4] = 1;
-  xTileList[5] = 0;
-  xTileList[6] = 0;
-  xTileList[7] = 1;
-  xTileList[8] = 2;
-  xTileList[9] = 2;
-  xTileList[10] = 1;
-  xTileList[11] = 0;
-
-  yTileList[0] = 0;
-  yTileList[1] = 0;
-  yTileList[2] = 0;
-  yTileList[3] = 1;
-  yTileList[4] = 1;
-  yTileList[5] = 1;
-  yTileList[6] = 2;
-  yTileList[7] = 2;
-  yTileList[8] = 2;
-  yTileList[9] = 3;
-  yTileList[10] = 3;
-  yTileList[11] = 3;
 
 
 
 
-  newList = DetermineStitching::ReturnIndexForCombOrder(xTileList, yTileList, 3, 4);
+//  xTileList[0] = 0;
+//  xTileList[1] = 1;
+//  xTileList[2] = 2;
+//  xTileList[3] = 2;
+//  xTileList[4] = 1;
+//  xTileList[5] = 0;
+//  xTileList[6] = 0;
+//  xTileList[7] = 1;
+//  xTileList[8] = 2;
+//  xTileList[9] = 2;
+//  xTileList[10] = 1;
+//  xTileList[11] = 0;
+
+//  yTileList[0] = 0;
+//  yTileList[1] = 0;
+//  yTileList[2] = 0;
+//  yTileList[3] = 1;
+//  yTileList[4] = 1;
+//  yTileList[5] = 1;
+//  yTileList[6] = 2;
+//  yTileList[7] = 2;
+//  yTileList[8] = 2;
+//  yTileList[9] = 3;
+//  yTileList[10] = 3;
+//  yTileList[11] = 3;
 
 
 
@@ -239,6 +272,96 @@ void DetermineStitchingCoordinatesGeneric::execute()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
+
+
+QVector<size_t> DetermineStitchingCoordinatesGeneric::extractTileIndices(QString DataArrayName)
+{
+    QVector<size_t> tileList(m_PointerList.size());
+    DataArrayPath tempPath;
+    IDataArray::Pointer iDataArray = IDataArray::NullPointer();
+    Int8ArrayType::Pointer MetaDataPtr = Int8ArrayType::NullPointer();
+    tempPath.update(getMetaDataAttributeMatrixName().getDataContainerName(), getMetaDataAttributeMatrixName().getAttributeMatrixName(), DataArrayName);
+    iDataArray = getDataContainerArray()->getExistingPrereqArrayFromPath<DataArray<int8_t>, AbstractFilter>(this, tempPath);
+    MetaDataPtr = boost::dynamic_pointer_cast<DataArray<int8_t> >(iDataArray);
+    int8_t dims = MetaDataPtr->getComponentDimensions()[0];
+    int8_t* MetaData = MetaDataPtr->getPointer(0);
+
+    std::stringstream str;
+    for (size_t i=0; i < m_PointerList.size(); i++)
+    {
+        char test = char(MetaData[(2*i)]);
+        str << test;
+        str >> tileList[i];
+       str.str("");
+       str.clear();
+    }
+
+    return tileList;
+}
+
+QVector<float> DetermineStitchingCoordinatesGeneric::extractGlobalIndices(QString DataArrayName, QString Resolution)
+{
+    QVector<float> globalIndexList(m_PointerList.size());
+    QVector<size_t> cDims;
+    DataArrayPath tempPath;
+    IDataArray::Pointer iDataArray = IDataArray::NullPointer();
+    Int8ArrayType::Pointer MetaDataPtr = Int8ArrayType::NullPointer();
+    int8_t* MetaData;
+    std::stringstream str;
+
+    tempPath.update(getMetaDataAttributeMatrixName().getDataContainerName(), getMetaDataAttributeMatrixName().getAttributeMatrixName(), Resolution);
+    iDataArray = getDataContainerArray()->getExistingPrereqArrayFromPath<DataArray<int8_t>, AbstractFilter>(this, tempPath);
+    MetaDataPtr = boost::dynamic_pointer_cast<DataArray<int8_t> >(iDataArray);
+    MetaData = MetaDataPtr->getPointer(0);
+    cDims = MetaDataPtr->getComponentDimensions();
+    float resolution;
+
+    for (size_t j=0; j<cDims[0]; j++)
+    {
+        char test = char(MetaData[(j)]);
+        str << test;
+    }
+   str >> resolution;
+   str.str("");
+   str.clear();
+
+
+
+    tempPath.update(getMetaDataAttributeMatrixName().getDataContainerName(), getMetaDataAttributeMatrixName().getAttributeMatrixName(), DataArrayName);
+    iDataArray = getDataContainerArray()->getExistingPrereqArrayFromPath<DataArray<int8_t>, AbstractFilter>(this, tempPath);
+    MetaDataPtr = boost::dynamic_pointer_cast<DataArray<int8_t> >(iDataArray);
+    MetaData = MetaDataPtr->getPointer(0);
+
+    cDims = MetaDataPtr->getComponentDimensions();
+
+
+
+    for (size_t i=0; i < m_PointerList.size(); i++)
+    {
+        for (size_t j=0; j<cDims[0]; j++)
+        {
+            char test = char(MetaData[(cDims[0]*i+j)]);
+            str << test;
+        }
+       str >> globalIndexList[i];
+       str.str("");
+       str.clear();
+       globalIndexList[i] = globalIndexList[i]/resolution;
+    }
+
+
+
+
+
+    return globalIndexList;
+}
+
+
+
+
+
+
+
 AbstractFilter::Pointer DetermineStitchingCoordinatesGeneric::newFilterInstance(bool copyFilterParameters)
 {
   /*
