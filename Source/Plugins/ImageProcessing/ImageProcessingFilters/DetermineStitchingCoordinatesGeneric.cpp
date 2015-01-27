@@ -278,12 +278,18 @@ QVector<size_t> DetermineStitchingCoordinatesGeneric::extractTileIndices(QString
     MetaDataPtr = boost::dynamic_pointer_cast<DataArray<int8_t> >(iDataArray);
     int8_t dims = MetaDataPtr->getComponentDimensions()[0];
     int8_t* MetaData = MetaDataPtr->getPointer(0);
-
+    QVector<size_t> cDims = MetaDataPtr->getComponentDimensions();
     std::stringstream str;
     for (size_t i=0; i < m_PointerList.size(); i++)
     {
-        char test = char(MetaData[(2*i)]);
-        str << test;
+
+        for (size_t j=0; j<cDims[0]; j++)
+        {
+            char test = char(MetaData[(cDims[0]*i+j)]);
+            str << test;
+        }
+//        char test = char(MetaData[(2*i)]);
+//        str << test;
         str >> tileList[i];
        str.str("");
        str.clear();

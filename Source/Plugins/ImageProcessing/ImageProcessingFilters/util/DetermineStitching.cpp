@@ -356,17 +356,17 @@ std::vector<float> DetermineStitching::CropAndCrossCorrelate(std::vector<float> 
 
 
     /////WRITING THE IMAGES FOR TESTING
-//   typedef itk::ImageFileWriter< ImageProcessing::UInt8ImageType > WriterType;
+   typedef itk::ImageFileWriter< ImageProcessing::UInt8ImageType > WriterType;
 
-//    WriterType::Pointer writer = WriterType::New();
-//    writer->SetFileName( "/Users/megnashah/Desktop/fixedImageWindow.tiff");
-//    writer->SetInput( fixedImageWindow2);
-//    writer->Update();
+    WriterType::Pointer writer = WriterType::New();
+    writer->SetFileName( "/Users/megnashah/Desktop/fixedImageWindow.tiff");
+    writer->SetInput( fixedImageWindow2);
+    writer->Update();
 
-//    WriterType::Pointer writer2 = WriterType::New();
-//    writer2->SetFileName( "/Users/megnashah/Desktop/CurrentImageWindow.tiff");
-//    writer2->SetInput( currentImageWindow2 );
-//    writer2->Update();
+    WriterType::Pointer writer2 = WriterType::New();
+    writer2->SetFileName( "/Users/megnashah/Desktop/CurrentImageWindow.tiff");
+    writer2->SetInput( currentImageWindow2 );
+    writer2->Update();
 
 
 
@@ -406,11 +406,11 @@ std::vector<float> DetermineStitching::CropAndCrossCorrelate(std::vector<float> 
 
    // xcoutputImage->SetPixel(calculator->GetIndexOfMaximum(), 0);
 
-//    typedef itk::ImageFileWriter< ImageProcessing::FloatImageType > nWriterType;
-//    nWriterType::Pointer writer3 = nWriterType::New();
-//    writer3->SetFileName( "/Users/megnashah/Desktop/imageXC.tiff");
-//    writer3->SetInput( xcoutputImage );
-//    writer3->Update();
+    typedef itk::ImageFileWriter< ImageProcessing::FloatImageType > nWriterType;
+    nWriterType::Pointer writer3 = nWriterType::New();
+    writer3->SetFileName( "/Users/megnashah/Desktop/imageXC.tiff");
+    writer3->SetInput( xcoutputImage );
+    writer3->Update();
 
     return newXYOrigin;
 }
