@@ -386,6 +386,19 @@ class DataArray : public IDataArray
     }
 
     /**
+     * @brief copyIntoArray
+     * @param dest
+     */
+    bool copyIntoArray(Pointer dest)
+    {
+      if(m_IsAllocated == true && dest->isAllocated() && m_Array && dest->getPointer(0))
+      {
+        size_t totalBytes = m_Size * sizeof(T);
+        ::memcpy(dest->getPointer(0), m_Array, totalBytes);
+      }
+    }
+
+    /**
      * @brief createNewArray
      * @param numTuples
      * @param rank
