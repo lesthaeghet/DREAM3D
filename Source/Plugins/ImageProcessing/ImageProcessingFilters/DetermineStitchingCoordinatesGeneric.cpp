@@ -10,17 +10,19 @@
 
 #include "ImageProcessing/ImageProcessingFilters/util/DetermineStitching.h"
 
+#include "DREAM3DLib/DataArrays/StringDataArray.hpp"
+
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
 DetermineStitchingCoordinatesGeneric::DetermineStitchingCoordinatesGeneric() :
-  AbstractFilter(),
-  m_AttributeMatrixName(DREAM3D::Defaults::VolumeDataContainerName, DREAM3D::Defaults::CellFeatureAttributeMatrixName, ""),
-  m_MetaDataAttributeMatrixName("")
-/* DO NOT FORGET TO INITIALIZE ALL YOUR DREAM3D Filter Parameters HERE */
+    AbstractFilter(),
+    m_AttributeMatrixName(DREAM3D::Defaults::VolumeDataContainerName, DREAM3D::Defaults::CellFeatureAttributeMatrixName, ""),
+    m_MetaDataAttributeMatrixName("")
+  /* DO NOT FORGET TO INITIALIZE ALL YOUR DREAM3D Filter Parameters HERE */
 {
-  setupFilterParameters();
+    setupFilterParameters();
 }
 
 // -----------------------------------------------------------------------------
@@ -35,21 +37,22 @@ DetermineStitchingCoordinatesGeneric::~DetermineStitchingCoordinatesGeneric()
 // -----------------------------------------------------------------------------
 void DetermineStitchingCoordinatesGeneric::setupFilterParameters()
 {
-  FilterParameterVector parameters;
-  QStringList linkedProps;
+    FilterParameterVector parameters;
+    QStringList linkedProps;
 
-  linkedProps << "MetaDataAttributeMatrixName";
+    linkedProps << "MetaDataAttributeMatrixName";
 
-  parameters.push_back(LinkedBooleanFilterParameter::New("Use Zeiss Meta Data", "UseZeissMetaData", getUseZeissMetaData(), linkedProps, false));
+    parameters.push_back(LinkedBooleanFilterParameter::New("Use Zeiss Meta Data", "UseZeissMetaData", getUseZeissMetaData(), linkedProps, false));
 
-  parameters.push_back(FilterParameter::New("Attribute Matrix Name", "AttributeMatrixName", FilterParameterWidgetType::AttributeMatrixSelectionWidget, getAttributeMatrixName(), false, ""));
-  parameters.push_back(FilterParameter::New("Meta Data for Attribute Matrix", "MetaDataAttributeMatrixName", FilterParameterWidgetType::AttributeMatrixSelectionWidget, getMetaDataAttributeMatrixName(), false, ""));
-  linkedProps.clear();
+    parameters.push_back(FilterParameter::New("Attribute Matrix Name", "AttributeMatrixName", FilterParameterWidgetType::AttributeMatrixSelectionWidget, getAttributeMatrixName(), false, ""));
+    parameters.push_back(FilterParameter::New("Meta Data for Attribute Matrix", "MetaDataAttributeMatrixName", FilterParameterWidgetType::AttributeMatrixSelectionWidget, getMetaDataAttributeMatrixName(), false, ""));
+    linkedProps.clear();
 
-  parameters.push_back(FilterParameter::New("Calculated Tile Info Attribute Matrix Name", "TileCalculatedInfoAttributeMatrixName", FilterParameterWidgetType::StringWidget, getTileCalculatedInfoAttributeMatrixName(), true, ""));
-  parameters.push_back(FilterParameter::New("Stiched Coordinates", "StitchedCoordinatesArrayName", FilterParameterWidgetType::StringWidget, getStitchedCoordinatesArrayName(), true, ""));
+    parameters.push_back(FilterParameter::New("Calculated Tile Info Attribute Matrix Name", "TileCalculatedInfoAttributeMatrixName", FilterParameterWidgetType::StringWidget, getTileCalculatedInfoAttributeMatrixName(), true, ""));
+    parameters.push_back(FilterParameter::New("Stiched Coordinates", "StitchedCoordinatesArrayName", FilterParameterWidgetType::StringWidget, getStitchedCoordinatesArrayName(), true, ""));
+    parameters.push_back(FilterParameter::New("Stitched Coordinates Data Array Name List", "DataArrayNameForStitchedCoordinatesArrayName", FilterParameterWidgetType::StringWidget, getDataArrayNameForStitchedCoordinatesArrayName(), true, ""));
 
-  setFilterParameters(parameters);
+    setFilterParameters(parameters);
 }
 
 // -----------------------------------------------------------------------------
@@ -57,10 +60,13 @@ void DetermineStitchingCoordinatesGeneric::setupFilterParameters()
 // -----------------------------------------------------------------------------
 void DetermineStitchingCoordinatesGeneric::readFilterParameters(AbstractFilterParametersReader* reader, int index)
 {
-  reader->openFilterGroup(this, index);
-  setAttributeMatrixName(reader->readDataArrayPath("AttributeMatrixName", getAttributeMatrixName()));
-  setMetaDataAttributeMatrixName(reader->readDataArrayPath("MetaDataAttributeMatrixName", getMetaDataAttributeMatrixName()));
-  reader->closeFilterGroup();
+    reader->openFilterGroup(this, index);
+    setAttributeMatrixName(reader->readDataArrayPath("AttributeMatrixName", getAttributeMatrixName()));
+    setMetaDataAttributeMatrixName(reader->readDataArrayPath("MetaDataAttributeMatrixName", getMetaDataAttributeMatrixName()));
+    setTileCalculatedInfoAttributeMatrixName(reader->readString("TileCalculatedInfoAttributeMatrixName", getTileCalculatedInfoAttributeMatrixName()));
+    setStitchedCoordinatesArrayName(reader->readString("StitchedCoordinatesArrayName", getStitchedCoordinatesArrayName()));
+    setDataArrayNameForStitchedCoordinatesArrayName(reader->readString("DataArrayNamesForStitchedCoordinates", getDataArrayNameForStitchedCoordinatesArrayName()));
+    reader->closeFilterGroup();
 }
 
 // -----------------------------------------------------------------------------
@@ -68,13 +74,14 @@ void DetermineStitchingCoordinatesGeneric::readFilterParameters(AbstractFilterPa
 // -----------------------------------------------------------------------------
 int DetermineStitchingCoordinatesGeneric::writeFilterParameters(AbstractFilterParametersWriter* writer, int index)
 {
-  writer->openFilterGroup(this, index);
-  DREAM3D_FILTER_WRITE_PARAMETER(AttributeMatrixName)
-  DREAM3D_FILTER_WRITE_PARAMETER(MetaDataAttributeMatrixName)
-  DREAM3D_FILTER_WRITE_PARAMETER(TileCalculatedInfoAttributeMatrixName)
-  DREAM3D_FILTER_WRITE_PARAMETER(StitchedCoordinatesArrayName)
-  writer->closeFilterGroup();
-  return ++index; // we want to return the next index that was just written to
+    writer->openFilterGroup(this, index);
+    DREAM3D_FILTER_WRITE_PARAMETER(AttributeMatrixName)
+    DREAM3D_FILTER_WRITE_PARAMETER(MetaDataAttributeMatrixName)
+    DREAM3D_FILTER_WRITE_PARAMETER(TileCalculatedInfoAttributeMatrixName)
+    DREAM3D_FILTER_WRITE_PARAMETER(StitchedCoordinatesArrayName)
+    DREAM3D_FILTER_WRITE_PARAMETER(DataArrayNameForStitchedCoordinatesArrayName)
+            writer->closeFilterGroup();
+    return ++index; // we want to return the next index that was just written to
 }
 
 // -----------------------------------------------------------------------------
@@ -96,14 +103,13 @@ void DetermineStitchingCoordinatesGeneric::dataCheck()
         return;
     }
 
-   QList<QString> names = am->getAttributeArrayNames();
+    QList<QString> names = am->getAttributeArrayNames();
 
 
     QVector<size_t> dims(1, 1);
 
 
-    UInt8ArrayType::Pointer imagePtr = UInt8ArrayType::NullPointer();
-    IDataArray::Pointer iDataArray = IDataArray::NullPointer();
+
     m_PointerList.resize(names.size());
 
     for(int i = 0; i < names.size(); i++)
@@ -126,7 +132,7 @@ void DetermineStitchingCoordinatesGeneric::dataCheck()
             notifyErrorMessage(getHumanLabel(), "The Attribute Matrix was not found", -76001);
             return;
         }
-//        QString temp = "_META_DATA";
+        //        QString temp = "_META_DATA";
         bool a = getMetaDataAttributeMatrixName().getAttributeMatrixName().contains("_META_DATA");
         if (a == false)
         {
@@ -145,19 +151,23 @@ void DetermineStitchingCoordinatesGeneric::dataCheck()
 
     dims[0]=2;
 
-    tempPath.update(getAttributeMatrixName().getDataContainerName(), getTileCalculatedInfoAttributeMatrixName(), getStitchedCoordinatesArrayName() );
-    m_StitchedCoordinatesPtr = getDataContainerArray()->createNonPrereqArrayFromPath<DataArray<float>, AbstractFilter, int32_t>(this,  tempPath, 0, dims); /* Assigns the shared_ptr<> to an instance variable that is a weak_ptr<> */
+    tempPath.update(getAttributeMatrixName().getDataContainerName(), getTileCalculatedInfoAttributeMatrixName(), getStitchedCoordinatesArrayName());
+    m_StitchedCoordinatesPtr = getDataContainerArray()->createNonPrereqArrayFromPath<DataArray<float>, AbstractFilter, float>(this,  tempPath, 0, dims); /* Assigns the shared_ptr<> to an instance variable that is a weak_ptr<> */
     if( NULL != m_StitchedCoordinatesPtr.lock().get() ) /* Validate the Weak Pointer wraps a non-NULL pointer to a DataArray<T> object */
     { m_StitchedCoordinates = m_StitchedCoordinatesPtr.lock()->getPointer(0); } /* Now assign the raw pointer to data from the DataArray<T> object */
 
+    dims[0]=1;
+
+
+
+    tempPath.update(getAttributeMatrixName().getDataContainerName(), getTileCalculatedInfoAttributeMatrixName(), getDataArrayNameForStitchedCoordinatesArrayName() );
+    m_DataArrayNamesForStitchedCoordinatesPtr = getDataContainerArray()->createNonPrereqArrayFromPath<StringDataArray, AbstractFilter, std::string>(this,  tempPath, "0", dims); /* Assigns the shared_ptr<> to an instance variable that is a weak_ptr<> */
+    if( NULL != m_DataArrayNamesForStitchedCoordinatesPtr.lock().get() ) /* Validate the Weak Pointer wraps a non-NULL pointer to a DataArray<T> object */
+    {
+     //   m_DataArrayNamesForStitchedCoordinates = m_DataArrayNamesForStitchedCoordinatesPtr.lock()->getPointer(0);  /* Now assign the raw pointer to data from the DataArray<T> object */
+    }
 
     return;
-
-
-
-
-
-
 }
 
 // -----------------------------------------------------------------------------
@@ -165,13 +175,13 @@ void DetermineStitchingCoordinatesGeneric::dataCheck()
 // -----------------------------------------------------------------------------
 void DetermineStitchingCoordinatesGeneric::preflight()
 {
-  // These are the REQUIRED lines of CODE to make sure the filter behaves correctly
-  setInPreflight(true); // Set the fact that we are preflighting.
-  emit preflightAboutToExecute(); // Emit this signal so that other widgets can do one file update
-  emit updateFilterParameters(this); // Emit this signal to have the widgets push their values down to the filter
-  dataCheck(); // Run our DataCheck to make sure everthing is setup correctly
-  emit preflightExecuted(); // We are done preflighting this filter
-  setInPreflight(false); // Inform the system this filter is NOT in preflight mode anymore.
+    // These are the REQUIRED lines of CODE to make sure the filter behaves correctly
+    setInPreflight(true); // Set the fact that we are preflighting.
+    emit preflightAboutToExecute(); // Emit this signal so that other widgets can do one file update
+    emit updateFilterParameters(this); // Emit this signal to have the widgets push their values down to the filter
+    dataCheck(); // Run our DataCheck to make sure everthing is setup correctly
+    emit preflightExecuted(); // We are done preflighting this filter
+    setInPreflight(false); // Inform the system this filter is NOT in preflight mode anymore.
 }
 
 // -----------------------------------------------------------------------------
@@ -179,7 +189,7 @@ void DetermineStitchingCoordinatesGeneric::preflight()
 // -----------------------------------------------------------------------------
 const QString DetermineStitchingCoordinatesGeneric::getCompiledLibraryName()
 {
-  return ZeissImport::ZeissImportBaseName;
+    return ZeissImport::ZeissImportBaseName;
 }
 
 // -----------------------------------------------------------------------------
@@ -187,7 +197,7 @@ const QString DetermineStitchingCoordinatesGeneric::getCompiledLibraryName()
 // -----------------------------------------------------------------------------
 const QString DetermineStitchingCoordinatesGeneric::getGroupName()
 {
-  return "ImageProcessing";
+    return "ImageProcessing";
 }
 
 // -----------------------------------------------------------------------------
@@ -195,7 +205,7 @@ const QString DetermineStitchingCoordinatesGeneric::getGroupName()
 // -----------------------------------------------------------------------------
 const QString DetermineStitchingCoordinatesGeneric::getHumanLabel()
 {
-  return "DetermineStitchingCoordinatesGeneric";
+    return "DetermineStitchingCoordinatesGeneric";
 }
 
 // -----------------------------------------------------------------------------
@@ -203,7 +213,7 @@ const QString DetermineStitchingCoordinatesGeneric::getHumanLabel()
 // -----------------------------------------------------------------------------
 const QString DetermineStitchingCoordinatesGeneric::getSubGroupName()
 {
-  return "Misc";
+    return "Misc";
 }
 
 // -----------------------------------------------------------------------------
@@ -211,55 +221,64 @@ const QString DetermineStitchingCoordinatesGeneric::getSubGroupName()
 // -----------------------------------------------------------------------------
 void DetermineStitchingCoordinatesGeneric::execute()
 {
-  int err = 0;
-  dataCheck();
-  if(getErrorCondition() < 0) { return; }
-  setErrorCondition(0);
+    int err = 0;
+    dataCheck();
+    if(getErrorCondition() < 0) { return; }
+    setErrorCondition(0);
 
-  VolumeDataContainer* m = getDataContainerArray()->getDataContainerAs<VolumeDataContainer>(getAttributeMatrixName().getDataContainerName());
-  QString attrMatName = getAttributeMatrixName().getAttributeMatrixName();
+    VolumeDataContainer* m = getDataContainerArray()->getDataContainerAs<VolumeDataContainer>(getAttributeMatrixName().getDataContainerName());
+    QString attrMatName = getAttributeMatrixName().getAttributeMatrixName();
 
-  QString XTileIndexName = "ImageIndexU";
-  QString YTileIndexName = "ImageIndexV";
-  QString XGlobalIndexName = "StagePositionX";
-  QString YGlobalIndexName = "StagePositionY";
-  QString XScale = "ScaleFactorForX";
-  QString YScale = "ScaleFactorForY";
+    QString XTileIndexName = "ImageIndexU";
+    QString YTileIndexName = "ImageIndexV";
+    QString XGlobalIndexName = "StagePositionX";
+    QString YGlobalIndexName = "StagePositionY";
+    QString XScale = "ScaleFactorForX";
+    QString YScale = "ScaleFactorForY";
 
-  QVector<size_t> xTileList(m_PointerList.size());
-  QVector<size_t> yTileList(m_PointerList.size());
-  QVector<float> xGlobCoordsList(m_PointerList.size());
-  QVector<float> yGlobCoordsList(m_PointerList.size());
+    QVector<size_t> xTileList(m_PointerList.size());
+    QVector<size_t> yTileList(m_PointerList.size());
+    QVector<float> xGlobCoordsList(m_PointerList.size());
+    QVector<float> yGlobCoordsList(m_PointerList.size());
 
-  AttributeMatrix::Pointer attrMat = m->getAttributeMatrix(attrMatName);
+    AttributeMatrix::Pointer attrMat = m->getAttributeMatrix(attrMatName);
 
-  xTileList = extractTileIndices(XTileIndexName);
-  yTileList = extractTileIndices(YTileIndexName);
+    xTileList = extractTileIndices(XTileIndexName);
+    yTileList = extractTileIndices(YTileIndexName);
 
-  xGlobCoordsList = extractGlobalIndices(XGlobalIndexName, XScale);
-  yGlobCoordsList = extractGlobalIndices(YGlobalIndexName, YScale);
+    xGlobCoordsList = extractGlobalIndices(XGlobalIndexName, XScale);
+    yGlobCoordsList = extractGlobalIndices(YGlobalIndexName, YScale);
 
-  float sampleOrigin[3];
-  float voxelResolution[3];
+    float sampleOrigin[3];
+    float voxelResolution[3];
 
-  m->getOrigin(sampleOrigin);
-  m->getResolution(voxelResolution);
-  QVector<size_t> udims = attrMat->getTupleDimensions();
-  size_t totalPoints = attrMat->getNumTuples();
-
-
-
-  FloatArrayType::Pointer temp = DetermineStitching::FindGlobalOrigins(totalPoints, udims, sampleOrigin, voxelResolution, m_PointerList, xGlobCoordsList, yGlobCoordsList, xTileList, yTileList);
+    m->getOrigin(sampleOrigin);
+    m->getResolution(voxelResolution);
+    QVector<size_t> udims = attrMat->getTupleDimensions();
+    size_t totalPoints = attrMat->getNumTuples();
 
 
-  float* src = temp->getPointer(0);
-  float* dest = m_StitchedCoordinatesPtr.lock()->getPointer(0);
-  size_t totalBytes = (m_StitchedCoordinatesPtr.lock()->getNumberOfTuples() * m_StitchedCoordinatesPtr.lock()->getNumberOfComponents() * sizeof(float));
-  ::memcpy(dest, src, totalBytes);
+
+    FloatArrayType::Pointer temp = DetermineStitching::FindGlobalOrigins(totalPoints, udims, sampleOrigin, voxelResolution, m_PointerList, xGlobCoordsList, yGlobCoordsList, xTileList, yTileList, this);
 
 
-  /* Let the GUI know we are done with this filter */
-  notifyStatusMessage(getHumanLabel(), "Complete");
+    float* src = temp->getPointer(0);
+    float* dest = m_StitchedCoordinatesPtr.lock()->getPointer(0);
+    size_t totalBytes = (m_StitchedCoordinatesPtr.lock()->getNumberOfTuples() * m_StitchedCoordinatesPtr.lock()->getNumberOfComponents() * sizeof(float));
+    ::memcpy(dest, src, totalBytes);
+
+    StringDataArray::Pointer arrayNames = m_DataArrayNamesForStitchedCoordinatesPtr.lock();
+    arrayNames->resize(m_PointerList.size());
+
+    //Create another data array with the list of names of the images in the same order as the returned stitched coordinates
+    QList<QString> names = attrMat->getAttributeArrayNames();
+    for(size_t i = 0; i < names.size(); i++ )
+    {
+        arrayNames->setValue(i, names[i]);
+    }
+
+    /* Let the GUI know we are done with this filter */
+    notifyStatusMessage(getHumanLabel(), "Complete");
 }
 
 // -----------------------------------------------------------------------------
@@ -288,11 +307,11 @@ QVector<size_t> DetermineStitchingCoordinatesGeneric::extractTileIndices(QString
             char test = char(MetaData[(cDims[0]*i+j)]);
             str << test;
         }
-//        char test = char(MetaData[(2*i)]);
-//        str << test;
+        //        char test = char(MetaData[(2*i)]);
+        //        str << test;
         str >> tileList[i];
-       str.str("");
-       str.clear();
+        str.str("");
+        str.clear();
     }
 
     return tileList;
@@ -320,9 +339,9 @@ QVector<float> DetermineStitchingCoordinatesGeneric::extractGlobalIndices(QStrin
         char test = char(MetaData[(j)]);
         str << test;
     }
-   str >> resolution;
-   str.str("");
-   str.clear();
+    str >> resolution;
+    str.str("");
+    str.clear();
 
 
 
@@ -342,10 +361,10 @@ QVector<float> DetermineStitchingCoordinatesGeneric::extractGlobalIndices(QStrin
             char test = char(MetaData[(cDims[0]*i+j)]);
             str << test;
         }
-       str >> globalIndexList[i];
-       str.str("");
-       str.clear();
-       globalIndexList[i] = globalIndexList[i]/resolution;
+        str >> globalIndexList[i];
+        str.str("");
+        str.clear();
+        globalIndexList[i] = globalIndexList[i]/resolution;
     }
 
 
@@ -363,26 +382,26 @@ QVector<float> DetermineStitchingCoordinatesGeneric::extractGlobalIndices(QStrin
 
 AbstractFilter::Pointer DetermineStitchingCoordinatesGeneric::newFilterInstance(bool copyFilterParameters)
 {
-  /*
+    /*
   * write code to optionally copy the filter parameters from the current filter into the new instance
   */
-  DetermineStitchingCoordinatesGeneric::Pointer filter = DetermineStitchingCoordinatesGeneric::New();
-  if(true == copyFilterParameters)
-  {
-    /* If the filter uses all the standard Filter Parameter Widgets you can probabaly get
+    DetermineStitchingCoordinatesGeneric::Pointer filter = DetermineStitchingCoordinatesGeneric::New();
+    if(true == copyFilterParameters)
+    {
+        /* If the filter uses all the standard Filter Parameter Widgets you can probabaly get
      * away with using this method to copy the filter parameters from the current instance
      * into the new instance
      */
-    copyFilterParameterInstanceVariables(filter.get());
-    /* If your filter is using a lot of custom FilterParameterWidgets @see ReadH5Ebsd then you
+        copyFilterParameterInstanceVariables(filter.get());
+        /* If your filter is using a lot of custom FilterParameterWidgets @see ReadH5Ebsd then you
      * may need to copy each filter parameter explicitly plus any other instance variables that
      * are needed into the new instance. Here is some example code from ReadH5Ebsd
      */
-    //    DREAM3D_COPY_INSTANCEVAR(OutputFile)
-    //    DREAM3D_COPY_INSTANCEVAR(ZStartIndex)
-    //    DREAM3D_COPY_INSTANCEVAR(ZEndIndex)
-    //    DREAM3D_COPY_INSTANCEVAR(ZResolution)
-  }
-  return filter;
+        //    DREAM3D_COPY_INSTANCEVAR(OutputFile)
+        //    DREAM3D_COPY_INSTANCEVAR(ZStartIndex)
+        //    DREAM3D_COPY_INSTANCEVAR(ZEndIndex)
+        //    DREAM3D_COPY_INSTANCEVAR(ZResolution)
+    }
+    return filter;
 }
 

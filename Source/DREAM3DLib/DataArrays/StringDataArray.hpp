@@ -74,6 +74,22 @@ class StringDataArray : public IDataArray
       return ptr;
     }
 
+    static Pointer CreateArray(size_t numTuples, QVector<size_t> cDims, const QString& name, bool allocate = true)
+    {
+      if (name.isEmpty() == true)
+      {
+        return NullPointer();
+      }
+      if (cDims.size() != 1)
+      {
+        return NullPointer();
+      }
+      StringDataArray* d = new StringDataArray(numTuples, name, allocate);
+      d->setName(name);
+      Pointer ptr(d);
+      return ptr;
+    }
+
     /**
      * @brief createNewArray
      * @param numElements
@@ -332,6 +348,18 @@ class StringDataArray : public IDataArray
       m_Array.fill(QString(""), m_Array.size());
     }
 
+    virtual void initializeWithValue(std::string initValue, size_t offset = 0)
+    {
+      if(!isAllocated()) { return; }
+
+      m_Array.fill(QString::fromStdString(initValue), m_Array.size());
+    }
+
+    virtual void setInitValue(std::string initValue)
+    {
+      m_InitValue = QString::fromStdString(initValue);
+    }
+
     /**
      * @brief deepCopy
      * @param forceNoAllocate
@@ -522,6 +550,7 @@ class StringDataArray : public IDataArray
   private:
     QVector<QString> m_Array;
     QString m_Name;
+    QString m_InitValue;
     size_t m_NumTuples;
     bool _ownsData;
 

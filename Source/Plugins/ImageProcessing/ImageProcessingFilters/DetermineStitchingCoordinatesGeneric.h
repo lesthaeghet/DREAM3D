@@ -9,6 +9,7 @@
 #include "DREAM3DLib/DREAM3DLib.h"
 #include "DREAM3DLib/Common/DREAM3DSetGetMacros.h"
 #include "DREAM3DLib/Common/AbstractFilter.h"
+#include "DREAM3DLib/DataArrays/StringDataArray.hpp"
 #include "ImageProcessing/ImageProcessingConstants.h"
 
 
@@ -55,6 +56,9 @@ class DetermineStitchingCoordinatesGeneric : public AbstractFilter
 
     DREAM3D_FILTER_PARAMETER(QString, StitchedCoordinatesArrayName)
     Q_PROPERTY(QString StitchedCoordinatesArrayName READ getStitchedCoordinatesArrayName WRITE setStitchedCoordinatesArrayName)
+
+    DREAM3D_FILTER_PARAMETER(QString, DataArrayNameForStitchedCoordinatesArrayName)
+    Q_PROPERTY(QString DataArrayNameForStitchedCoordinatesArrayName READ getDataArrayNameForStitchedCoordinatesArrayName WRITE setDataArrayNameForStitchedCoordinatesArrayName)
 
 
     /**
@@ -162,7 +166,7 @@ class DetermineStitchingCoordinatesGeneric : public AbstractFilter
     QVector<ImageProcessing::DefaultPixelType* > m_PointerList;
     DEFINE_CREATED_DATAARRAY_VARIABLE(ImageProcessing::DefaultPixelType, SelectedCellArray)
     DEFINE_CREATED_DATAARRAY_VARIABLE(float, StitchedCoordinates)
-
+    StringDataArray::WeakPointer m_DataArrayNamesForStitchedCoordinatesPtr;
 
 
     DetermineStitchingCoordinatesGeneric(const DetermineStitchingCoordinatesGeneric&); // Copy Constructor Not Implemented
