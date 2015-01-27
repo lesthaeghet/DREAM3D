@@ -45,8 +45,7 @@
 
 
 /**
- * @brief The DetermineStitching class can generate different types of distributions
- * for a Radial Distribution Function
+ * @brief The DetermineStitching class
  */
 class DREAM3DLib_EXPORT DetermineStitching
 {
@@ -55,22 +54,48 @@ class DREAM3DLib_EXPORT DetermineStitching
     virtual ~DetermineStitching();
 
     /**
-     * @brief GenerateRandomDistribution
-     * @param minDistance The minimum distance between objects
-     * @param maxDistance The maximum distance between objects
-     * @param numBins The number of bins to generate
-     * @return An array of values that are the frequency values for the histogram
-     */
+   * @brief FindGlobalOrigins
+   * @param totalPoints
+   * @param udims
+   * @param sampleOrigin
+   * @param voxelResolution
+   * @param dataArrayList
+   * @param xGlobCoordsList
+   * @param yGlobCoordsList
+   * @param xTileList
+   * @param yTileList
+   * @param obs
+   * @return
+   */
+    static FloatArrayType::Pointer FindGlobalOrigins(size_t totalPoints,
+                                                     QVector<size_t> udims,
+                                                     float sampleOrigin[],
+                                                     float voxelResolution[],
+                                                     QVector<ImageProcessing::DefaultPixelType *> dataArrayList,
+                                                     QVector<float> xGlobCoordsList,
+                                                     QVector<float> yGlobCoordsList,
+                                                     QVector<qint32> xTileList,
+                                                     QVector<qint32> yTileList,
+                                                     AbstractFilter *filter = NULL);
 
+    /**
+   * @brief ReturnIndexForCombOrder
+   * @param xTileList
+   * @param yTileList
+   * @param numXtiles
+   * @param numYtiles
+   * @return
+   */
+    static QVector<size_t> ReturnIndexForCombOrder(QVector<qint32> xTileList, QVector<qint32> yTileList, size_t numXtiles, size_t numYtiles);
 
-
-  static FloatArrayType::Pointer FindGlobalOrigins(size_t totalPoints, QVector<size_t> udims, float sampleOrigin[], float voxelResolution[], QVector<ImageProcessing::DefaultPixelType *> dataArrayList, QVector<float> xGlobCoordsList, QVector<float> yGlobCoordsList, QVector<size_t> xTileList, QVector<size_t> yTileList, AbstractFilter *obs = NULL);
-
-  static size_t FindMaxValue(QVector<size_t> inputVector);
-
-  static QVector<size_t> ReturnIndexForCombOrder(QVector<size_t> xTileList, QVector<size_t> yTileList, size_t numXtiles, size_t numYtiles);
-
-  static std::vector<float> CropAndCrossCorrelate(std::vector<float> cropSpecsIm1Im2, ImageProcessing::UInt8ImageType* currentImage, ImageProcessing::UInt8ImageType* fixedImage);
+    /**
+   * @brief CropAndCrossCorrelate
+   * @param cropSpecsIm1Im2
+   * @param currentImage
+   * @param fixedImage
+   * @return
+   */
+    static std::vector<float> CropAndCrossCorrelate(std::vector<float> cropSpecsIm1Im2, ImageProcessing::UInt8ImageType* currentImage, ImageProcessing::UInt8ImageType* fixedImage);
 
   protected:
     DetermineStitching();

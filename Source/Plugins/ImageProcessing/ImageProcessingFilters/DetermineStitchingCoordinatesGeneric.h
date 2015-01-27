@@ -45,11 +45,11 @@ class DetermineStitchingCoordinatesGeneric : public AbstractFilter
     DREAM3D_FILTER_PARAMETER(DataArrayPath, AttributeMatrixName)
     Q_PROPERTY(DataArrayPath AttributeMatrixName READ getAttributeMatrixName WRITE setAttributeMatrixName)
 
-    DREAM3D_FILTER_PARAMETER(DataArrayPath, MetaDataAttributeMatrixName)
-    Q_PROPERTY(DataArrayPath MetaDataAttributeMatrixName READ getMetaDataAttributeMatrixName WRITE setMetaDataAttributeMatrixName)
-
     DREAM3D_FILTER_PARAMETER(bool, UseZeissMetaData)
     Q_PROPERTY(bool UseZeissMetaData READ getUseZeissMetaData WRITE setUseZeissMetaData)
+
+    DREAM3D_FILTER_PARAMETER(DataArrayPath, MetaDataAttributeMatrixName)
+    Q_PROPERTY(DataArrayPath MetaDataAttributeMatrixName READ getMetaDataAttributeMatrixName WRITE setMetaDataAttributeMatrixName)
 
     DREAM3D_FILTER_PARAMETER(QString, TileCalculatedInfoAttributeMatrixName)
     Q_PROPERTY(QString TileCalculatedInfoAttributeMatrixName READ getTileCalculatedInfoAttributeMatrixName WRITE setTileCalculatedInfoAttributeMatrixName)
@@ -57,8 +57,8 @@ class DetermineStitchingCoordinatesGeneric : public AbstractFilter
     DREAM3D_FILTER_PARAMETER(QString, StitchedCoordinatesArrayName)
     Q_PROPERTY(QString StitchedCoordinatesArrayName READ getStitchedCoordinatesArrayName WRITE setStitchedCoordinatesArrayName)
 
-    DREAM3D_FILTER_PARAMETER(QString, DataArrayNameForStitchedCoordinatesArrayName)
-    Q_PROPERTY(QString DataArrayNameForStitchedCoordinatesArrayName READ getDataArrayNameForStitchedCoordinatesArrayName WRITE setDataArrayNameForStitchedCoordinatesArrayName)
+    DREAM3D_FILTER_PARAMETER(QString, StitchedArrayNames)
+    Q_PROPERTY(QString StitchedArrayNames READ getStitchedArrayNames WRITE setStitchedArrayNames)
 
 
     /**
@@ -152,8 +152,9 @@ class DetermineStitchingCoordinatesGeneric : public AbstractFilter
   protected:
     DetermineStitchingCoordinatesGeneric();
 
-    QVector<size_t> extractTileIndices(QString DataArrayName);
-    QVector<float> extractGlobalIndices(QString DataArrayName, QString Resolution);
+    QVector<qint32> extractIntegerValues(QString arrayName);
+    QVector<float> extractFloatValues(QString arrayName);
+    QVector<float> extractGlobalIndices(QString DataArrayName, QString resolution);
 
     /**
     * @brief Checks for the appropriate parameter values and availability of arrays in the data container

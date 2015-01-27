@@ -31,10 +31,9 @@
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 #include "DetermineStitching.h"
 
+#include <QtCore/QDir>
+
 #include "itkMaskedFFTNormalizedCorrelationImageFilter.h"
-
-#include "ImageProcessing/ImageProcessingFilters/ItkBridge.h"
-
 #include "itkImage.h"
 #include "itkImageFileWriter.h"
 #include "itkRegionOfInterestImageFilter.h"
@@ -42,6 +41,7 @@
 #include "itkMinimumMaximumImageCalculator.h"
 
 
+#include "ImageProcessing/ImageProcessingFilters/ItkBridge.h"
 #include "ImageProcessing/ImageProcessingHelpers.hpp"
 
 
@@ -65,15 +65,32 @@ DetermineStitching::~DetermineStitching()
 
 }
 
+
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-FloatArrayType::Pointer DetermineStitching::FindGlobalOrigins(size_t totalPoints, QVector<size_t> udims,
-                                                              float sampleOrigin[3],  float voxelResolution[3],
-QVector<ImageProcessing::DefaultPixelType* > dataArrayList,
-QVector<float> xGlobCoordsList, QVector<float> yGlobCoordsList,
-QVector<size_t> xTileList, QVector<size_t> yTileList,
-AbstractFilter* filter)
+//Finds the max value in a vector ... possibly redunant since it is one line ...
+template<typename T>
+T FindMaxValue(QVector<T> inputVector)
+{
+    typename QVector<T>::iterator it = std::max_element(inputVector.begin(), inputVector.end());
+    return *it;
+}
+
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+FloatArrayType::Pointer DetermineStitching::FindGlobalOrigins(size_t totalPoints,
+                                                              QVector<size_t> udims,
+                                                              float sampleOrigin[],
+                                                              float voxelResolution[],
+                                                              QVector<ImageProcessing::DefaultPixelType *> dataArrayList,
+                                                              QVector<float> xGlobCoordsList,
+                                                              QVector<float> yGlobCoordsList,
+                                                              QVector<qint32> xTileList,
+                                                              QVector<qint32> yTileList,
+                                                              AbstractFilter* filter)
 {
 
     QVector<size_t> cDims(1, 2);  // a dimension for the xvalues and one for the y values
@@ -84,8 +101,8 @@ AbstractFilter* filter)
     FloatArrayType::Pointer xyStitchedGlobalListPtr = FloatArrayType::CreateArray(tDims, cDims, "xyGlobalList");
     FloatArrayType::Pointer xyStitchedGlobalListPtr_orig = FloatArrayType::CreateArray(tDims, cDims, "xyGlobalList_orig");
 
-    size_t numXtiles = FindMaxValue(xTileList) + 1;
-    size_t numYtiles = FindMaxValue(yTileList) + 1;
+    qint32 numXtiles = FindMaxValue(xTileList) + 1;
+    qint32 numYtiles = FindMaxValue(yTileList) + 1;
 
     QVector<size_t> combIndexList(xTileList.size());
 
@@ -315,12 +332,9 @@ AbstractFilter* filter)
 
 }
 
-
-
-
-
-
-
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
 std::vector<float> DetermineStitching::CropAndCrossCorrelate(std::vector<float> cropSpecsIm1Im2,  ImageProcessing::UInt8ImageType* currentImage,  ImageProcessing::UInt8ImageType* fixedImage)
 {
 
@@ -394,17 +408,19 @@ std::vector<float> DetermineStitching::CropAndCrossCorrelate(std::vector<float> 
 
     /////WRITING THE IMAGES FOR TESTING
     typedef itk::ImageFileWriter< ImageProcessing::UInt8ImageType > WriterType;
-
+#if 1
+    QString imagePath = QDir::homePath() + QDir::separator() + "Desktop" + QDir::separator() + "fixedImageWindow.tiff";
     WriterType::Pointer writer = WriterType::New();
-    writer->SetFileName( "/Users/megnashah/Desktop/fixedImageWindow.tiff");
+    writer->SetFileName(imagePath.toLatin1().constData());
     writer->SetInput( fixedImageWindow2);
     writer->Update();
 
+    imagePath = QDir::homePath() + QDir::separator() + "Desktop" + QDir::separator() + "CurrentImageWindow.tiff";
     WriterType::Pointer writer2 = WriterType::New();
-    writer2->SetFileName( "/Users/megnashah/Desktop/CurrentImageWindow.tiff");
+    writer2->SetFileName(imagePath.toLatin1().constData());
     writer2->SetInput( currentImageWindow2 );
     writer2->Update();
-
+#endif
 
 
 
@@ -449,24 +465,16 @@ std::vector<float> DetermineStitching::CropAndCrossCorrelate(std::vector<float> 
     return newXYOrigin;
 }
 
-//Finds the max value in a vector ... possibly redunant since it is one line ...
-size_t DetermineStitching::FindMaxValue(QVector<size_t> inputVector)
-{
-
-    QVector<size_t>::iterator it = std::max_element(inputVector.begin(), inputVector.end());
-
-    return *it;
-
-}
-
 
 
 //This helper function takes the tile list and creates a new vector that orders the tiles as though they are in comb order. So a tile set collected
 //in a comb fashion (along the rows first) will have the values in the new vector match the original index. This is a helper so that we can always stitch the
 //tiles the same way regardless of how they were collected.
 
-
-QVector<size_t> DetermineStitching::ReturnIndexForCombOrder(QVector<size_t> xTileList, QVector<size_t> yTileList, size_t numXtiles, size_t numYtiles)
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+QVector<size_t> DetermineStitching::ReturnIndexForCombOrder(QVector<qint32> xTileList, QVector<qint32> yTileList, size_t numXtiles, size_t numYtiles)
 {
 
     QVector<size_t> newIndices(xTileList.size(), 0);
