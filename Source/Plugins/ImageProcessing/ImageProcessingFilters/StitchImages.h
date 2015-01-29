@@ -31,8 +31,8 @@
  *                              FA8650-10-D-5210
  *
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
-#ifndef _DetermineStitching_H_
-#define _DetermineStitching_H_
+#ifndef _StitchImages_H_
+#define _StitchImages_H_
 
 #include <QtCore/QString>
 
@@ -43,25 +43,28 @@
 #include "ImageProcessing/ImageProcessingConstants.h"
 
 /**
- * @class DetermineStitching DetermineStitching.h ImageProcessing/ImageProcessingFilters/DetermineStitching.h
+ * @class StitchImages StitchImages.h ImageProcessing/ImageProcessingFilters/StitchImages.h
  * @brief
  * @author
  * @date
  * @version 1.0
  */
-class DetermineStitching : public AbstractFilter
+class StitchImages : public AbstractFilter
 {
     Q_OBJECT /* Need this for Qt's signals and slots mechanism to work */
 
   public:
-    DREAM3D_SHARED_POINTERS(DetermineStitching)
-    DREAM3D_STATIC_NEW_MACRO(DetermineStitching)
-    DREAM3D_TYPE_MACRO_SUPER(DetermineStitching, AbstractFilter)
+    DREAM3D_SHARED_POINTERS(StitchImages)
+    DREAM3D_STATIC_NEW_MACRO(StitchImages)
+    DREAM3D_TYPE_MACRO_SUPER(StitchImages, AbstractFilter)
 
-    virtual ~DetermineStitching();
+    virtual ~StitchImages();
 
-    DREAM3D_FILTER_PARAMETER(DataArrayPath, SelectedCellArrayPath)
-    Q_PROPERTY(DataArrayPath SelectedCellArrayPath READ getSelectedCellArrayPath WRITE setSelectedCellArrayPath)
+    DREAM3D_FILTER_PARAMETER(DataArrayPath, AttributeMatrixName)
+    Q_PROPERTY(DataArrayPath AttributeMatrixName READ getAttributeMatrixName WRITE setAttributeMatrixName)
+
+    DREAM3D_FILTER_PARAMETER(DataArrayPath, StitchedCoordinatesArrayPath)
+    Q_PROPERTY(DataArrayPath StitchedCoordinatesArrayPath READ getStitchedCoordinatesArrayPath WRITE setStitchedCoordinatesArrayPath)
 
     /**
      * @brief getCompiledLibraryName Returns the name of the Library that this filter is a part of
@@ -152,7 +155,7 @@ class DetermineStitching : public AbstractFilter
     void preflightExecuted();
 
   protected:
-    DetermineStitching();
+    StitchImages();
 
     /**
     * @brief Checks for the appropriate parameter values and availability of arrays in the data container
@@ -162,9 +165,9 @@ class DetermineStitching : public AbstractFilter
   private:
 
     DEFINE_REQUIRED_DATAARRAY_VARIABLE(ImageProcessing::DefaultPixelType, SelectedCellArray)
-
-    DetermineStitching(const DetermineStitching&); // Copy Constructor Not Implemented
-    void operator=(const DetermineStitching&); // Operator '=' Not Implemented
+    DEFINE_REQUIRED_DATAARRAY_VARIABLE(float, StitchedCoordinates)
+    StitchImages(const StitchImages&); // Copy Constructor Not Implemented
+    void operator=(const StitchImages&); // Operator '=' Not Implemented
 };
 
-#endif /* _DetermineStitching_H_ */
+#endif /* _StitchImages_H_ */

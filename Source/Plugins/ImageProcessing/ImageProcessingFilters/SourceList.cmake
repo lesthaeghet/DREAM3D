@@ -36,6 +36,7 @@ set(_PublicFilters
   FindMaxima
   BinaryWatershed
   DetermineStitchingCoordinatesGeneric
+  StitchImages
 )
 
 
