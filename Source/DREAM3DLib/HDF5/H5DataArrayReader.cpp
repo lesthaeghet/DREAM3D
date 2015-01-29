@@ -194,7 +194,7 @@ IDataArray::Pointer H5DataArrayReader::ReadStringDataArray(hid_t gid, const QStr
     {
 
       ptr = StringDataArray::CreateArray(0, name);
-      StringDataArray* strArray = StringDataArray::SafePointerDownCast(ptr.get());
+      StringDataArray::Pointer strArray = boost::dynamic_pointer_cast<StringDataArray>(ptr);
 
       Int8ArrayType::Pointer bufPtr = Int8ArrayType::CreateArray(tDims, cDims, "INTERNAL_TEMP_STRING_MATRIX");
       // Read the string matrix
