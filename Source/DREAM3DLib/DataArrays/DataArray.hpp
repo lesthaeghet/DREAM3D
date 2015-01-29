@@ -395,7 +395,9 @@ class DataArray : public IDataArray
       {
         size_t totalBytes = m_Size * sizeof(T);
         ::memcpy(dest->getPointer(0), m_Array, totalBytes);
+        return true;
       }
+      return false;
     }
 
     /**
