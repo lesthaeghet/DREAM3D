@@ -122,6 +122,8 @@ FloatArrayType::Pointer DetermineStitching::FindGlobalOrigins(size_t totalPoints
     //set the stitched global coordinates of the first tile to the top left corner
     xyStitchedGlobalListPtr->setValue(0, 0);
     xyStitchedGlobalListPtr->setValue(1, 0);
+    xyStitchedGlobalListPtr_orig->setValue(0, 0);
+    xyStitchedGlobalListPtr_orig->setValue(1, 0);
 
 
     //helper variables to store previous stitched global values
