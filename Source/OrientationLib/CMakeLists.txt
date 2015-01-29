@@ -241,7 +241,13 @@ if(QT4_FOUND)
     )
 endif()
 
-target_link_libraries(${PROJECT_NAME} DREAM3DLib ${OrientationLib_LINK_LIBRARIES})
+ # On mac systems, we likely have to link against the vecLib framework
+if(APPLE)
+  find_library(LAPACK_LIB Accelerate)
+#  include_directories("-FvecLib")
+endif(APPLE)
+
+target_link_libraries(${PROJECT_NAME} DREAM3DLib ${OrientationLib_LINK_LIBRARIES} ${LAPACK_LIB})
 
 LibraryProperties( ${PROJECT_NAME} ${EXE_DEBUG_EXTENSION} )
 

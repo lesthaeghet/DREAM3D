@@ -34,6 +34,7 @@
  *
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
+#include <limits>
 
 #include "DREAM3DLib/DREAM3DLib.h"
 #include "DREAM3DLib/Math/QuaternionMath.hpp"
@@ -43,7 +44,7 @@
 
 #include "DREAM3DLib/Utilities/UnitTestSupport.hpp"
 #include "TestFileLocations.h"
-#include <limits>
+
 
 
 // -----------------------------------------------------------------------------
