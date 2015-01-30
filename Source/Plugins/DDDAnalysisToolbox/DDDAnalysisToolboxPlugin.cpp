@@ -33,9 +33,9 @@ m_CompatibilityVersion(DREAM3DLib::Version::Package()),
 m_Vendor(DREAM3D::BlueQuartz::VendorName),
 m_URL(DREAM3D::BlueQuartz::URL),
 m_Location(""),
-m_Platforms(QList<QString>()),
 m_Copyright(DREAM3D::BlueQuartz::Copyright),
-m_Dependencies(QList<QString>())
+m_Filters(QList<QString>()),
+  m_DidLoad(false)
 {
 
 }
@@ -98,14 +98,6 @@ QString DDDAnalysisToolboxPlugin::getLocation()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-QList<QString> DDDAnalysisToolboxPlugin::getPlatforms()
-{
-  return m_Platforms;
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
 QString DDDAnalysisToolboxPlugin::getDescription()
 {
   QFile licenseFile(":/DDDAnalysisToolbox/DDDAnalysisToolboxDescription.txt");
@@ -154,9 +146,9 @@ QString DDDAnalysisToolboxPlugin::getLicense()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-QList<QString> DDDAnalysisToolboxPlugin::getDependencies()
+QList<QString> DDDAnalysisToolboxPlugin::getFilters()
 {
-  return m_Dependencies;
+  return m_Filters;
 }
 
 // -----------------------------------------------------------------------------
@@ -187,6 +179,30 @@ QMap<QString, QString> DDDAnalysisToolboxPlugin::getThirdPartyLicenses()
   }
 
   return licenseMap;
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+bool DDDAnalysisToolboxPlugin::getDidLoad()
+{
+  return m_DidLoad;
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void DDDAnalysisToolboxPlugin::setDidLoad(bool didLoad)
+{
+  m_DidLoad = didLoad;
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void DDDAnalysisToolboxPlugin::setLocation(QString filePath)
+{
+  m_Location = filePath;
 }
 
 // -----------------------------------------------------------------------------

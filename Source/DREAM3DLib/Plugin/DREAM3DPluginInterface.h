@@ -178,11 +178,6 @@ class DREAM3DPluginInterface
     virtual QString getLocation() = 0;
 
     /**
-     * @brief Returns the compatible platforms for the plugin
-     */
-    virtual QList<QString> getPlatforms() = 0;
-
-    /**
      * @brief Returns the description of the plugin
      */
     virtual QString getDescription() = 0;
@@ -200,12 +195,29 @@ class DREAM3DPluginInterface
     /**
      * @brief Returns the dependencies of the plugin
      */
-    virtual QList<QString> getDependencies() = 0;
+    virtual QList<QString> getFilters() = 0;
 
     /**
      * @brief Returns the third party licenses of the plugin
      */
     virtual QMap<QString, QString> getThirdPartyLicenses() = 0;
+
+    /**
+     * @brief Returns the load status of the plugin
+     */
+    virtual bool getDidLoad() = 0;
+
+    /**
+     * @brief Sets the load status of the plugin
+     */
+    virtual void setDidLoad(bool didLoad) = 0;
+
+    /**
+     * @brief Sets the location of the plugin on the file system.
+     * This is required so that we can cache the file path information
+     * as the plugin is loaded.
+     */
+    virtual void setLocation(QString filePath) = 0;
 
     /**
      * @brief Register all the filters with the FilterWidgetFactory

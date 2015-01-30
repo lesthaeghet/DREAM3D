@@ -34,9 +34,9 @@ m_CompatibilityVersion(DREAM3DLib::Version::Package()),
 m_Vendor(DREAM3D::BlueQuartz::VendorName),
 m_URL(DREAM3D::BlueQuartz::URL),
 m_Location(""),
-m_Platforms(QList<QString>()),
 m_Copyright(DREAM3D::BlueQuartz::Copyright),
-m_Dependencies(QList<QString>())
+m_Filters(QList<QString>()),
+  m_DidLoad(false)
 {
 
 }
@@ -99,14 +99,6 @@ QString SamplingPlugin::getLocation()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-QList<QString> SamplingPlugin::getPlatforms()
-{
-  return m_Platforms;
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
 QString SamplingPlugin::getDescription()
 {
   QFile licenseFile(":/Sampling/SamplingDescription.txt");
@@ -155,9 +147,9 @@ QString SamplingPlugin::getLicense()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-QList<QString> SamplingPlugin::getDependencies()
+QList<QString> SamplingPlugin::getFilters()
 {
-  return m_Dependencies;
+  return m_Filters;
 }
 
 // -----------------------------------------------------------------------------
@@ -188,6 +180,30 @@ QMap<QString, QString> SamplingPlugin::getThirdPartyLicenses()
   }
 
   return licenseMap;
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+bool SamplingPlugin::getDidLoad()
+{
+  return m_DidLoad;
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void SamplingPlugin::setDidLoad(bool didLoad)
+{
+  m_DidLoad = didLoad;
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void SamplingPlugin::setLocation(QString filePath)
+{
+  m_Location = filePath;
 }
 
 // -----------------------------------------------------------------------------

@@ -63,9 +63,9 @@ m_CompatibilityVersion(DREAM3DLib::Version::Package()),
 m_Vendor(DREAM3D::BlueQuartz::VendorName),
 m_URL(DREAM3D::BlueQuartz::URL),
 m_Location(""),
-m_Platforms(QList<QString>()),
 m_Copyright(DREAM3D::BlueQuartz::Copyright),
-m_Dependencies(QList<QString>())
+m_Filters(QList<QString>()),
+  m_DidLoad(false)
 {
 
 }
@@ -128,14 +128,6 @@ QString ReconstructionPlugin::getLocation()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-QList<QString> ReconstructionPlugin::getPlatforms()
-{
-  return m_Platforms;
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
 QString ReconstructionPlugin::getDescription()
 {
   QFile licenseFile(":/Reconstruction/ReconstructionDescription.txt");
@@ -184,9 +176,9 @@ QString ReconstructionPlugin::getLicense()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-QList<QString> ReconstructionPlugin::getDependencies()
+QList<QString> ReconstructionPlugin::getFilters()
 {
-  return m_Dependencies;
+  return m_Filters;
 }
 
 // -----------------------------------------------------------------------------
@@ -217,6 +209,30 @@ QMap<QString, QString> ReconstructionPlugin::getThirdPartyLicenses()
   }
 
   return licenseMap;
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+bool ReconstructionPlugin::getDidLoad()
+{
+  return m_DidLoad;
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void ReconstructionPlugin::setDidLoad(bool didLoad)
+{
+  m_DidLoad = didLoad;
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void ReconstructionPlugin::setLocation(QString filePath)
+{
+  m_Location = filePath;
 }
 
 // -----------------------------------------------------------------------------

@@ -1,5 +1,6 @@
 /* ============================================================================
- * Copyright (c) 2010, Michael A. Jackson (BlueQuartz Software)
+ * Copyright (c) 2012 Michael A. Jackson (BlueQuartz Software)
+ * Copyright (c) 2012 Dr. Michael A. Groeber (US Air Force Research Laboratories)
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -32,80 +33,75 @@
  *                           FA8650-07-D-5800
  *
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
-
-#include "PluginDetails.h"
+#include "PluginProxy.h"
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-PluginDetails::PluginDetails(QString pluginName, QWidget* parent)
+PluginProxy::PluginProxy() :
+  m_PluginName(""),
+  m_FilePath(""),
+  m_Enabled(false)
 {
-  m_PluginName = pluginName;
 
-  setupUi(this);
-
-  setupGui();
 }
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-PluginDetails::~PluginDetails() {}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void PluginDetails::setupGui()
+PluginProxy::~PluginProxy()
 {
-  QString wt = "Plugin Details of " + m_PluginName;
-  setWindowTitle(wt);
-
-  loadPluginDetails();
+//  qDebug() << "~PluginProxy()" << this;
 }
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void PluginDetails::loadPluginDetails()
+void PluginProxy::setPluginName(QString name)
 {
-  PluginManager* manager = PluginManager::Instance();
-  DREAM3DPluginInterface* plugin = manager->findPlugin(m_PluginName);
-
-  // Add plugin details to PluginDetails dialog box
-  nameLabel->setText(plugin->getPluginName());
-
-  if (plugin->getDidLoad() == true)
-  {
-      statusLabel->setText("Enabled");
-  }
-  else
-  {
-      statusLabel->setText("Disabled");
-  }
-
-  versionLabel->setText(plugin->getVersion());
-  cVersionLabel->setText(plugin->getCompatibilityVersion());
-  vendorLabel->setText(plugin->getVendor());
-  urlLabel->setText(plugin->getURL());
-  locationLabel->setText(plugin->getLocation());
-  descriptionTextEdit->setText(plugin->getDescription());
-  copyrightLabel->setText(plugin->getCopyright());
-  licenseTextEdit->setText(plugin->getLicense());
-
-  QList<QString> filters = plugin->getFilters();
-  for (QList<QString>::iterator iter = filters.begin(); iter != filters.end(); iter++)
-  {
-    filtersListWidget->addItem(*iter);
-  }
+  m_PluginName = name;
 }
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void PluginDetails::on_closeBtn_clicked()
+QString PluginProxy::getPluginName()
 {
-  // Close the dialog box
-  close();
+  return m_PluginName;
 }
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void PluginProxy::setFilePath(QString path)
+{
+  m_FilePath = path;
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+QString PluginProxy::getFilePath()
+{
+  return m_FilePath;
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void PluginProxy::setEnabled(bool isEnabled)
+{
+  m_Enabled = isEnabled;
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+bool PluginProxy::getEnabled()
+{
+  return m_Enabled;
+}
+
+
 
 

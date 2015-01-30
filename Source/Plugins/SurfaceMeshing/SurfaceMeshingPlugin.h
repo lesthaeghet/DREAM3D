@@ -89,11 +89,6 @@ class SurfaceMeshingPlugin : public QObject, public DREAM3DPluginInterface
     virtual QString getLocation();
 
     /**
-     * @brief Returns the compatible platforms of the plugin
-     */
-    virtual QList<QString> getPlatforms();
-
-    /**
      * @brief Returns the description of the plugin
      */
     virtual QString getDescription();
@@ -109,14 +104,31 @@ class SurfaceMeshingPlugin : public QObject, public DREAM3DPluginInterface
     virtual QString getLicense();
 
     /**
-     * @brief Returns the dependencies of the plugin
+     * @brief Returns the filters of the plugin
      */
-    virtual QList<QString> getDependencies();
+    virtual QList<QString> getFilters();
 
     /**
      * @brief Returns the third party licenses of the plugin
      */
     virtual QMap<QString, QString> getThirdPartyLicenses();
+
+    /**
+     * @brief Returns the load status of the plugin
+     */
+    virtual bool getDidLoad();
+
+    /**
+     * @brief Sets the load status of the plugin
+     */
+    virtual void setDidLoad(bool didLoad);
+
+    /**
+     * @brief Sets the location of the plugin on the file system.
+     * This is required so that we can cache the file path information
+     * as the plugin is loaded.
+     */
+    virtual void setLocation(QString filePath);
 
     /**
      * @brief Register all the filters with the FilterWidgetFactory
@@ -149,9 +161,9 @@ class SurfaceMeshingPlugin : public QObject, public DREAM3DPluginInterface
     QString             m_Vendor;
     QString             m_URL;
     QString             m_Location;
-    QList<QString>      m_Platforms;
     QString             m_Copyright;
-    QList<QString>      m_Dependencies;
+    QList<QString>      m_Filters;
+    bool                m_DidLoad;
 
     SurfaceMeshingPlugin(const SurfaceMeshingPlugin&); // Copy Constructor Not Implemented
     void operator=(const SurfaceMeshingPlugin&); // Operator '=' Not Implemented

@@ -64,9 +64,9 @@ m_CompatibilityVersion(DREAM3DLib::Version::Package()),
 m_Vendor(DREAM3D::BlueQuartz::VendorName),
 m_URL(DREAM3D::BlueQuartz::URL),
 m_Location(""),
-m_Platforms(QList<QString>()),
 m_Copyright(DREAM3D::BlueQuartz::Copyright),
-m_Dependencies(QList<QString>())
+m_Filters(QList<QString>()),
+  m_DidLoad(false)
 {
 
 }
@@ -129,14 +129,6 @@ QString SurfaceMeshingPlugin::getLocation()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-QList<QString> SurfaceMeshingPlugin::getPlatforms()
-{
-  return m_Platforms;
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
 QString SurfaceMeshingPlugin::getDescription()
 {
   QFile licenseFile(":/SurfaceMeshing/SurfaceMeshingDescription.txt");
@@ -185,9 +177,9 @@ QString SurfaceMeshingPlugin::getLicense()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-QList<QString> SurfaceMeshingPlugin::getDependencies()
+QList<QString> SurfaceMeshingPlugin::getFilters()
 {
-  return m_Dependencies;
+  return m_Filters;
 }
 
 // -----------------------------------------------------------------------------
@@ -218,6 +210,30 @@ QMap<QString, QString> SurfaceMeshingPlugin::getThirdPartyLicenses()
   }
 
   return licenseMap;
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+bool SurfaceMeshingPlugin::getDidLoad()
+{
+  return m_DidLoad;
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void SurfaceMeshingPlugin::setDidLoad(bool didLoad)
+{
+  m_DidLoad = didLoad;
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void SurfaceMeshingPlugin::setLocation(QString filePath)
+{
+  m_Location = filePath;
 }
 
 // -----------------------------------------------------------------------------

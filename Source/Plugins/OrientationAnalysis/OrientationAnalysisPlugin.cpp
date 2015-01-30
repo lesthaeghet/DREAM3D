@@ -64,9 +64,9 @@ m_CompatibilityVersion(DREAM3DLib::Version::Package()),
 m_Vendor(DREAM3D::BlueQuartz::VendorName),
 m_URL(DREAM3D::BlueQuartz::URL),
 m_Location(""),
-m_Platforms(QList<QString>()),
 m_Copyright(DREAM3D::BlueQuartz::Copyright),
-m_Dependencies(QList<QString>())
+m_Filters(QList<QString>()),
+  m_DidLoad(false)
 {
 
 }
@@ -129,14 +129,6 @@ QString OrientationAnalysisPlugin::getLocation()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-QList<QString> OrientationAnalysisPlugin::getPlatforms()
-{
-  return m_Platforms;
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
 QString OrientationAnalysisPlugin::getDescription()
 {
   QFile licenseFile(":/OrientationAnalysis/OrientationAnalysisDescription.txt");
@@ -185,9 +177,9 @@ QString OrientationAnalysisPlugin::getLicense()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-QList<QString> OrientationAnalysisPlugin::getDependencies()
+QList<QString> OrientationAnalysisPlugin::getFilters()
 {
-  return m_Dependencies;
+  return m_Filters;
 }
 
 // -----------------------------------------------------------------------------
@@ -218,6 +210,30 @@ QMap<QString, QString> OrientationAnalysisPlugin::getThirdPartyLicenses()
   }
 
   return licenseMap;
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+bool OrientationAnalysisPlugin::getDidLoad()
+{
+  return m_DidLoad;
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void OrientationAnalysisPlugin::setDidLoad(bool didLoad)
+{
+  m_DidLoad = didLoad;
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void OrientationAnalysisPlugin::setLocation(QString filePath)
+{
+  m_Location = filePath;
 }
 
 // -----------------------------------------------------------------------------
