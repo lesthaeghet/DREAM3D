@@ -156,7 +156,7 @@ FloatArrayType::Pointer DetermineStitching::FindGlobalOrigins(size_t totalPoints
             leftImage = importFilter2->GetOutput();
 
             // Determine the windows to be cross correlated depending on the rough overlap as found from the global coordinates
-            cropSpecsIm1Im2[0] = xGlobCoordsList[combIndexList[i]] - xyStitchedGlobalListPtr->getValue(2*(i-1)) - xGlobCoordsList[0]; //left image X Origin
+            cropSpecsIm1Im2[0] = xGlobCoordsList[combIndexList[i]] - xGlobCoordsList[combIndexList[i-1]]; //xGlobCoordsList[combIndexList[i]] - xyStitchedGlobalListPtr->getValue(2*(i-1)) - xGlobCoordsList[0]; //left image X Origin
             cropSpecsIm1Im2[1] = 0; //left image Y Origin
             cropSpecsIm1Im2[2] = 0; //left image Z Origin
             cropSpecsIm1Im2[3] = 0; //current image X Origin
@@ -200,7 +200,7 @@ FloatArrayType::Pointer DetermineStitching::FindGlobalOrigins(size_t totalPoints
             // Determine the windows to be cross correlated depending on the rough overlap as found from the global coordinates
 
             cropSpecsIm1Im2[0] = 0; //top image X Origin
-            cropSpecsIm1Im2[1] = yGlobCoordsList[combIndexList[i]] - xyStitchedGlobalListPtr->getValue(2*(i-numXtiles)+1) - yGlobCoordsList[0]; //top image Y Origin
+            cropSpecsIm1Im2[1] = yGlobCoordsList[combIndexList[i]] - yGlobCoordsList[combIndexList[i-numXtiles]];// yGlobCoordsList[combIndexList[i]] - xyStitchedGlobalListPtr->getValue(2*(i-numXtiles)+1) - yGlobCoordsList[0]; //top image Y Origin
             cropSpecsIm1Im2[2] = 0; //top image Z Origin
             cropSpecsIm1Im2[3] = 0; //current image X Origin
             cropSpecsIm1Im2[4] = 0; //current image Y Origin
@@ -249,7 +249,7 @@ FloatArrayType::Pointer DetermineStitching::FindGlobalOrigins(size_t totalPoints
             // Determine the windows to be cross correlated depending on the rough overlap as found from the global coordinates
 
             cropSpecsIm1Im2[0] = 0; //top image X Origin
-            cropSpecsIm1Im2[1] = yGlobCoordsList[combIndexList[i]] - xyStitchedGlobalListPtr->getValue(2*(i-numXtiles)+1) - yGlobCoordsList[0]; //top image Y Origin
+            cropSpecsIm1Im2[1] = yGlobCoordsList[combIndexList[i]] - yGlobCoordsList[combIndexList[i-numXtiles]]; //yGlobCoordsList[combIndexList[i]] - xyStitchedGlobalListPtr->getValue(2*(i-numXtiles)+1) - yGlobCoordsList[0]; //top image Y Origin
             cropSpecsIm1Im2[2] = 0; //top image Z Origin
             cropSpecsIm1Im2[3] = 0; //current image X Origin
             cropSpecsIm1Im2[4] = 0; //current image Y Origin
@@ -278,7 +278,7 @@ FloatArrayType::Pointer DetermineStitching::FindGlobalOrigins(size_t totalPoints
             importFilter2 = ITKUtilitiesType::Dream3DtoITKImportFilterDataArray<ImageProcessing::DefaultPixelType>(totalPoints, udims, sampleOrigin, voxelResolution, dataArrayList[combIndexList[i-1]]);
             leftImage = importFilter2->GetOutput();
 
-            cropSpecsIm1Im2[0] = xGlobCoordsList[combIndexList[i]] - xyStitchedGlobalListPtr->getValue(2*(i-1)) - xGlobCoordsList[0]; //left image X Origin
+            cropSpecsIm1Im2[0] = xGlobCoordsList[combIndexList[i]] - xGlobCoordsList[combIndexList[i-1]]; //xGlobCoordsList[combIndexList[i]] - xyStitchedGlobalListPtr->getValue(2*(i-1)) - xGlobCoordsList[0]; //left image X Origin
             cropSpecsIm1Im2[1] = 0; //left image Y Origin
             cropSpecsIm1Im2[2] = 0; //left image Z Origin
             cropSpecsIm1Im2[3] = 0; //current image X Origin
