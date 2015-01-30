@@ -66,6 +66,12 @@ class StitchImages : public AbstractFilter
     DREAM3D_FILTER_PARAMETER(DataArrayPath, StitchedCoordinatesArrayPath)
     Q_PROPERTY(DataArrayPath StitchedCoordinatesArrayPath READ getStitchedCoordinatesArrayPath WRITE setStitchedCoordinatesArrayPath)
 
+    DREAM3D_FILTER_PARAMETER(QString, StitchedImagesArrayName)
+    Q_PROPERTY(QString StitchedImagesArrayName READ getStitchedImagesArrayName WRITE setStitchedImagesArrayName)
+
+    DREAM3D_FILTER_PARAMETER(QString, StitchedAttributeMatrixName)
+    Q_PROPERTY(QString StitchedAttributeMatrixName READ getStitchedAttributeMatrixName WRITE setStitchedAttributeMatrixName)
+
     /**
      * @brief getCompiledLibraryName Returns the name of the Library that this filter is a part of
      * @return
@@ -166,6 +172,7 @@ class StitchImages : public AbstractFilter
 
     DEFINE_REQUIRED_DATAARRAY_VARIABLE(ImageProcessing::DefaultPixelType, SelectedCellArray)
     DEFINE_REQUIRED_DATAARRAY_VARIABLE(float, StitchedCoordinates)
+    DEFINE_CREATED_DATAARRAY_VARIABLE(ImageProcessing::DefaultPixelType, StitchedImageArray)
     StitchImages(const StitchImages&); // Copy Constructor Not Implemented
     void operator=(const StitchImages&); // Operator '=' Not Implemented
 };

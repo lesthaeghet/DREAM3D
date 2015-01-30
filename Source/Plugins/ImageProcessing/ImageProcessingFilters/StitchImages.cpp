@@ -51,7 +51,10 @@ StitchImages::StitchImages() :
   AbstractFilter(),
   m_AttributeMatrixName(DREAM3D::Defaults::VolumeDataContainerName, DREAM3D::Defaults::CellFeatureAttributeMatrixName, ""),
   m_StitchedCoordinatesArrayPath(DREAM3D::Defaults::VolumeDataContainerName, "", ""),
-  m_StitchedCoordinates(NULL)
+  m_StitchedCoordinates(NULL),
+  m_StitchedImagesArrayName(""),
+  m_StitchedImageArray(NULL),
+  m_StitchedAttributeMatrixName("Stitched Images Attribute Matrix")
 
 
 {
@@ -74,7 +77,8 @@ void StitchImages::setupFilterParameters()
 
   parameters.push_back(FilterParameter::New("Attribute Matrix Name", "AttributeMatrixName", FilterParameterWidgetType::AttributeMatrixSelectionWidget, getAttributeMatrixName(), false, ""));
   parameters.push_back(FilterParameter::New("Stitched Coordinates", "StitchedCoordinatesArrayPath", FilterParameterWidgetType::DataArraySelectionWidget, getStitchedCoordinatesArrayPath(), false, ""));
-
+  parameters.push_back(FilterParameter::New("Stitched Image Array Name", "StitchedImagesArrayName", FilterParameterWidgetType::StringWidget, getStitchedImagesArrayName(), false, ""));
+  parameters.push_back(FilterParameter::New("Stitched Image Attribute Matrix", "StitchedAttributeMatrixName", FilterParameterWidgetType::StringWidget, getStitchedAttributeMatrixName(), true, ""));
 
   setFilterParameters(parameters);
 }
@@ -87,7 +91,8 @@ void StitchImages::readFilterParameters(AbstractFilterParametersReader* reader, 
   reader->openFilterGroup(this, index);
   setAttributeMatrixName(reader->readDataArrayPath("AttributeMatrixName", getAttributeMatrixName()));
   setStitchedCoordinatesArrayPath(reader->readDataArrayPath("StitchedCoordinatesArrayPath", getStitchedCoordinatesArrayPath()));
-
+  setStitchedImagesArrayName(reader->readString("StitchedImagesArrayName", getStitchedImagesArrayName()));
+  setStitchedAttributeMatrixName(reader->readString("StitchedAttributeMatrix", getStitchedAttributeMatrixName()));
   reader->closeFilterGroup();
 
 }
@@ -100,6 +105,8 @@ int StitchImages::writeFilterParameters(AbstractFilterParametersWriter* writer, 
   writer->openFilterGroup(this, index);
   DREAM3D_FILTER_WRITE_PARAMETER(AttributeMatrixName)
   DREAM3D_FILTER_WRITE_PARAMETER(StitchedCoordinatesArrayPath)
+  DREAM3D_FILTER_WRITE_PARAMETER(StitchedImagesArrayName)
+  DREAM3D_FILTER_WRITE_PARAMETER(StitchedAttributeMatrixName)
 
   writer->closeFilterGroup();
   return ++index;
@@ -151,7 +158,18 @@ void StitchImages::dataCheck()
   if( NULL != m_StitchedCoordinatesPtr.lock().get() ) /* Validate the Weak Pointer wraps a non-NULL pointer to a DataArray<T> object */
   { m_StitchedCoordinates = m_StitchedCoordinatesPtr.lock()->getPointer(0); } /* Now assign the raw pointer to data from the DataArray<T> object */
 
+  VolumeDataContainer* m = getDataContainerArray()->getPrereqDataContainer<VolumeDataContainer, AbstractFilter>(this, getStitchedCoordinatesArrayPath().getDataContainerName(), false);
+  if(getErrorCondition() < 0 || NULL == m) { return; }
 
+  QVector<size_t> tDims(1, 0);
+  AttributeMatrix::Pointer stitchedAttMat = m->createNonPrereqAttributeMatrix<AbstractFilter>(this, getStitchedAttributeMatrixName(), tDims, DREAM3D::AttributeMatrixType::Cell);
+  if(getErrorCondition() < 0){ return; }
+  dims[0] = 1;
+
+  tempPath.update(getStitchedCoordinatesArrayPath().getDataContainerName(), getStitchedAttributeMatrixName(), getStitchedImagesArrayName() );
+  m_StitchedImageArrayPtr = getDataContainerArray()->createNonPrereqArrayFromPath<DataArray<ImageProcessing::DefaultPixelType>, AbstractFilter, ImageProcessing::DefaultPixelType>(this, tempPath, 0, dims); /* Assigns the shared_ptr<> to an instance variable that is a weak_ptr<> */
+  if( NULL != m_StitchedImageArrayPtr.lock().get() ) /* Validate the Weak Pointer wraps a non-NULL pointer to a DataArray<T> object */
+  { m_StitchedImageArray = m_StitchedImageArrayPtr.lock()->getPointer(0); } /* Now assign the raw pointer to data from the DataArray<T> object */
 
 
 }
@@ -235,6 +253,17 @@ void StitchImages::execute()
     static_cast<DimType>(udims[2]),
   };
 
+  for (size_t i = 0; i < names.size(); i++)
+  {
+    value = m_StitchedCoordinates[2*i];
+    if(value > maxx) { maxx = value; }
+    if(value < minx) { minx = value; }
+
+    value = m_StitchedCoordinates[2*i+1];
+    if(value > maxy) { maxy = value; }
+    if(value < miny) { miny = value; }
+  }
+
 
 //    ImageProcessing::UInt8ImageType* image2 = ImageProcessing::UInt8ImageType::New();
     ImageProcessing::UInt8ImageType::Pointer image2 = ImageProcessing::UInt8ImageType::New();
@@ -245,8 +274,8 @@ void StitchImages::execute()
     start[2] = 0;
 
     ImageProcessing::UInt8ImageType::SizeType size;
-    unsigned int NumRows = udims[0]*2;
-    unsigned int NumCols = udims[1]*2;
+    unsigned int NumRows = udims[0] + abs(int(maxx)) + abs(int(minx));
+    unsigned int NumCols = udims[1] + abs(int(maxy)) + abs(int(miny));
     size[0] = NumRows;
     size[1] = NumCols;
     size[2] = 1;
@@ -266,29 +295,17 @@ void StitchImages::execute()
 
     ImageProcessing::UInt8ImageType::IndexType destinationIndex;
 
-for (size_t i = 0; i < names.size(); i++)
-{
-  value = m_StitchedCoordinates[2*i];
-  if(value > maxx) { maxx = value; }
-  if(value < minx) { minx = value; }
+    QVector<size_t> tDims(3);
+    tDims[0] = NumRows;
+    tDims[1] = NumCols;
+    tDims[2] = 1;
 
-  value = m_StitchedCoordinates[2*i+1];
-  if(value > max) { max = value; }
-  if(value < min) { min = value; }
-}
+    m->getAttributeMatrix(getStitchedAttributeMatrixName())->resizeAttributeArrays(tDims);
 
-for (size_t i = 1; i < totalFeatures; i++)
-{
-  for (size_t j = 0; j < clusteringlist[i].size(); j++)
-  {
-    if (m_FeaturePhases[i] == m_PhaseNumber)
-    {
-      value = clusteringlist[i][j];
-      if(value > max) { max = value; }
-      if(value < min) { min = value; }
-    }
-  }
-}
+
+
+
+
 
 
 // run through all the data containers (images)
@@ -306,8 +323,8 @@ for (size_t i = 1; i < totalFeatures; i++)
           ImageProcessing::UInt8ImageType* currentImage = importFilter->GetOutput();
 
 
-          destinationIndex[0] = 0;
-          destinationIndex[1] = 0;
+          destinationIndex[0] = m_StitchedCoordinates[2*i] + abs(int(minx));
+          destinationIndex[1] = m_StitchedCoordinates[2*i + 1] + abs(int(miny));;
           destinationIndex[2] = 0;
 
           pasteFilter->InPlaceOn();
@@ -318,6 +335,9 @@ for (size_t i = 1; i < totalFeatures; i++)
           pasteFilter->Update();
           image2 = pasteFilter->GetOutput();
           image2->DisconnectPipeline();
+          ITKUtilitiesType::SetITKFilterOutput(pasteFilter->GetOutput(), m_StitchedImageArrayPtr.lock());
+          pasteFilter->Update();
+
 
 
       }
@@ -326,75 +346,12 @@ for (size_t i = 1; i < totalFeatures; i++)
 
   }
 
+#if 0
   writer->SetFileName( "/Users/megnashah/Desktop/testImage.tiff");
   writer->SetInput( image2 );
   writer->Update();
+#endif
 
-  //int err = 0;
-  dataCheck();
-  if(getErrorCondition() < 0) { return; }
-
-
-
-  /////////////////////////////////
-
-//  VolumeDataContainer* m = getDataContainerArray()->getDataContainerAs<VolumeDataContainer>(getSelectedCellArrayPath().getDataContainerName());
-//  QString attrMatName = getSelectedCellArrayPath().getAttributeMatrixName();
-
-//  //get filter to convert m_RawImageData to itk::image
-//  ImageProcessing::ImportUInt8FilterType::Pointer importFilter = ITKUtilitiesType::Dream3DtoITKImportFilter<ImageProcessing::DefaultPixelType>(m, attrMatName, m_SelectedCellArray);
-
-//  //get image from filter
-//  const ImageProcessing::UInt8ImageType* inputImage = importFilter->GetOutput();
-//  ImageProcessing::UInt8ImageType::RegionType filterRegion = inputImage->GetBufferedRegion();
-//  ImageProcessing::UInt8ConstIteratorType it(inputImage, filterRegion);
-
-//  typedef itk::MaskedFFTNormalizedCorrelationImageFilter< ImageProcessing::DefaultImageType, ImageProcessing::FloatImageType, ImageProcessing::DefaultImageType > XCFilterType;
-//  XCFilterType::Pointer xCorrFilter = XCFilterType::New();
-
-
-//  std::cout << "Image largest region: " << filterRegion.GetSize() << std::endl;
-
-//  ImageProcessing::UInt8ImageType::RegionType cropRegion;
-
-//  cropRegion.SetSize(0, 50);
-//  cropRegion.SetSize(1, 600);
-//  cropRegion.SetSize(2, 1);
-
-//  cropRegion.SetIndex(0, 0);
-//  cropRegion.SetIndex(1, 0);
-//  cropRegion.SetIndex(2, 0);
-
-//  typedef itk::ExtractImageFilter< ImageProcessing::UInt8ImageType, ImageProcessing::UInt8ImageType > exImFilterType;
-//  exImFilterType::Pointer exImfilter = exImFilterType::New();
-//  exImfilter->SetExtractionRegion(cropRegion);
-//  exImfilter->SetInput(inputImage);
-//#if ITK_VERSION_MAJOR >= 4
-//  exImfilter->SetDirectionCollapseToIdentity(); // This is required.
-//#endif
-//  exImfilter->Update();
-//  ImageProcessing::UInt8ImageType* outputImage = exImfilter->GetOutput();
-
-
-//  typedef itk::ImageFileWriter< ImageProcessing::UInt8ImageType > WriterType;
-//  WriterType::Pointer writer = WriterType::New();
-//  writer->SetFileName( "/Users/megnashah/Desktop/imageEXIm.tiff");
-//  writer->SetInput( outputImage );
-//  writer->Update();
-
-
-
-//  xCorrFilter->SetFixedImage(inputImage);
-//  xCorrFilter->SetMovingImage(outputImage);
-//  xCorrFilter->Update();
-//  xCorrFilter->SetRequiredFractionOfOverlappingPixels(1);
-//  ImageProcessing::FloatImageType* xcoutputImage = xCorrFilter->GetOutput();
-
-//  typedef itk::ImageFileWriter< ImageProcessing::FloatImageType > nWriterType;
-//  nWriterType::Pointer writer2 = nWriterType::New();
-//  writer2->SetFileName( "/Users/megnashah/Desktop/imageXC.tiff");
-//  writer2->SetInput( xcoutputImage );
-//  writer2->Update();
 
 
 
