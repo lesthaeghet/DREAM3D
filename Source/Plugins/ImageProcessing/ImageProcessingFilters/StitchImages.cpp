@@ -54,7 +54,7 @@ StitchImages::StitchImages() :
   m_StitchedCoordinates(NULL),
   m_StitchedImagesArrayName(""),
   m_StitchedImageArray(NULL),
-  m_StitchedAttributeMatrixName("Stitched Images Attribute Matrix")
+  m_StitchedAttributeMatrixName("Montage Attribute Matrix")
 
 
 {
@@ -74,11 +74,12 @@ StitchImages::~StitchImages()
 void StitchImages::setupFilterParameters()
 {
   FilterParameterVector parameters;
-
-  parameters.push_back(FilterParameter::New("Attribute Matrix Name", "AttributeMatrixName", FilterParameterWidgetType::AttributeMatrixSelectionWidget, getAttributeMatrixName(), false, ""));
-  parameters.push_back(FilterParameter::New("Stitched Coordinates", "StitchedCoordinatesArrayPath", FilterParameterWidgetType::DataArraySelectionWidget, getStitchedCoordinatesArrayPath(), false, ""));
-  parameters.push_back(FilterParameter::New("Stitched Image Array Name", "StitchedImagesArrayName", FilterParameterWidgetType::StringWidget, getStitchedImagesArrayName(), false, ""));
-  parameters.push_back(FilterParameter::New("Stitched Image Attribute Matrix", "StitchedAttributeMatrixName", FilterParameterWidgetType::StringWidget, getStitchedAttributeMatrixName(), true, ""));
+  parameters.push_back(FilterParameter::New("Required Information", "", FilterParameterWidgetType::SeparatorWidget, "", false));
+  parameters.push_back(FilterParameter::New("Image Tile Attribute Matrix", "AttributeMatrixName", FilterParameterWidgetType::AttributeMatrixSelectionWidget, getAttributeMatrixName(), false, ""));
+  parameters.push_back(FilterParameter::New("Image Tile Origins", "StitchedCoordinatesArrayPath", FilterParameterWidgetType::DataArraySelectionWidget, getStitchedCoordinatesArrayPath(), false, ""));
+  parameters.push_back(FilterParameter::New("Created Information", "", FilterParameterWidgetType::SeparatorWidget, "", false));
+  parameters.push_back(FilterParameter::New("Montage Attribute Matrix", "StitchedAttributeMatrixName", FilterParameterWidgetType::StringWidget, getStitchedAttributeMatrixName(), false, ""));
+  parameters.push_back(FilterParameter::New("Montage Array Name", "StitchedImagesArrayName", FilterParameterWidgetType::StringWidget, getStitchedImagesArrayName(), false, ""));
 
   setFilterParameters(parameters);
 }
