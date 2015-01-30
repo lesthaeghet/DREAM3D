@@ -410,7 +410,7 @@ std::vector<float> DetermineStitching::CropAndCrossCorrelate(std::vector<float> 
 
     /////WRITING THE IMAGES FOR TESTING
     typedef itk::ImageFileWriter< ImageProcessing::UInt8ImageType > WriterType;
-#if 1
+#if 0
     QString imagePath = QDir::homePath() + QDir::separator() + "Desktop" + QDir::separator() + "fixedImageWindow.tiff";
     WriterType::Pointer writer = WriterType::New();
     writer->SetFileName(imagePath.toLatin1().constData());
