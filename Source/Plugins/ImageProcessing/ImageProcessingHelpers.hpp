@@ -4,6 +4,8 @@
 #include "itkBinaryImageToLabelMapFilter.h"
 #include "itkBinaryThresholdImageFunction.h"
 #include "itkFloodFilledImageFunctionConditionalIterator.h"
+#include "itkImageFileWriter.h"
+
 
 namespace ImageProcessing
 {
@@ -160,6 +162,15 @@ namespace ImageProcessing
         maxima->SetBackgroundValue(0);
         maxima->SetForegroundValue(255);
         maxima->SetFullyConnected(fullyConnected);//4 vs 8 connected
+        maxima->Update();
+
+        typedef itk::ImageFileWriter< BinaryImageType > WriterType;
+      #if 1
+        typename WriterType::Pointer writer = WriterType::New();
+        writer->SetFileName("/Users/megnashah/Desktop/maxima.tiff");
+        writer->SetInput( maxima->GetOutput());
+        writer->Update();
+      #endif
 
         //segment local maxima flag image
         typename BinaryToLabelType::Pointer binaryLabel = BinaryToLabelType::New();

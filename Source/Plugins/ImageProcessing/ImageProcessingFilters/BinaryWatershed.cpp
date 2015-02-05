@@ -11,9 +11,12 @@
 #include "itkMaskImageFilter.h"
 #include "itkBinaryThresholdImageFilter.h"
 
+
 // ImageProcessing Plugin
 #include "ItkBridge.h"
 #include "ImageProcessing/ImageProcessingHelpers.hpp"
+#include "itkImageFileWriter.h"
+
 
 // -----------------------------------------------------------------------------
 //
@@ -146,6 +149,14 @@ void BinaryWatershed::execute()
     QString ss = QObject::tr("Failed to execute itk::KMeans filter. Error Message returned from ITK:\n   %1").arg(err.GetDescription());
     notifyErrorMessage(getHumanLabel(), ss, getErrorCondition());
   }
+
+  typedef itk::ImageFileWriter< FloatBridgeType::ScalarImageType > WriterType;
+#if 1
+  WriterType::Pointer writer = WriterType::New();
+  writer->SetFileName("/Users/megnashah/Desktop/distanceMap.tiff");
+  writer->SetInput( distanceMap->GetOutput());
+  writer->Update();
+#endif
 
   //find maxima in distance map (ultimate points)
   std::vector<FloatBridgeType::ScalarImageType::IndexType> peakLocations = ImageProcessing::LocalMaxima<FloatBridgeType::ScalarImageType>::Find(distanceMap->GetOutput(), m_PeakTolerance, true);
