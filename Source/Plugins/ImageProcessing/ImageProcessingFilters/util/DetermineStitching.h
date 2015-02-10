@@ -47,7 +47,7 @@
 /**
  * @brief The DetermineStitching class
  */
-class DREAM3DLib_EXPORT DetermineStitching
+class DetermineStitching
 {
   public:
 
