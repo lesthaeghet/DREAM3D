@@ -5,6 +5,7 @@
 #include "itkBinaryThresholdImageFunction.h"
 #include "itkFloodFilledImageFunctionConditionalIterator.h"
 #include "itkImageFileWriter.h"
+#include "itkImageFileReader.h"
 
 
 namespace ImageProcessing
@@ -153,6 +154,7 @@ namespace ImageProcessing
       typedef itk::BinaryImageToLabelMapFilter<BinaryImageType> BinaryToLabelType;
       typedef itk::BinaryThresholdImageFunction< TInputImage, double > ThresholdFunctionType;
       typedef itk::FloodFilledImageFunctionConditionalIterator< TInputImage, ThresholdFunctionType > FloodingIterator;
+      typedef itk::ImageFileReader<BinaryImageType> FileReader;
 
       typename std::vector<typename TInputImage::IndexType> static Find(typename TInputImage::Pointer inputImage, typename TInputImage::PixelType noiseTolerance, bool fullyConnected)
       {
@@ -162,11 +164,55 @@ namespace ImageProcessing
         maxima->SetBackgroundValue(0);
         maxima->SetForegroundValue(255);
         maxima->SetFullyConnected(fullyConnected);//4 vs 8 connected
+        maxima->Update();
+
+
+//        typename FileReader::Pointer reader = FileReader::New();
+//        reader->SetFileName("/Users/megnashah/Desktop/maxima.tiff");
+//        reader->Update();
+        typename BinaryImageType::Pointer outputImage = maxima->GetOutput();
+
+//        typename BinaryImageType::Pointer outputImage = BinaryImageType::New();
+
+//        typename BinaryImageType::IndexType start;
+//        start.Fill(0);
+
+
+
+//        typename BinaryImageType::RegionType region;
+//        region.SetIndex(start);
+//        region.SetSize(0, 400);
+//        region.SetSize(1, 400);
+//        region.SetSize(2, 1);
+//        outputImage->SetRegions(region);
+//        outputImage->Allocate();
+
+//        typename itk::ImageRegionIterator<BinaryImageType> imageIterator(outputImage, outputImage->GetLargestPossibleRegion());
+
+//        while(!imageIterator.IsAtEnd())
+//          {
+//          if((imageIterator.GetIndex()[0] > 5 && imageIterator.GetIndex()[0] < 10) &&
+//             (imageIterator.GetIndex()[1] > 5 && imageIterator.GetIndex()[1] < 10) )
+//              {
+//              imageIterator.Set(0);
+
+//              }
+//            else
+//              {
+//              imageIterator.Set(1);
+//              }
+
+//          ++imageIterator;
+//          }
+
+
 
         //segment local maxima flag image
         typename BinaryToLabelType::Pointer binaryLabel = BinaryToLabelType::New();
-        binaryLabel->SetInput(maxima->GetOutput());
+        binaryLabel->SetInput(outputImage);
         binaryLabel->SetFullyConnected(fullyConnected);
+        binaryLabel->SetNumberOfThreads(1);
+        binaryLabel->SetInputForegroundValue(255);
         binaryLabel->Update();
 
         //loop over all local maxima eliminating bad peaks
@@ -284,3 +330,5 @@ namespace ImageProcessing
   };
 
 }
+
+

@@ -10,6 +10,8 @@
 #include "itkMorphologicalWatershedFromMarkersImageFilter.h"
 #include "itkMaskImageFilter.h"
 #include "itkBinaryThresholdImageFilter.h"
+#include "itkRegionalMaximaImageFilter.h"
+#include "itkBinaryImageToLabelMapFilter.h"
 
 
 // ImageProcessing Plugin
@@ -112,6 +114,9 @@ void BinaryWatershed::preflight()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
+
+
+
 void BinaryWatershed::execute()
 {
   QString ss;
@@ -124,12 +129,16 @@ void BinaryWatershed::execute()
     return;
   }
 
+
+
+
   VolumeDataContainer* m = getDataContainerArray()->getDataContainerAs<VolumeDataContainer>(getSelectedCellArrayPath().getDataContainerName());
   QString attrMatName = getSelectedCellArrayPath().getAttributeMatrixName();
 
   //get utilities
   typedef ItkBridge<bool> BoolBridgeType;
   typedef ItkBridge<float> FloatBridgeType;
+
 
   //wrap input
   BoolBridgeType::ScalarImageType::Pointer inputImage = BoolBridgeType::CreateItkWrapperForDataPointer(m, attrMatName, m_SelectedCellArray);
@@ -149,7 +158,48 @@ void BinaryWatershed::execute()
     QString ss = QObject::tr("Failed to execute itk::KMeans filter. Error Message returned from ITK:\n   %1").arg(err.GetDescription());
     notifyErrorMessage(getHumanLabel(), ss, getErrorCondition());
   }
+/////////////////TEST//////////////
 
+
+  typedef itk::Image<unsigned char, 2>  ImageType;
+  ImageType::Pointer image = ImageType::New();
+  ImageType::IndexType start;
+  start.Fill(0);
+
+  ImageType::SizeType size;
+  size.Fill(20);
+
+  ImageType::RegionType region1;
+  region1.SetSize(size);
+  region1.SetIndex(start);
+  image->SetRegions(region1);
+  image->Allocate();
+
+  itk::ImageRegionIterator<ImageType> imageIterator(image,image->GetLargestPossibleRegion());
+
+  // Make a square
+  while(!imageIterator.IsAtEnd())
+    {
+    if((imageIterator.GetIndex()[0] > 5 && imageIterator.GetIndex()[0] < 10) &&
+      (imageIterator.GetIndex()[1] > 5 && imageIterator.GetIndex()[1] < 10) )
+        {
+        imageIterator.Set(255);
+        }
+      else
+        {
+        imageIterator.Set(0);
+        }
+
+    ++imageIterator;
+    }
+
+  typedef itk::BinaryImageToLabelMapFilter<ImageType> BinaryImageToLabelMapFilterType;
+  BinaryImageToLabelMapFilterType::Pointer binaryImageToLabelMapFilter = BinaryImageToLabelMapFilterType::New();
+  binaryImageToLabelMapFilter->SetInput(image);
+  binaryImageToLabelMapFilter->SetFullyConnected(true);
+  binaryImageToLabelMapFilter->Update();
+
+/////////////////TEST//////////////
 
   //find maxima in distance map (ultimate points)
   std::vector<FloatBridgeType::ScalarImageType::IndexType> peakLocations = ImageProcessing::LocalMaxima<FloatBridgeType::ScalarImageType>::Find(distanceMap->GetOutput(), m_PeakTolerance, true);
