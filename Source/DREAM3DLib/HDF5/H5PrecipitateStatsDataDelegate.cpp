@@ -590,31 +590,31 @@ int H5PrecipitateStatsDataDelegate::writeRDFDistributionData(hid_t pid, RdfData:
       err = H5Lite::writeVectorDataset(disId, DREAM3D::StringConstants::Frequencies.toStdString(), dims, freqs);
       if(err < 0)
       {
+        H5Gclose(disId);
         return err;
       }
       float val = rdfData->getMaxDistance();
       err = QH5Lite::writeScalarAttribute(disId, DREAM3D::StringConstants::Frequencies, DREAM3D::StringConstants::RdfMaxDistance, val);
       if(err < 0)
       {
+          H5Gclose(disId);
         return err;
       }
       val = rdfData->getMinDistance();
       err = QH5Lite::writeScalarAttribute(disId, DREAM3D::StringConstants::Frequencies, DREAM3D::StringConstants::RdfMinDistance, val);
       if(err < 0)
       {
+        H5Gclose(disId);
         return err;
       }
-      err = QH5Lite::writeStringAttribute(disId, DREAM3D::StringConstants::RadialDistFunc, DREAM3D::StringConstants::DistributionType, disTypeStr);
-      if(err < 0)
-      {
-        return err;
-      }
+
 
       // Close the HDF5 Group
       err = H5Gclose(disId);
     }
     else
     {
+
       retErr = disId;
     }
   }

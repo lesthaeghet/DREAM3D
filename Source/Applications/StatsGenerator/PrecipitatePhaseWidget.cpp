@@ -442,6 +442,7 @@ void PrecipitatePhaseWidget::updatePlots()
     m_AxisODFWidget->updatePlots();
 
     progress.setValue(4);
+    m_RdfPlot->updatePlots();
   }
 }
 
