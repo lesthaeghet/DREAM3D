@@ -1,7 +1,7 @@
 
 
 
-
+if (0)
 # --------------------------------------------------------------------
 # find ITK libararies
 find_package(ITK COMPONENTS
@@ -43,6 +43,11 @@ find_package(ITK COMPONENTS
 
   REQUIRED
 )
+else()
+
+  find_package(ITK REQUIRED)
+  include(${ITK_USE_FILE})
+endif()
 
 include(${ITK_USE_FILE})
 

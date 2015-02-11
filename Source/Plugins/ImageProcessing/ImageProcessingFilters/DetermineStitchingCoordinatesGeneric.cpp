@@ -6,8 +6,6 @@
 
 #include <QtCore/QString>
 
-#include "ZeissImport/ZeissImportConstants.h"
-
 #include "ImageProcessing/ImageProcessingFilters/util/DetermineStitching.h"
 
 #include "DREAM3DLib/DataArrays/StringDataArray.hpp"
@@ -334,7 +332,7 @@ QVector<qint32> DetermineStitchingCoordinatesGeneric::extractIntegerValues(QStri
 // -----------------------------------------------------------------------------
 const QString DetermineStitchingCoordinatesGeneric::getCompiledLibraryName()
 {
-  return ZeissImport::ZeissImportBaseName;
+  return ImageProcessing::ImageProcessingBaseName;
 }
 
 // -----------------------------------------------------------------------------
