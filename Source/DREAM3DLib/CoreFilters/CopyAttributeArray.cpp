@@ -106,54 +106,23 @@ void CopyAttributeArray::dataCheck()
     return;
   }
 
-  if (m_SelectedArrayPath.isEmpty() == true)
-  {
-    setErrorCondition(-11010);
-    QString ss = QObject::tr("The complete path to the Attribute Array can not be empty. Please set an appropriate path.");
-    notifyErrorMessage(getHumanLabel(), ss, getErrorCondition());
-    return;
-  }
-  else
-  {
-    QString dcName = m_SelectedArrayPath.getDataContainerName();
-    QString amName = m_SelectedArrayPath.getAttributeMatrixName();
-    QString daName = m_SelectedArrayPath.getDataArrayName();
 
-    DataContainer::Pointer dc = getDataContainerArray()->getDataContainer(dcName);
-    if(NULL == dc.get())
-    {
-      setErrorCondition(-11007);
-      QString ss = QObject::tr("The DataContainer '%1' was not found in the DataContainerArray").arg(dcName);
-      notifyErrorMessage(getHumanLabel(), ss, getErrorCondition());
-      return;
-    }
-
-    AttributeMatrix::Pointer attrMat = dc->getAttributeMatrix(amName);
-    if(NULL == attrMat.get())
-    {
-      setErrorCondition(-11008);
-      QString ss = QObject::tr("The AttributeMatrix '%1' was not found in the DataContainer '%2'").arg(amName).arg(dcName);
-      notifyErrorMessage(getHumanLabel(), ss, getErrorCondition());
-      return;
-    }
+	//some if statement
+	{
 
     // We the AttributeMatrix, now lets try to get the AttributeArray object and copy it if it exists
-    IDataArray::Pointer dataArray = attrMat->getAttributeArray(daName);
-    if(NULL == dataArray.get() )
-    {
-      setErrorCondition(-11014);
-      QString ss = QObject::tr("A DataArray with the name '%1' was not found in the AttributeMatrix").arg(daName);
-      notifyErrorMessage(getHumanLabel(), ss, getErrorCondition());
-      return;
-    }
-    IDataArray::Pointer p = attrMat->getAttributeArray(daName);
-    IDataArray::Pointer pNew = p->deepCopy();
-    int err = attrMat->addAttributeArray(m_NewArrayName, pNew);
+		IDataArray::Pointer dataArray = getDataContainerArray()->getPrereqIDataArrayFromPath<IDataArray, AbstractFilter>(this, getSelectedArrayPath());
+		if (getErrorCondition() < 0) { return;  }
+   
+		IDataArray::Pointer pNew = dataArray->deepCopy();
+		int err = getDataContainerArray()->getDataContainer(getSelectedArrayPath())->getAttributeMatrix(getSelectedArrayPath())->addAttributeArray(getNewArrayName(), pNew);
 
+		DataArrayPath npath = getSelectedArrayPath();
+		npath.setDataArrayName(getNewArrayName());
     if(0 != err)
     {
       setErrorCondition(err);
-      QString ss = QObject::tr("Attempt to copy AttributeArray '%1' to '%2' Failed.").arg(daName).arg(m_NewArrayName);
+			QString ss = QObject::tr("Attempt to copy AttributeArray '%1' to '%2' Failed.").arg(getSelectedArrayPath().serialize("/")).arg(npath.serialize("/"));
       notifyErrorMessage(getHumanLabel(), ss, getErrorCondition());
     }
   }

@@ -97,15 +97,6 @@ void ClearDataMask::dataCheck()
 {
   setErrorCondition(0);
 
-  DataContainer::Pointer m = getDataContainerArray()->getDataContainer(m_MaskArrayPath.getDataContainerName());
-  if( NULL == m)
-  {
-    QString ss = QObject::tr("DataContainer was NULL");
-    notifyErrorMessage(getHumanLabel(), ss, -5550);
-    setErrorCondition(-5550);
-    return;
-  }
-
   QVector<size_t> dims(1, 1);
   m_MaskPtr = getDataContainerArray()->getPrereqArrayFromPath<DataArray<bool>, AbstractFilter>(this, getMaskArrayPath(), dims); /* Assigns the shared_ptr<> to an instance variable that is a weak_ptr<> */
   if( NULL != m_MaskPtr.lock().get() ) /* Validate the Weak Pointer wraps a non-NULL pointer to a DataArray<T> object */
