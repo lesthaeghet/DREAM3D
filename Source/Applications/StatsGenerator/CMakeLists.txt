@@ -177,7 +177,7 @@ set(StatsGenerator_PROJECT_SRCS
     ${StatsGenerator_DIALOGS_HDRS}
     ${Generated_RC_SRCS}
     ${Generated_UI_HDRS}
-    ${Generated_MOC_SRCS}
+#    ${Generated_MOC_SRCS}
 )
 
 include_directories(${HDF5_INCLUDE_DIR})

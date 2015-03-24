@@ -335,6 +335,11 @@ if(DREAM3D_BUILD_PLUGINMAKER)
     add_subdirectory( ${DREAM3DProj_SOURCE_DIR}/Source/Applications/PluginMaker  ${PROJECT_BINARY_DIR}/Applications/PluginMaker)
 endif()
 
+#- Add in the PluginMaker application
+option(DREAM3D_BUILD_QHDFViewer "Compile the QHDFViewer Application" ON)
+if(DREAM3D_BUILD_QHDFViewer)
+    add_subdirectory( ${DREAM3DProj_SOURCE_DIR}/Source/Applications/QHDFViewer  ${PROJECT_BINARY_DIR}/Applications/QHDFViewer)
+endif()
 
 # add the Command line utilities
 # Figure out here if we are going to build the command line tools

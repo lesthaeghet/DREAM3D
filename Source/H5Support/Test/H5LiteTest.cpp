@@ -181,7 +181,7 @@ herr_t testReadPointer1DArrayAttribute(hid_t file_id, const QString& dsetName)
 template<typename T>
 herr_t testWritePointer2DArrayAttribute(hid_t file_id, const QString& dsetName)
 {
-  //qDebug() << DEBUG_OUT(logTime) << "testWritePointer2DArrayAttribute" << "\n";
+  //qDebug() << "testWritePointer2DArrayAttribute" << "\n";
   T value = 0x0;
   herr_t err = -1;
   QString attributeKey = QH5Lite::HDFTypeForPrimitiveAsStr(value);

@@ -113,7 +113,7 @@ herr_t testWritePointer1DArrayAttribute(hid_t file_id, const QString& dsetName)
 template<typename T>
 herr_t testWritePointer2DArrayAttribute(hid_t file_id, const QString& dsetName)
 {
-  //std::cout << DEBUG_OUT(logTime) << "testWritePointer2DArrayAttribute";
+  //std::cout << "testWritePointer2DArrayAttribute";
   AttrSize++;
   T value = 0x0;
   herr_t err = -1;
