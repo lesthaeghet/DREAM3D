@@ -35,6 +35,7 @@ m_UseSimulatedAnnealing(false),
 m_UseGradientPenalty(false),
 m_GradientPenalty(1.0f),
 m_UseCurvaturePenalty(false),
+m_UseManualInitialization(false),
 m_CurvaturePenalty(1.0f),
 m_RMax(15.0f),
 m_EMLoopDelay(1),
@@ -79,6 +80,26 @@ void EMMPMFilter::setupFilterParameters()
   parameters.push_back(FilterParameter::New("Output Data", "", FilterParameterWidgetType::SeparatorWidget, "", false));
   parameters.push_back(FilterParameter::New("Created Data Array", "OutputDataArrayPath", FilterParameterWidgetType::DataArrayCreationWidget, getOutputDataArrayPath()));
 
+  {
+	  QStringList rHeaders, cHeaders;
+	  cHeaders << "Chem. Potential" << "Min.Std Dev";
+	  std::vector<std::vector<double> > data = DynamicTableData::DeserializeData("0,5.0,0,5.0", 2, 2, ',');
+	  parameters.push_back(DynamicTableFilterParameter::New("Class Values", "ClassValues", FilterParameterWidgetType::DynamicTableWidget, rHeaders, cHeaders, data, true, false, 2));
+	  parameters.back()->setAdvanced(true);
+  }
+
+  linkedProps.clear();
+  linkedProps << "ManualInitValues";
+  parameters.push_back(LinkedBooleanFilterParameter::New("Manual Initialization", "UseManualInitialization", getUseManualInitialization(), linkedProps, true));
+
+  {
+	  QStringList rHeaders, cHeaders;
+	  cHeaders << "Mean" << "Std Dev";
+	  std::vector<std::vector<double> > data = DynamicTableData::DeserializeData("100,5.0,200,5.0", 2, 2, ',');
+	  parameters.push_back(DynamicTableFilterParameter::New("Manual Values", "ManualInitValues", FilterParameterWidgetType::DynamicTableWidget, rHeaders, cHeaders, data, true, false, 2));
+	  parameters.back()->setAdvanced(true);
+  }
+
   setFilterParameters(parameters);
 }
 
@@ -101,6 +122,9 @@ void EMMPMFilter::readFilterParameters(AbstractFilterParametersReader* reader, i
   setRMax(reader->readValue("RMax", getRMax()));
   setEMLoopDelay(reader->readValue("EMLoopDelay", getEMLoopDelay()));
   setOutputDataArrayPath(reader->readDataArrayPath("OutputDataArrayPath", getOutputDataArrayPath()));
+  setClassValues(reader->readDynamicTableData("ClassValues", getClassValues()));
+  setUseManualInitialization(reader->readValue("UseManualInitialization", getUseManualInitialization()));
+  setManualInitValues(reader->readDynamicTableData("ManualInitValues", getManualInitValues()));
 
   reader->closeFilterGroup();
 }
@@ -127,6 +151,9 @@ int EMMPMFilter::writeFilterParameters(AbstractFilterParametersWriter* writer, i
     DREAM3D_FILTER_WRITE_PARAMETER(RMax)
     DREAM3D_FILTER_WRITE_PARAMETER(EMLoopDelay)
     DREAM3D_FILTER_WRITE_PARAMETER(OutputDataArrayPath)
+	DREAM3D_FILTER_WRITE_PARAMETER(ClassValues)
+	DREAM3D_FILTER_WRITE_PARAMETER(UseManualInitialization)
+	DREAM3D_FILTER_WRITE_PARAMETER(ManualInitValues)
 
     writer->closeFilterGroup();
   return ++index; // we want to return the next index that was just written to
@@ -150,7 +177,7 @@ void EMMPMFilter::dataCheck()
   ImageGeom::Pointer image = getDataContainerArray()->getDataContainer(getInputDataArrayPath().getDataContainerName())->getPrereqGeometry<ImageGeom, AbstractFilter>(this);
   if(getErrorCondition() < 0 || NULL == image.get()) { return; }
 
-  m_OutputImagePtr = getDataContainerArray()->createNonPrereqArrayFromPath<DataArray<uint8_t>, AbstractFilter, uint8_t>(this, getOutputDataArrayPath(), 0, cDims); /* Assigns the shared_ptr<> to an instance variable that is a weak_ptr<> */
+  m_OutputImagePtr = getDataContainerArray()->createNonPrereqArrayFromPath<DataArray<uint8_t>, AbstractFilter, uint8_t>(this, getOutputDataArrayPath(), 0, cDims, "Created Data Array"); /* Assigns the shared_ptr<> to an instance variable that is a weak_ptr<> */
   if(NULL != m_OutputImagePtr.lock().get()) /* Validate the Weak Pointer wraps a non-NULL pointer to a DataArray<T> object */
   {
     m_OutputImage = m_OutputImagePtr.lock()->getPointer(0);
@@ -170,6 +197,31 @@ void EMMPMFilter::dataCheck()
     notifyErrorMessage(getHumanLabel(), ss, getErrorCondition());
   }
 
+  DynamicTableData classValues = getClassValues();
+  DynamicTableData manualValues = getManualInitValues();
+
+  if (getNumClasses() != classValues.getTableData().size())
+  {
+	  setErrorCondition(-62002);
+	  QString ss = QObject::tr("The value 'Num Classes' is not equal to the number of rows in the Class Values table");
+	  notifyErrorMessage(getHumanLabel(), ss, getErrorCondition());
+  }
+
+  if (getUseManualInitialization() == true)
+  {
+	  if (getNumClasses() != manualValues.getTableData().size())
+	  {
+		  setErrorCondition(-62003);
+		  QString ss = QObject::tr("The value 'Num Classes' is not equal to the number of rows in the Manual Initialization table");
+		  notifyErrorMessage(getHumanLabel(), ss, getErrorCondition());
+	  }
+	  if (classValues.getTableData().size() != manualValues.getTableData().size())
+	  {
+		  setErrorCondition(-62004);
+		  QString ss = QObject::tr("The number of rows in the Class Values table is not equal to the number of rows in the Manual Initialization table");
+		  notifyErrorMessage(getHumanLabel(), ss, getErrorCondition());
+	  }
+  }
 
 }
 

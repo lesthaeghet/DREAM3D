@@ -9,6 +9,7 @@
 #include "DREAM3DLib/DREAM3DLib.h"
 #include "DREAM3DLib/Common/DREAM3DSetGetMacros.h"
 #include "DREAM3DLib/Common/AbstractFilter.h"
+#include "DREAM3DLib/FilterParameters/DynamicTableData.h"
 
 #include "EMMPMLib/Core/EMMPM_Constants.h"
 
@@ -73,6 +74,15 @@ class EMMPMFilter : public AbstractFilter
     Q_PROPERTY(DataArrayPath OutputDataArrayPath READ getOutputDataArrayPath WRITE setOutputDataArrayPath)
     
     DREAM3D_INSTANCE_PROPERTY(EMMPM_InitializationType, EmmpmInitType)
+
+	DREAM3D_FILTER_PARAMETER(DynamicTableData, ClassValues)
+	Q_PROPERTY(DynamicTableData ClassValues READ getClassValues WRITE setClassValues)
+
+	DREAM3D_FILTER_PARAMETER(bool, UseManualInitialization)
+	Q_PROPERTY(bool UseManualInitialization READ getUseManualInitialization WRITE setUseManualInitialization)
+
+	DREAM3D_FILTER_PARAMETER(DynamicTableData, ManualInitValues)
+	Q_PROPERTY(DynamicTableData ManualInitValues READ getManualInitValues WRITE setManualInitValues)
 
     /**
      * @brief getCompiledLibraryName Returns the name of the Library that this filter is a part of
