@@ -233,6 +233,32 @@ void MultiEmmpmFilter::dataCheck()
     notifyErrorMessage(getHumanLabel(), ss, getErrorCondition());
   }
 
+  DynamicTableData classValues = getClassValues();
+  DynamicTableData manualValues = getManualInitValues();
+
+  if (getNumClasses() != classValues.getTableData().size())
+  {
+	  setErrorCondition(-62002);
+	  QString ss = QObject::tr("The value 'Num Classes' is not equal to the number of rows in the Class Values table");
+	  notifyErrorMessage(getHumanLabel(), ss, getErrorCondition());
+  }
+
+  if (getUseManualInitialization() == true)
+  {
+	  if (getNumClasses() != manualValues.getTableData().size())
+	  {
+		  setErrorCondition(-62003);
+		  QString ss = QObject::tr("The value 'Num Classes' is not equal to the number of rows in the Manual Initialization table");
+		  notifyErrorMessage(getHumanLabel(), ss, getErrorCondition());
+	  }
+	  if (classValues.getTableData().size() != manualValues.getTableData().size())
+	  {
+		  setErrorCondition(-62004);
+		  QString ss = QObject::tr("The number of rows in the Class Values table is not equal to the number of rows in the Manual Initialization table");
+		  notifyErrorMessage(getHumanLabel(), ss, getErrorCondition());
+	  }
+  }
+
 }
 
 // -----------------------------------------------------------------------------
