@@ -122,22 +122,6 @@ void CalculateArrayHistogram::dataCheck()
   DataArrayPath tempPath;
   setErrorCondition(0);
 
-  if (m_SelectedArrayPath.isEmpty() == true)
-  {
-    setErrorCondition(-11010);
-    QString ss = QObject::tr("The complete path to the Data Array can not be empty. Please set an appropriate path.");
-    notifyErrorMessage(getHumanLabel(), ss, getErrorCondition());
-    return;
-  }
-
-  if (m_NewAttributeMatrixName.isEmpty() == true)
-  {
-    setErrorCondition(-11009);
-    QString ss = QObject::tr("The New Histogram Attribute Matrix name can not be empty. Please set a value.");
-    notifyErrorMessage(getHumanLabel(), ss, getErrorCondition());
-    return;
-  }
-
   if (m_NewDataArrayName.isEmpty() == true)
   {
     setErrorCondition(-11008);

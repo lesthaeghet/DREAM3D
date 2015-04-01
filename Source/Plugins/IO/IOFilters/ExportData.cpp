@@ -126,14 +126,6 @@ void ExportData::dataCheck()
   DataArrayPath tempPath;
   setErrorCondition(0);
 
-  if (m_SelectedArrayPath.isEmpty() == true)
-  {
-    setErrorCondition(-11001);
-    QString ss = QObject::tr("The complete path to the Data Array can not be empty. Please set an appropriate path.");
-    notifyErrorMessage(getHumanLabel(), ss, getErrorCondition());
-    return;
-  }
-
   if (m_OutputPath.isEmpty() == true)
   {
     setErrorCondition(-11002);

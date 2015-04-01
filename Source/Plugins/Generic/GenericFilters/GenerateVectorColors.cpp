@@ -122,13 +122,6 @@ void GenerateVectorColors::dataCheck()
   DataArrayPath tempPath;
   setErrorCondition(0);
 
-  if(m_VectorsArrayPath.isEmpty() == true)
-  {
-    setErrorCondition(-11000);
-    notifyErrorMessage(getHumanLabel(), "An array from the Volume DataContainer must be selected.", getErrorCondition());
-    return;
-  }
-
   QVector<size_t> dims(1, 3);
   m_VectorsPtr = getDataContainerArray()->getPrereqArrayFromPath<DataArray<float>, AbstractFilter>(this, getVectorsArrayPath(), dims); /* Assigns the shared_ptr<> to an instance variable that is a weak_ptr<> */
   if( NULL != m_VectorsPtr.lock().get() ) /* Validate the Weak Pointer wraps a non-NULL pointer to a DataArray<T> object */
