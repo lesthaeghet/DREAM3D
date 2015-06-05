@@ -1,5 +1,7 @@
 /* ============================================================================
-* Copyright (c) 2009-2015 BlueQuartz Software, LLC
+* Copyright (c) 2010, Michael A. Jackson (BlueQuartz Software)
+* Copyright (c) 2010, Dr. Michael A. Groeber (US Air Force Research Laboratories
+* All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification,
 * are permitted provided that the following conditions are met:
@@ -11,9 +13,10 @@
 * list of conditions and the following disclaimer in the documentation and/or
 * other materials provided with the distribution.
 *
-* Neither the name of BlueQuartz Software, the US Air Force, nor the names of its 
-* contributors may be used to endorse or promote products derived from this software 
-* without specific prior written permission.
+* Neither the name of Michael A. Groeber, Michael A. Jackson, the US Air Force,
+* BlueQuartz Software nor the names of its contributors may be used to endorse
+* or promote products derived from this software without specific prior written
+* permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -26,45 +29,35 @@
 * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
 * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
-* The code contained herein was partially funded by the followig contracts:
-*    United States Air Force Prime Contract FA8650-07-D-5800
-*    United States Air Force Prime Contract FA8650-10-D-5210
-*    United States Prime Contract Navy N00173-07-C-2068
+*  This code was written under United States Air Force Contract number
+*                           FA8650-07-D-5800
 *
 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
+#ifndef _DREAM3DLineEdit_H_
+#define _DREAM3DLineEdit_H_
 
-#ifndef _QFSDropLineEdit_H
-#define _QFSDropLineEdit_H
-
-#include "DREAM3DLineEdit.h"
+#include <QtWidgets/QLineEdit>
 
 #include "QtSupportLib/QtSupportLib.h"
 
-/**
-* @class QFSDropLineEdit QFSDropLineEdit.h EmMpm/Common/Qt/QFSDropLineEdit.h
-* @brief
-* @author Michael A. Jackson for BlueQuartz Software
-* @date Feb 5, 2010
-* @version 1.0
-*/
-class QtSupportLib_EXPORT QFSDropLineEdit : public DREAM3DLineEdit
+
+class QtSupportLib_EXPORT DREAM3DLineEdit : public QLineEdit
 {
-    Q_OBJECT
+  Q_OBJECT
 
-  public:
-    QFSDropLineEdit(QWidget* parent = NULL);
+public:
+  DREAM3DLineEdit(QWidget* parent = 0);
+  DREAM3DLineEdit(const QString &title, QWidget* parent = 0);
+  virtual ~DREAM3DLineEdit();
 
-    void dragEnterEvent(QDragEnterEvent* event);
-    void dropEvent(QDropEvent* event);
+  void setupGui();
 
+private:
 
-  signals:
-    void fileDropped(const QString& file);
-
-  private:
-
+  DREAM3DLineEdit(const DREAM3DLineEdit&); // Copy Constructor Not Implemented
+  void operator=(const DREAM3DLineEdit&); // Operator '=' Not Implemented
 };
 
+#endif /* DREAM3DLineEdit_H_ */
 
-#endif

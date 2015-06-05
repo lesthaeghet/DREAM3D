@@ -24,71 +24,71 @@
     <number>2</number>
    </property>
    <item row="3" column="7">
-    <widget class="QLineEdit" name="v24"/>
+    <widget class="DREAM3DLineEdit" name="v24"/>
    </item>
    <item row="3" column="3">
-    <widget class="QLineEdit" name="v22"/>
+    <widget class="DREAM3DLineEdit" name="v22"/>
    </item>
    <item row="2" column="3">
-    <widget class="QLineEdit" name="v12"/>
+    <widget class="DREAM3DLineEdit" name="v12"/>
    </item>
    <item row="4" column="7">
-    <widget class="QLineEdit" name="v34"/>
+    <widget class="DREAM3DLineEdit" name="v34"/>
    </item>
    <item row="4" column="6">
-    <widget class="QLineEdit" name="v33"/>
+    <widget class="DREAM3DLineEdit" name="v33"/>
    </item>
    <item row="5" column="7">
-    <widget class="QLineEdit" name="v44"/>
+    <widget class="DREAM3DLineEdit" name="v44"/>
    </item>
    <item row="2" column="7">
-    <widget class="QLineEdit" name="v14"/>
+    <widget class="DREAM3DLineEdit" name="v14"/>
    </item>
    <item row="2" column="2">
-    <widget class="QLineEdit" name="v11"/>
+    <widget class="DREAM3DLineEdit" name="v11"/>
    </item>
    <item row="4" column="9">
-    <widget class="QLineEdit" name="v36"/>
+    <widget class="DREAM3DLineEdit" name="v36"/>
    </item>
    <item row="7" column="9">
-    <widget class="QLineEdit" name="v66"/>
+    <widget class="DREAM3DLineEdit" name="v66"/>
    </item>
    <item row="4" column="8">
-    <widget class="QLineEdit" name="v35"/>
+    <widget class="DREAM3DLineEdit" name="v35"/>
    </item>
    <item row="3" column="9">
-    <widget class="QLineEdit" name="v26"/>
+    <widget class="DREAM3DLineEdit" name="v26"/>
    </item>
    <item row="5" column="8">
-    <widget class="QLineEdit" name="v45"/>
+    <widget class="DREAM3DLineEdit" name="v45"/>
    </item>
    <item row="6" column="8">
-    <widget class="QLineEdit" name="v55"/>
+    <widget class="DREAM3DLineEdit" name="v55"/>
    </item>
    <item row="2" column="8">
-    <widget class="QLineEdit" name="v15"/>
+    <widget class="DREAM3DLineEdit" name="v15"/>
    </item>
    <item row="6" column="9">
-    <widget class="QLineEdit" name="v56"/>
+    <widget class="DREAM3DLineEdit" name="v56"/>
    </item>
    <item row="2" column="9">
-    <widget class="QLineEdit" name="v16"/>
+    <widget class="DREAM3DLineEdit" name="v16"/>
    </item>
    <item row="3" column="6">
-    <widget class="QLineEdit" name="v23"/>
+    <widget class="DREAM3DLineEdit" name="v23"/>
    </item>
    <item row="5" column="9">
-    <widget class="QLineEdit" name="v46"/>
+    <widget class="DREAM3DLineEdit" name="v46"/>
    </item>
    <item row="2" column="6">
-    <widget class="QLineEdit" name="v13">
+    <widget class="DREAM3DLineEdit" name="v13">
      <property name="text">
       <string/>
      </property>
     </widget>
    </item>
    <item row="3" column="8">
-    <widget class="QLineEdit" name="v25"/>
+    <widget class="DREAM3DLineEdit" name="v25"/>
    </item>
    <item row="1" column="6" colspan="2">
     <widget class="DREAM3DComboBox" name="comboBox">
@@ -191,6 +191,11 @@
    <class>DREAM3DComboBox</class>
    <extends>QComboBox</extends>
    <header location="global">DREAM3DComboBox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>DREAM3DLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header location="global">DREAM3DLineEdit.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

@@ -118,6 +118,7 @@ set(QtSupportLib_SRCS
     ${QtSupportLib_SOURCE_DIR}/DREAM3DSettings.cpp
     ${QtSupportLib_SOURCE_DIR}/BookmarkMissingDialog.cpp
     ${QtSupportLib_SOURCE_DIR}/DREAM3DComboBox.cpp
+    ${QtSupportLib_SOURCE_DIR}/DREAM3DLineEdit.cpp
 )
 
 set(QtSupportLib_HDRS
@@ -148,6 +149,7 @@ set(QtSupportLib_HDRS
     ${QtSupportLib_SOURCE_DIR}/DREAM3DSettings.h
     ${QtSupportLib_SOURCE_DIR}/BookmarkMissingDialog.h
     ${QtSupportLib_SOURCE_DIR}/DREAM3DComboBox.h
+    ${QtSupportLib_SOURCE_DIR}/DREAM3DLineEdit.h
 )
 
 # --------------------------------------------------------------------

@@ -11,7 +11,16 @@
    </rect>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout_2">
-   <property name="margin">
+   <property name="leftMargin">
+    <number>2</number>
+   </property>
+   <property name="topMargin">
+    <number>2</number>
+   </property>
+   <property name="rightMargin">
+    <number>2</number>
+   </property>
+   <property name="bottomMargin">
     <number>2</number>
    </property>
    <item>
@@ -22,7 +31,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QLineEdit" name="value">
+    <widget class="DREAM3DLineEdit" name="value">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
        <horstretch>0</horstretch>
@@ -98,6 +107,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>DREAM3DLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header location="global">DREAM3DLineEdit.h</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="../../../../Resources/icons/images/Icons.qrc"/>
  </resources>

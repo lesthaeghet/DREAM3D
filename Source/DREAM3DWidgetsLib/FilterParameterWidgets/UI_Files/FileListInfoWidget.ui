@@ -144,7 +144,7 @@ font-size: 11px;
       </widget>
      </item>
      <item row="0" column="1">
-      <widget class="QLineEdit" name="m_FilePrefix">
+      <widget class="DREAM3DLineEdit" name="m_FilePrefix">
        <property name="toolTip">
         <string>The front part of the input file name</string>
        </property>
@@ -170,7 +170,7 @@ font-size: 11px;
       </widget>
      </item>
      <item row="0" column="3">
-      <widget class="QLineEdit" name="m_FileSuffix">
+      <widget class="DREAM3DLineEdit" name="m_FileSuffix">
        <property name="toolTip">
         <string>The part of the filename that comes AFTER the slice index</string>
        </property>
@@ -193,7 +193,7 @@ font-size: 11px;
       </widget>
      </item>
      <item row="0" column="5">
-      <widget class="QLineEdit" name="m_FileExt">
+      <widget class="DREAM3DLineEdit" name="m_FileExt">
        <property name="toolTip">
         <string>The file extension of the input files</string>
        </property>

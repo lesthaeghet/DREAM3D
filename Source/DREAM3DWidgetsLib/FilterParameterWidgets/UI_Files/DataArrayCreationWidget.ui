@@ -69,7 +69,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QLineEdit" name="dataArrayName">
+    <widget class="DREAM3DLineEdit" name="dataArrayName">
      <property name="minimumSize">
       <size>
        <width>120</width>
@@ -144,6 +144,11 @@
    <class>DREAM3DComboBox</class>
    <extends>QComboBox</extends>
    <header location="global">DREAM3DComboBox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>DREAM3DLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header location="global">DREAM3DLineEdit.h</header>
   </customwidget>
  </customwidgets>
  <resources>

@@ -11,7 +11,16 @@
    </rect>
   </property>
   <layout class="QGridLayout" name="gridLayout_2">
-   <property name="margin">
+   <property name="leftMargin">
+    <number>2</number>
+   </property>
+   <property name="topMargin">
+    <number>2</number>
+   </property>
+   <property name="rightMargin">
+    <number>2</number>
+   </property>
+   <property name="bottomMargin">
     <number>2</number>
    </property>
    <item row="1" column="12">
@@ -22,10 +31,10 @@
     </widget>
    </item>
    <item row="1" column="2">
-    <widget class="QLineEdit" name="c20"/>
+    <widget class="DREAM3DLineEdit" name="c20"/>
    </item>
    <item row="1" column="7">
-    <widget class="QLineEdit" name="c11">
+    <widget class="DREAM3DLineEdit" name="c11">
      <property name="text">
       <string/>
      </property>
@@ -39,7 +48,7 @@
     </widget>
    </item>
    <item row="1" column="4">
-    <widget class="QLineEdit" name="c02"/>
+    <widget class="DREAM3DLineEdit" name="c02"/>
    </item>
    <item row="1" column="10">
     <widget class="QLabel" name="label_5">
@@ -49,10 +58,10 @@
     </widget>
    </item>
    <item row="1" column="13">
-    <widget class="QLineEdit" name="c00"/>
+    <widget class="DREAM3DLineEdit" name="c00"/>
    </item>
    <item row="1" column="11">
-    <widget class="QLineEdit" name="c01"/>
+    <widget class="DREAM3DLineEdit" name="c01"/>
    </item>
    <item row="1" column="5">
     <widget class="QLabel" name="label_3">
@@ -83,7 +92,7 @@
     </widget>
    </item>
    <item row="1" column="9">
-    <widget class="QLineEdit" name="c10"/>
+    <widget class="DREAM3DLineEdit" name="c10"/>
    </item>
    <item row="1" column="14">
     <spacer name="horizontalSpacer">
@@ -100,6 +109,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>DREAM3DLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header location="global">DREAM3DLineEdit.h</header>
+  </customwidget>
+ </customwidgets>
  <tabstops>
   <tabstop>c20</tabstop>
   <tabstop>c02</tabstop>

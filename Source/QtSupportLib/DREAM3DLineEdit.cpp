@@ -1,5 +1,7 @@
 /* ============================================================================
-* Copyright (c) 2009-2015 BlueQuartz Software, LLC
+* Copyright (c) 2010, Michael A. Jackson (BlueQuartz Software)
+* Copyright (c) 2010, Dr. Michael A. Groeber (US Air Force Research Laboratories
+* All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification,
 * are permitted provided that the following conditions are met:
@@ -11,9 +13,10 @@
 * list of conditions and the following disclaimer in the documentation and/or
 * other materials provided with the distribution.
 *
-* Neither the name of BlueQuartz Software, the US Air Force, nor the names of its 
-* contributors may be used to endorse or promote products derived from this software 
-* without specific prior written permission.
+* Neither the name of Michael A. Groeber, Michael A. Jackson, the US Air Force,
+* BlueQuartz Software nor the names of its contributors may be used to endorse
+* or promote products derived from this software without specific prior written
+* permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -26,15 +29,12 @@
 * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
 * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
-* The code contained herein was partially funded by the followig contracts:
-*    United States Air Force Prime Contract FA8650-07-D-5800
-*    United States Air Force Prime Contract FA8650-10-D-5210
-*    United States Prime Contract Navy N00173-07-C-2068
+*  This code was written under United States Air Force Contract number
+*                           FA8650-07-D-5800
 *
 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
-
-#include "QFSDropLineEdit.h"
+#include "DREAM3DLineEdit.h"
 
 #include <QtCore/QFileInfo>
 #include <QtCore/QDir>
@@ -47,8 +47,25 @@
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-QFSDropLineEdit::QFSDropLineEdit(QWidget* parent)
-  : DREAM3DLineEdit(parent)
+DREAM3DLineEdit::DREAM3DLineEdit(QWidget* parent) :
+QLineEdit(parent)
+{
+  setupGui();
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+DREAM3DLineEdit::DREAM3DLineEdit(const QString &title, QWidget* parent) :
+QLineEdit(title, parent)
+{
+  setupGui();
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+DREAM3DLineEdit::~DREAM3DLineEdit()
 {
 
 }
@@ -56,40 +73,8 @@ QFSDropLineEdit::QFSDropLineEdit(QWidget* parent)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void QFSDropLineEdit::dragEnterEvent(QDragEnterEvent* event)
+void DREAM3DLineEdit::setupGui()
 {
-  // accept just text/uri-list mime format
-  if (event->mimeData()->hasFormat("text/uri-list"))
-  {
-    event->acceptProposedAction();
-  }
+  // Set the minimum size of the line edit
+  setMinimumSize(120, 0);
 }
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void QFSDropLineEdit::dropEvent(QDropEvent* event)
-{
-  QList<QUrl> urlList;
-  QString fName;
-  QFileInfo info;
-
-  if (event->mimeData()->hasUrls())
-  {
-    urlList = event->mimeData()->urls(); // returns list of QUrls
-    // if just text was dropped, urlList is empty (size == 0)
-
-    if ( urlList.size() > 0) // if at least one QUrl is present in list
-    {
-      fName = urlList[0].toLocalFile(); // convert first QUrl to local path
-      fName = QDir::toNativeSeparators(fName);
-      info.setFile( fName ); // information about file
-      setText( fName ); // if is file, setText
-      emit fileDropped(fName);
-    }
-  }
-
-  event->acceptProposedAction();
-}
-
-
