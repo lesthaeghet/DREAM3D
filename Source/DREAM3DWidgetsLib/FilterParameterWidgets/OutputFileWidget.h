@@ -55,7 +55,7 @@
 
 #include "DREAM3DWidgetsLib/ui_OutputFileWidget.h"
 
-class QLineEdit;
+class DREAM3DLineEdit;
 class FileSystemFilterParameter;
 
 /**
@@ -86,7 +86,7 @@ class DREAM3DWidgetsLib_EXPORT OutputFileWidget : public FilterParameterWidget, 
     /**
     * @brief
     */
-    bool verifyPathExists(QString filePath, QLineEdit* lineEdit);
+    bool verifyPathExists(QString filePath, DREAM3DLineEdit* lineEdit);
 
     void setFilterParameter(FilterParameter* value);
     FilterParameter* getFilterParameter() const;

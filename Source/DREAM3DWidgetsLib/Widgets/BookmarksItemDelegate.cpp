@@ -36,14 +36,14 @@
 
 #include <QtCore/QFileInfo>
 
-#include <QtWidgets/QLineEdit>
-
 #include <QtGui/QIntValidator>
 #include <QtGui/QPainter>
 
 #include "DREAM3DWidgetsLib/Widgets/BookmarksItemDelegate.h"
 #include "DREAM3DWidgetsLib/Widgets/BookmarksItem.h"
 #include "DREAM3DWidgetsLib/Widgets/BookmarksModel.h"
+
+#include "QtSupportLib/DREAM3DLineEdit.h"
 
 // -----------------------------------------------------------------------------
 //
@@ -67,7 +67,7 @@ BookmarksItemDelegate::~BookmarksItemDelegate()
 // -----------------------------------------------------------------------------
 QWidget* BookmarksItemDelegate::createEditor(QWidget* parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-  QLineEdit* editor = new QLineEdit(parent);
+  DREAM3DLineEdit* editor = new DREAM3DLineEdit(parent);
   return editor;
 }
 
@@ -77,7 +77,7 @@ QWidget* BookmarksItemDelegate::createEditor(QWidget* parent, const QStyleOption
 void BookmarksItemDelegate::setEditorData(QWidget* editor, const QModelIndex &index) const
 {
   QString value = index.model()->data(index, Qt::DisplayRole).toString();
-  QLineEdit* line = static_cast<QLineEdit*>(editor);
+  DREAM3DLineEdit* line = static_cast<DREAM3DLineEdit*>(editor);
   line->setText(value);
 }
 
@@ -88,7 +88,7 @@ void BookmarksItemDelegate::setModelData(QWidget* editor, QAbstractItemModel* mo
 {
   BookmarksModel* bModel = qobject_cast<BookmarksModel*>(model);
 
-  QLineEdit* line = static_cast<QLineEdit*>(editor);
+  DREAM3DLineEdit* line = static_cast<DREAM3DLineEdit*>(editor);
   QString value = line->text();
 
   if (value.isEmpty() == false)

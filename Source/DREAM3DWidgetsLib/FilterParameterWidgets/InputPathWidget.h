@@ -86,7 +86,7 @@ class DREAM3DWidgetsLib_EXPORT InputPathWidget : public FilterParameterWidget, p
     /**
     * @brief
     */
-    bool verifyPathExists(QString filePath, QLineEdit* lineEdit);
+    bool verifyPathExists(QString filePath, DREAM3DLineEdit* lineEdit);
 
     void setFilterParameter(FilterParameter* value);
     FilterParameter* getFilterParameter() const;

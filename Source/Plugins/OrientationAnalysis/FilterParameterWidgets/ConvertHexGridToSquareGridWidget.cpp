@@ -268,7 +268,7 @@ void ConvertHexGridToSquareGridWidget::resolutionChanged(const QString& string)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-bool ConvertHexGridToSquareGridWidget::verifyPathExists(QString outFilePath, QLineEdit* lineEdit)
+bool ConvertHexGridToSquareGridWidget::verifyPathExists(QString outFilePath, DREAM3DLineEdit* lineEdit)
 {
   //  std::cout << "outFilePath: " << outFilePath << std::endl;
   QFileInfo fileinfo(outFilePath);

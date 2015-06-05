@@ -334,7 +334,7 @@ void ReadH5EbsdWidget::on_m_DataArraysCheckBox_stateChanged(int state)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-bool ReadH5EbsdWidget::verifyPathExists(QString outFilePath, QLineEdit* lineEdit)
+bool ReadH5EbsdWidget::verifyPathExists(QString outFilePath, DREAM3DLineEdit* lineEdit)
 {
   //  std::cout << "outFilePath: " << outFilePath.toStdString() << std::endl;
   QFileInfo fileinfo(outFilePath);

@@ -285,7 +285,7 @@ void EbsdToH5EbsdWidget::on_m_OutputFile_textChanged(const QString& text)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-bool EbsdToH5EbsdWidget::verifyPathExists(QString outFilePath, QLineEdit* lineEdit)
+bool EbsdToH5EbsdWidget::verifyPathExists(QString outFilePath, DREAM3DLineEdit* lineEdit)
 {
   //  std::cout << "outFilePath: " << outFilePath << std::endl;
   QFileInfo fileinfo(outFilePath);

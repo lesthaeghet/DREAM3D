@@ -41,11 +41,11 @@
 #include <QtCore/QModelIndex>
 #include <QtGui/QPainter>
 #include <QtWidgets/QStyleOptionViewItemV4>
-#include <QtWidgets/QLineEdit>
 #include <QtGui/QDoubleValidator>
 #include <QtWidgets/QStyledItemDelegate>
 
 #include "QtSupportLib/DREAM3DComboBox.h"
+#include "QtSupportLib/DREAM3DLineEdit.h"
 
 #include "OrientationLib/Texture/StatsGen.hpp"
 #include "QtSupportLib/ColorComboPicker.h"
@@ -81,11 +81,11 @@ class SGPowerLawItemDelegate : public QStyledItemDelegate
     // -----------------------------------------------------------------------------
     QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const
     {
-      QLineEdit* alpha;
-      QLineEdit* beta;
+      DREAM3DLineEdit* alpha;
+      DREAM3DLineEdit* beta;
       QDoubleValidator* alphaValidator;
       QDoubleValidator* betaValidator;
-      QLineEdit* k;
+      DREAM3DLineEdit* k;
       QDoubleValidator* kValidator;
 
       DREAM3DComboBox* colorCombo;
@@ -98,21 +98,21 @@ class SGPowerLawItemDelegate : public QStyledItemDelegate
           break;
 
         case SGPowerLawTableModel::Alpha:
-          alpha = new QLineEdit(parent);
+          alpha = new DREAM3DLineEdit(parent);
           alpha->setFrame(false);
           alphaValidator = new QDoubleValidator(alpha);
           alphaValidator->setDecimals(6);
           alpha->setValidator(alphaValidator);
           return alpha;
         case SGPowerLawTableModel::K:
-          k = new QLineEdit(parent);
+          k = new DREAM3DLineEdit(parent);
           k->setFrame(false);
           kValidator = new QDoubleValidator(k);
           kValidator->setDecimals(6);
           k->setValidator(kValidator);
           return k;
         case SGPowerLawTableModel::Beta:
-          beta = new QLineEdit(parent);
+          beta = new DREAM3DLineEdit(parent);
           beta->setFrame(false);
           betaValidator = new QDoubleValidator(beta);
           betaValidator->setDecimals(6);
@@ -137,7 +137,7 @@ class SGPowerLawItemDelegate : public QStyledItemDelegate
       if (col == SGPowerLawTableModel::Alpha || col == SGPowerLawTableModel::K || col == SGPowerLawTableModel::Beta)
       {
         //    double value = index.model()->data(index).toFloat(&ok);
-        QLineEdit* lineEdit = qobject_cast<QLineEdit* > (editor);
+        DREAM3DLineEdit* lineEdit = qobject_cast<DREAM3DLineEdit* > (editor);
         Q_ASSERT(lineEdit);
         lineEdit->setText(index.model()->data(index).toString());
       }
@@ -161,7 +161,7 @@ class SGPowerLawItemDelegate : public QStyledItemDelegate
       //  bool ok = false;
       if (col == SGPowerLawTableModel::Alpha || col == SGPowerLawTableModel::K || col == SGPowerLawTableModel::Beta)
       {
-        QLineEdit* lineEdit = qobject_cast<QLineEdit* > (editor);
+        DREAM3DLineEdit* lineEdit = qobject_cast<DREAM3DLineEdit* > (editor);
         Q_ASSERT(lineEdit);
         bool ok = false;
         double v = lineEdit->text().toFloat(&ok);

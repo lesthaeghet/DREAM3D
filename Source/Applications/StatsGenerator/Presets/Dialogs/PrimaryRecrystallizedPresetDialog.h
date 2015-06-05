@@ -39,7 +39,7 @@
 
 #include <QtWidgets/QDialog>
 
-class QLineEdit;
+class DREAM3DLineEdit;
 
 /**
  * @class PrimaryRecrystallizedPresetDialog PrimaryRecrystallizedPresetDialog.h StatsGenerator/Presets/Dialogs/PrimaryRecrystallizedPresetDialog.h
@@ -63,7 +63,7 @@ class PrimaryRecrystallizedPresetDialog : public QDialog
     void setupGui();
 
   private:
-    QLineEdit* percentRecystallized;
+    DREAM3DLineEdit* percentRecystallized;
 
     PrimaryRecrystallizedPresetDialog(const PrimaryRecrystallizedPresetDialog&); // Copy Constructor Not Implemented
     void operator=(const PrimaryRecrystallizedPresetDialog&); // Operator '=' Not Implemented

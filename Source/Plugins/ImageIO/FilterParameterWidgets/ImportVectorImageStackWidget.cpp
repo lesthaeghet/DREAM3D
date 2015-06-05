@@ -311,7 +311,7 @@ void ImportVectorImageStackWidget::originChanged(const QString& string)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-bool ImportVectorImageStackWidget::verifyPathExists(QString outFilePath, QLineEdit* lineEdit)
+bool ImportVectorImageStackWidget::verifyPathExists(QString outFilePath, DREAM3DLineEdit* lineEdit)
 {
   //  std::cout << "outFilePath: " << outFilePath << std::endl;
   QFileInfo fileinfo(outFilePath);

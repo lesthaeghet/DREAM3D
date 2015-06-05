@@ -119,7 +119,7 @@ font-size: 12px;
           </widget>
          </item>
          <item row="0" column="1">
-          <widget class="QLineEdit" name="m_Mu_SizeDistribution">
+          <widget class="DREAM3DLineEdit" name="m_Mu_SizeDistribution">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
              <horstretch>0</horstretch>
@@ -283,7 +283,7 @@ font-size: 12px;
           </widget>
          </item>
          <item row="1" column="1">
-          <widget class="QLineEdit" name="m_Sigma_SizeDistribution">
+          <widget class="DREAM3DLineEdit" name="m_Sigma_SizeDistribution">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
              <horstretch>0</horstretch>
@@ -308,7 +308,7 @@ font-size: 12px;
           </widget>
          </item>
          <item row="0" column="4">
-          <widget class="QLineEdit" name="m_MinSigmaCutOff">
+          <widget class="DREAM3DLineEdit" name="m_MinSigmaCutOff">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
              <horstretch>0</horstretch>
@@ -367,7 +367,7 @@ font-size: 12px;
           </widget>
          </item>
          <item row="1" column="4">
-          <widget class="QLineEdit" name="m_MaxSigmaCutOff">
+          <widget class="DREAM3DLineEdit" name="m_MaxSigmaCutOff">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
              <horstretch>0</horstretch>

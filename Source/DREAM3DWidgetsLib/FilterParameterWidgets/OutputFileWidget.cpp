@@ -133,7 +133,7 @@ void OutputFileWidget::setupGui()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-bool OutputFileWidget::verifyPathExists(QString filePath, QLineEdit* lineEdit)
+bool OutputFileWidget::verifyPathExists(QString filePath, DREAM3DLineEdit* lineEdit)
 {
   QFileInfo fileinfo(filePath);
   if (false == fileinfo.exists())

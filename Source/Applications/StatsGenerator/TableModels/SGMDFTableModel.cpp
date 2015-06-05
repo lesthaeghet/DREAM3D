@@ -110,7 +110,7 @@ QVariant SGMDFTableModel::data(const QModelIndex& index, qint32 role) const
   if (role == Qt::SizeHintRole)
   {
     QStyleOptionFrame comboBox;
-    QLineEdit contents("1");
+    DREAM3DLineEdit contents("1");
     switch(index.column())
     {
       case Angle:

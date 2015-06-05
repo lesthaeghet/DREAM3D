@@ -131,7 +131,7 @@ void InputPathWidget::setupGui()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-bool InputPathWidget::verifyPathExists(QString filePath, QLineEdit* lineEdit)
+bool InputPathWidget::verifyPathExists(QString filePath, DREAM3DLineEdit* lineEdit)
 {
   QFileInfo fileinfo(filePath);
   if (false == fileinfo.exists())

@@ -490,7 +490,7 @@ void StatsGeneratorUI::on_actionClose_triggered()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-bool StatsGeneratorUI::verifyOutputPathParentExists(QString outFilePath, QLineEdit* lineEdit)
+bool StatsGeneratorUI::verifyOutputPathParentExists(QString outFilePath, DREAM3DLineEdit* lineEdit)
 {
   QFileInfo fileinfo(outFilePath);
   QDir parent(fileinfo.dir());
@@ -500,7 +500,7 @@ bool StatsGeneratorUI::verifyOutputPathParentExists(QString outFilePath, QLineEd
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-bool StatsGeneratorUI::verifyPathExists(QString outFilePath, QLineEdit* lineEdit)
+bool StatsGeneratorUI::verifyPathExists(QString outFilePath, DREAM3DLineEdit* lineEdit)
 {
   QFileInfo fileinfo(outFilePath);
   if (false == fileinfo.exists())

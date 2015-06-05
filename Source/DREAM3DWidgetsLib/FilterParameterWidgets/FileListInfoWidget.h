@@ -102,7 +102,7 @@ class FileListInfoWidget : public FilterParameterWidget, private Ui::FileListInf
   protected slots:
 
     void on_m_InputDirBtn_clicked();
-    // slots to catch signals emittd by the various QLineEdit widgets
+    // slots to catch signals emittd by the various DREAM3DLineEdit widgets
     void on_m_InputDir_textChanged(const QString& text);
 
 
@@ -135,7 +135,7 @@ class FileListInfoWidget : public FilterParameterWidget, private Ui::FileListInf
      * @param lineEdit
      * @return
      */
-    bool verifyPathExists(QString outFilePath, QLineEdit* lineEdit);
+    bool verifyPathExists(QString outFilePath, DREAM3DLineEdit* lineEdit);
 
     /**
      * @brief setWidgetListEnabled

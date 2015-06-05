@@ -41,7 +41,6 @@
 
 #include "QtSupportLib/QtSupportLib.h"
 
-
 class QtSupportLib_EXPORT DREAM3DLineEdit : public QLineEdit
 {
   Q_OBJECT

@@ -38,7 +38,7 @@
 
 #include <QtWidgets/QDialog>
 
-class QLineEdit;
+class DREAM3DLineEdit;
 
 /**
  * @class PrecipitateRolledPresetDialog PrecipitateRolledPresetDialog.h StatsGenerator/Presets/Dialogs/PrecipitateRolledPresetDialog.h
@@ -63,9 +63,9 @@ class PrecipitateRolledPresetDialog : public QDialog
     void setupGui();
 
   private:
-    QLineEdit* A;
-    QLineEdit* B;
-    QLineEdit* C;
+    DREAM3DLineEdit* A;
+    DREAM3DLineEdit* B;
+    DREAM3DLineEdit* C;
 
 
     PrecipitateRolledPresetDialog(const PrecipitateRolledPresetDialog&); // Copy Constructor Not Implemented

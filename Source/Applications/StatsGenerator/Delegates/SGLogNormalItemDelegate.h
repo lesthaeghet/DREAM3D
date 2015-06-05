@@ -41,13 +41,13 @@
 #include <QtCore/QModelIndex>
 #include <QtGui/QPainter>
 #include <QtWidgets/QStyleOptionViewItemV4>
-#include <QtWidgets/QLineEdit>
 #include <QtGui/QDoubleValidator>
 #include <QtWidgets/QStyledItemDelegate>
 
 #include "OrientationLib/Texture/StatsGen.hpp"
 #include "QtSupportLib/ColorComboPicker.h"
 #include "QtSupportLib/DREAM3DComboBox.h"
+#include "QtSupportLib/DREAM3DLineEdit.h"
 #include "StatsGenerator/TableModels/SGLogNormalTableModel.h"
 
 /**
@@ -80,8 +80,8 @@ class SGLogNormalItemDelegate : public QStyledItemDelegate
     // -----------------------------------------------------------------------------
     QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const
     {
-      QLineEdit* avg;
-      QLineEdit* stdDev;
+      DREAM3DLineEdit* avg;
+      DREAM3DLineEdit* stdDev;
       QDoubleValidator* avgValidator;
       QDoubleValidator* stdDevValidator;
       DREAM3DComboBox* colorCombo;
@@ -94,14 +94,14 @@ class SGLogNormalItemDelegate : public QStyledItemDelegate
           break;
 
         case SGLogNormalTableModel::Average:
-          avg = new QLineEdit(parent);
+          avg = new DREAM3DLineEdit(parent);
           avg->setFrame(false);
           avgValidator = new QDoubleValidator(avg);
           avgValidator->setDecimals(6);
           avg->setValidator(avgValidator);
           return avg;
         case SGLogNormalTableModel::StdDev:
-          stdDev = new QLineEdit(parent);
+          stdDev = new DREAM3DLineEdit(parent);
           stdDev->setFrame(false);
           stdDevValidator = new QDoubleValidator(stdDev);
           stdDevValidator->setDecimals(6);
@@ -126,7 +126,7 @@ class SGLogNormalItemDelegate : public QStyledItemDelegate
       if (col == SGLogNormalTableModel::Average || col == SGLogNormalTableModel::StdDev)
       {
         //     double value = index.model()->data(index).toFloat(&ok);
-        QLineEdit* lineEdit = qobject_cast<QLineEdit* > (editor);
+        DREAM3DLineEdit* lineEdit = qobject_cast<DREAM3DLineEdit* > (editor);
         Q_ASSERT(lineEdit);
         lineEdit->setText(index.model()->data(index).toString());
       }
@@ -150,7 +150,7 @@ class SGLogNormalItemDelegate : public QStyledItemDelegate
       //  bool ok = false;
       if (col == SGLogNormalTableModel::Average || col == SGLogNormalTableModel::StdDev)
       {
-        QLineEdit* lineEdit = qobject_cast<QLineEdit* > (editor);
+        DREAM3DLineEdit* lineEdit = qobject_cast<DREAM3DLineEdit* > (editor);
         Q_ASSERT(lineEdit);
         bool ok = false;
         double v = lineEdit->text().toFloat(&ok);

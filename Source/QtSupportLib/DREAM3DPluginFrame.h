@@ -49,7 +49,7 @@
 
 #include "QtSupportLib/QtSupportLib.h"
 
-class QLineEdit;
+class DREAM3DLineEdit;
 
 
 /**
@@ -90,16 +90,16 @@ class QtSupportLib_EXPORT DREAM3DPluginFrame : public QFrame
     /**
      * @brief Verifies that a path exists on the file system.
      * @param outFilePath The file path to check
-     * @param lineEdit The QLineEdit object to modify visuals of (Usually by placing a red line around the QLineEdit widget)
+     * @param lineEdit The DREAM3DLineEdit object to modify visuals of (Usually by placing a red line around the DREAM3DLineEdit widget)
      */
-    bool verifyPathExists(QString outFilePath, QLineEdit* lineEdit);
+    bool verifyPathExists(QString outFilePath, DREAM3DLineEdit* lineEdit);
 
     /**
      * @brief Verifies that a parent path exists on the file system.
      * @param outFilePath The parent file path to check
-     * @param lineEdit The QLineEdit object to modify visuals of (Usually by placing a red line around the QLineEdit widget)
+     * @param lineEdit The DREAM3DLineEdit object to modify visuals of (Usually by placing a red line around the DREAM3DLineEdit widget)
      */
-    bool verifyOutputPathParentExists(QString outFilePath, QLineEdit* lineEdit);
+    bool verifyOutputPathParentExists(QString outFilePath, DREAM3DLineEdit* lineEdit);
 
     /**
      * @brief Initializes some of the GUI elements with selections or other GUI related items
@@ -127,11 +127,11 @@ class QtSupportLib_EXPORT DREAM3DPluginFrame : public QFrame
      * @brief Runs checks on the output files to let the user know which output
      * files already exist in the output directory location potentially warning
      * them of an over writing situation
-     * @param le The QLineEdit where the output directory is defined
+     * @param le The DREAM3DLineEdit where the output directory is defined
      * @param msgTitle A message to display.
      * @return
      */
-    virtual bool sanityCheckOutputDirectory(QLineEdit* le, QString msgTitle);
+    virtual bool sanityCheckOutputDirectory(DREAM3DLineEdit* le, QString msgTitle);
 
     /**
      * @brief Displays a Type Dialog box used for errors that occur

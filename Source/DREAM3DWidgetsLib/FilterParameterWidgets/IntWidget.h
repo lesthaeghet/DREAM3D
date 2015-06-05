@@ -49,7 +49,7 @@
 
 #include "DREAM3DWidgetsLib/ui_IntWidget.h"
 
-class QLineEdit;
+class DREAM3DLineEdit;
 
 /**
 * @brief

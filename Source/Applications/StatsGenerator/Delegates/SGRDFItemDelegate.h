@@ -41,13 +41,13 @@
 #include <QtCore/QModelIndex>
 #include <QtGui/QPainter>
 #include <QtWidgets/QStyleOptionViewItemV4>
-#include <QtWidgets/QLineEdit>
 #include <QtGui/QDoubleValidator>
 #include <QtWidgets/QStyledItemDelegate>
 
 #include "EbsdLib/EbsdConstants.h"
 
 #include "QtSupportLib/DREAM3DComboBox.h"
+#include "QtSupportLib/DREAM3DLineEdit.h"
 
 #include "OrientationLib/Texture/StatsGen.hpp"
 #include "StatsGenerator/TableModels/SGRDFTableModel.h"
@@ -82,12 +82,12 @@ class SGRDFItemDelegate : public QStyledItemDelegate
     // -----------------------------------------------------------------------------
     QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const
     {
-      QLineEdit* editor;
+      DREAM3DLineEdit* editor;
       QDoubleValidator* validator;
       qint32 col = index.column();
       if (col == SGRDFTableModel::Frequency)
       {
-        editor = new QLineEdit(parent);
+        editor = new DREAM3DLineEdit(parent);
         editor->setFrame(false);
         validator = new QDoubleValidator(editor);
         editor->setValidator(validator);
@@ -105,7 +105,7 @@ class SGRDFItemDelegate : public QStyledItemDelegate
       qint32 col = index.column();
       if (col < SGRDFTableModel::ColumnCount)
       {
-        QLineEdit* lineEdit = qobject_cast<QLineEdit* > (editor);
+        DREAM3DLineEdit* lineEdit = qobject_cast<DREAM3DLineEdit* > (editor);
         Q_ASSERT(lineEdit);
         lineEdit->setText(index.model()->data(index).toString());
       }
@@ -120,7 +120,7 @@ class SGRDFItemDelegate : public QStyledItemDelegate
       qint32 col = index.column();
       if (col < SGRDFTableModel::ColumnCount)
       {
-        QLineEdit* lineEdit = qobject_cast<QLineEdit* > (editor);
+        DREAM3DLineEdit* lineEdit = qobject_cast<DREAM3DLineEdit* > (editor);
         Q_ASSERT(lineEdit);
         bool ok = false;
         double v = lineEdit->text().toFloat(&ok);

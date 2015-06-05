@@ -40,12 +40,12 @@
 
 #include <QtCore/QAbstractItemModel>
 #include <QtWidgets/QStyleOptionViewItemV4>
-#include <QtWidgets/QLineEdit>
 #include <QtGui/QDoubleValidator>
 #include <QtGui/QPainter>
 #include <QtCore/QDebug>
 
 #include "QtSupportLib/DREAM3DComboBox.h"
+#include "QtSupportLib/DREAM3DLineEdit.h"
 
 #include "DREAM3DWidgetsLib/FilterParameterWidgets/ComparisonSelectionTableModel.h"
 
@@ -93,7 +93,7 @@ void ComparisonSelectionItemDelegate::setFeatureList(QStringList features)
 // -----------------------------------------------------------------------------
 QWidget* ComparisonSelectionItemDelegate::createEditor(QWidget* widgetParent, const QStyleOptionViewItem& option, const QModelIndex& index) const
 {
-  QLineEdit* featureValue = NULL;
+  DREAM3DLineEdit* featureValue = NULL;
   QDoubleValidator* featureValueValidator = NULL;
   DREAM3DComboBox* operatorCombo = NULL;
 
@@ -126,7 +126,7 @@ QWidget* ComparisonSelectionItemDelegate::createEditor(QWidget* widgetParent, co
       return operatorCombo;
     case ComparisonSelectionTableModel::FeatureValue:
     {
-      featureValue = new QLineEdit(widgetParent);
+      featureValue = new DREAM3DLineEdit(widgetParent);
       featureValue->setFrame(false);
       featureValueValidator = new QDoubleValidator(featureValue);
       featureValueValidator->setRange(-1.0f * std::numeric_limits<float>::max(), std::numeric_limits<float>::max(), 6);
@@ -182,7 +182,7 @@ void ComparisonSelectionItemDelegate::setEditorData(QWidget* editor, const QMode
   else if (col == ComparisonSelectionTableModel::FeatureValue )
   {
     QString objName = QString::number(index.row()) + "," + QString::number(ComparisonSelectionTableModel::FeatureValue);
-    QLineEdit* lineEdit = qobject_cast<QLineEdit* > (editor);
+    DREAM3DLineEdit* lineEdit = qobject_cast<DREAM3DLineEdit* > (editor);
     Q_ASSERT(lineEdit);
     lineEdit->setObjectName(objName);
 //    QVariant var = index.model()->data(index);
@@ -216,7 +216,7 @@ void ComparisonSelectionItemDelegate::setModelData(QWidget* editor, QAbstractIte
   }
   else if (col == ComparisonSelectionTableModel::FeatureValue)
   {
-    QLineEdit* lineEdit = qobject_cast<QLineEdit* > (editor);
+    DREAM3DLineEdit* lineEdit = qobject_cast<DREAM3DLineEdit* > (editor);
     Q_ASSERT(lineEdit);
     bool ok = false;
     double v = lineEdit->text().toFloat(&ok);

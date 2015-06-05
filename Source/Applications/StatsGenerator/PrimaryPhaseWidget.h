@@ -119,7 +119,7 @@ class PrimaryPhaseWidget : public SGWidget, private Ui::PrimaryPhaseWidget
      * @param lineEdit
      * @return
      */
-    bool validateValue(QDoubleValidator* val, QLineEdit* lineEdit);
+    bool validateValue(QDoubleValidator* val, DREAM3DLineEdit* lineEdit);
 
     /**
      * @brief validateMuSigma

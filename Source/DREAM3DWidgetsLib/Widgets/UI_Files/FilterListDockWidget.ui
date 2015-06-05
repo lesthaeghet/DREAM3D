@@ -65,7 +65,7 @@ padding-left: 5px;
        </size>
       </property>
       <property name="styleSheet">
-       <string notr="true">QLineEdit {
+       <string notr="true">DREAM3DLineEdit {
     color: rgb(127, 0, 63);
     selection-color: white;
     border: 1px groove gray;
@@ -75,7 +75,7 @@ padding-left: 5px;
     border-bottom-right-radius: 5px;
     padding: 2px 4px;
 }
-QLineEdit:focus {
+DREAM3DLineEdit:focus {
     color: rgb(127, 0, 63);
     selection-color: white;
     border: 1px groove gray;
@@ -86,7 +86,7 @@ QLineEdit:focus {
     padding: 2px 4px;
 }
 
-QLineEdit:edit-focus {
+DREAM3DLineEdit:edit-focus {
     color: rgb(127, 0, 63);
     selection-color: white;
     border: 1px groove gray;

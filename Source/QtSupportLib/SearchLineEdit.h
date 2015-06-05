@@ -3,12 +3,12 @@
 
 
 
-#include <QLineEdit>
 #include <QAbstractButton>
 
 #include "DREAM3DLib/Common/DREAM3DSetGetMacros.h"
 
 #include "QtSupportLib/QtSupportLib.h"
+#include "QtSupportLib/DREAM3DLineEdit.h"
 
 class SearchLineEditPrivate;
 
@@ -48,7 +48,7 @@ class QtSupportLib_EXPORT IconButton : public QAbstractButton
     text if isShowingHintText() returns true (that is, does not contain
     valid user input).
  */
-class QtSupportLib_EXPORT SearchLineEdit : public QLineEdit
+class QtSupportLib_EXPORT SearchLineEdit : public DREAM3DLineEdit
 {
     Q_OBJECT
     Q_ENUMS(Side)

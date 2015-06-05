@@ -315,14 +315,14 @@
       </widget>
      </item>
      <item row="1" column="2">
-      <widget class="QLineEdit" name="filterName">
+      <widget class="DREAM3DLineEdit" name="filterName">
        <property name="placeholderText">
         <string>Choose a new filter name, and enter it here...</string>
        </property>
       </widget>
      </item>
      <item row="2" column="2">
-      <widget class="QLineEdit" name="pluginDir">
+      <widget class="DREAM3DLineEdit" name="pluginDir">
        <property name="placeholderText">
         <string>Enter the top-level plugin directory to which your filter will be added...</string>
        </property>

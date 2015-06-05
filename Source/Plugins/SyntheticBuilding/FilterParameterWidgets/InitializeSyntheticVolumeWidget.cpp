@@ -599,7 +599,7 @@ void InitializeSyntheticVolumeWidget::estimateNumFeaturesSetup()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-bool InitializeSyntheticVolumeWidget::verifyPathExists(QString outFilePath, QLineEdit* lineEdit)
+bool InitializeSyntheticVolumeWidget::verifyPathExists(QString outFilePath, DREAM3DLineEdit* lineEdit)
 {
   //  std::cout << "outFilePath: " << outFilePath << std::endl;
   QFileInfo fileinfo(outFilePath);
@@ -769,7 +769,7 @@ void InitializeSyntheticVolumeWidget::setShapeTypes(DataArray<unsigned int>::Poi
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-bool InitializeSyntheticVolumeWidget::verifyPathExists(QString outFilePath, QLineEdit* lineEdit)
+bool InitializeSyntheticVolumeWidget::verifyPathExists(QString outFilePath, DREAM3DLineEdit* lineEdit)
 {
   //  qDebug() << "outFilePath: " << outFilePath() << "\n";
   QFileInfo fileinfo(outFilePath);

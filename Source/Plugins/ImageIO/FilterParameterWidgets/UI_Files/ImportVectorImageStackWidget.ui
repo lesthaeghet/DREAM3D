@@ -75,22 +75,22 @@ font-size: 11px;
       </widget>
      </item>
      <item row="2" column="3">
-      <widget class="QLineEdit" name="zRes"/>
+      <widget class="DREAM3DLineEdit" name="zRes"/>
      </item>
      <item row="1" column="2">
-      <widget class="QLineEdit" name="yOrigin"/>
+      <widget class="DREAM3DLineEdit" name="yOrigin"/>
      </item>
      <item row="1" column="3">
-      <widget class="QLineEdit" name="zOrigin"/>
+      <widget class="DREAM3DLineEdit" name="zOrigin"/>
      </item>
      <item row="2" column="2">
-      <widget class="QLineEdit" name="yRes"/>
+      <widget class="DREAM3DLineEdit" name="yRes"/>
      </item>
      <item row="2" column="1">
-      <widget class="QLineEdit" name="xRes"/>
+      <widget class="DREAM3DLineEdit" name="xRes"/>
      </item>
      <item row="1" column="1">
-      <widget class="QLineEdit" name="xOrigin"/>
+      <widget class="DREAM3DLineEdit" name="xOrigin"/>
      </item>
      <item row="0" column="1">
       <widget class="QLabel" name="label_3">
@@ -475,7 +475,7 @@ font-size: 11px;
       </widget>
      </item>
      <item row="0" column="1">
-      <widget class="QLineEdit" name="m_FilePrefix">
+      <widget class="DREAM3DLineEdit" name="m_FilePrefix">
        <property name="toolTip">
         <string>The front part of the input file name</string>
        </property>
@@ -501,7 +501,7 @@ font-size: 11px;
       </widget>
      </item>
      <item row="0" column="3">
-      <widget class="QLineEdit" name="m_FileSuffix">
+      <widget class="DREAM3DLineEdit" name="m_FileSuffix">
        <property name="toolTip">
         <string>The part of the filename that comes AFTER the slice index</string>
        </property>
@@ -524,7 +524,7 @@ font-size: 11px;
       </widget>
      </item>
      <item row="0" column="5">
-      <widget class="QLineEdit" name="m_FileExt">
+      <widget class="DREAM3DLineEdit" name="m_FileExt">
        <property name="toolTip">
         <string>The file extension of the input files</string>
        </property>
@@ -599,7 +599,7 @@ font-size: 11px;
       </widget>
      </item>
      <item row="2" column="1">
-      <widget class="QLineEdit" name="m_Separator">
+      <widget class="DREAM3DLineEdit" name="m_Separator">
        <property name="text">
         <string>_</string>
        </property>

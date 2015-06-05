@@ -43,10 +43,10 @@
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QFormLayout>
-#include <QtWidgets/QLineEdit>
 
 #include "QtSupportLib/DREAM3DHelpUrlGenerator.h"
 #include "QtSupportLib/DREAM3DStyles.h"
+#include "QtSupportLib/DREAM3DLineEdit.h"
 
 #include "DREAM3DWidgetsLib/DREAM3DWidgetsLibConstants.h"
 #include "DREAM3DWidgetsLib/FilterWidgetManager.h"

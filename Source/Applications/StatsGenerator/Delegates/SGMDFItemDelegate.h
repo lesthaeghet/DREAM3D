@@ -41,11 +41,11 @@
 #include <QtCore/QModelIndex>
 #include <QtGui/QPainter>
 #include <QtWidgets/QStyleOptionViewItemV4>
-#include <QtWidgets/QLineEdit>
 #include <QtGui/QDoubleValidator>
 #include <QtWidgets/QStyledItemDelegate>
 
 #include "QtSupportLib/DREAM3DComboBox.h"
+#include "QtSupportLib/DREAM3DLineEdit.h"
 
 #include "OrientationLib/Texture/StatsGen.hpp"
 #include "StatsGenerator/TableModels/SGMDFTableModel.h"
@@ -80,25 +80,25 @@ class SGMDFItemDelegate : public QStyledItemDelegate
     // -----------------------------------------------------------------------------
     QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const
     {
-      QLineEdit* editor;
+      DREAM3DLineEdit* editor;
       QDoubleValidator* weightValidator;
 
       qint32 col = index.column();
       switch(col)
       {
         case SGMDFTableModel::Angle:
-          editor = new QLineEdit(parent);
+          editor = new DREAM3DLineEdit(parent);
           editor->setFrame(false);
           weightValidator = new QDoubleValidator(editor);
           weightValidator->setDecimals(4);
           editor->setValidator(weightValidator);
           return editor;
         case SGMDFTableModel::Axis:
-          editor = new QLineEdit(parent);
+          editor = new DREAM3DLineEdit(parent);
           editor->setFrame(false);
           return editor;
         case SGMDFTableModel::Weight:
-          editor = new QLineEdit(parent);
+          editor = new DREAM3DLineEdit(parent);
           editor->setFrame(false);
           weightValidator = new QDoubleValidator(editor);
           weightValidator->setDecimals(4);
@@ -121,7 +121,7 @@ class SGMDFItemDelegate : public QStyledItemDelegate
           || col == SGMDFTableModel::Weight
           || col == SGMDFTableModel::Axis)
       {
-        QLineEdit* lineEdit = qobject_cast<QLineEdit* > (editor);
+        DREAM3DLineEdit* lineEdit = qobject_cast<DREAM3DLineEdit* > (editor);
         Q_ASSERT(lineEdit);
         lineEdit->setText(index.model()->data(index).toString());
       }
@@ -138,7 +138,7 @@ class SGMDFItemDelegate : public QStyledItemDelegate
       //  bool ok = false;
       if (col == SGMDFTableModel::Angle || col == SGMDFTableModel::Weight)
       {
-        QLineEdit* lineEdit = qobject_cast<QLineEdit* > (editor);
+        DREAM3DLineEdit* lineEdit = qobject_cast<DREAM3DLineEdit* > (editor);
         Q_ASSERT(lineEdit);
         bool ok = false;
         double v = lineEdit->text().toFloat(&ok);
@@ -146,7 +146,7 @@ class SGMDFItemDelegate : public QStyledItemDelegate
       }
       else if (col == SGMDFTableModel::Axis)
       {
-        QLineEdit* lineEdit = qobject_cast<QLineEdit* > (editor);
+        DREAM3DLineEdit* lineEdit = qobject_cast<DREAM3DLineEdit* > (editor);
         Q_ASSERT(lineEdit);
         model->setData(index, lineEdit->text());
       }

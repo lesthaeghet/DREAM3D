@@ -120,7 +120,7 @@ class DREAM3DWidgetsLib_EXPORT Symmetric6x6Widget : public FilterParameterWidget
     void setTriclinicSym();
 
     //helper functions for complex inter dependancies
-    // void vbar(QLineEdit* obj);
+    // void vbar(DREAM3DLineEdit* obj);
 
     Symmetric6x6Widget(const Symmetric6x6Widget&); // Copy Constructor Not Implemented
     void operator=(const Symmetric6x6Widget&); // Operator '=' Not Implemented

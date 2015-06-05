@@ -93,7 +93,7 @@ class DREAM3DWidgetsLib_EXPORT FourthOrderPolynomialWidget : public FilterParame
     bool m_DidCausePreflight;
 
     //helper functions for complex inter dependancies
-    // void vbar(QLineEdit* obj);
+    // void vbar(DREAM3DLineEdit* obj);
 
     FourthOrderPolynomialWidget(const FourthOrderPolynomialWidget&); // Copy Constructor Not Implemented
     void operator=(const FourthOrderPolynomialWidget&); // Operator '=' Not Implemented

@@ -35,8 +35,9 @@
 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
 #include "DynamicTableItemDelegate.h"
-#include <QLineEdit>
 #include <QIntValidator>
+
+#include "QtSupportLib/DREAM3DLineEdit.h"
 
 // -----------------------------------------------------------------------------
 //
@@ -60,7 +61,7 @@ DynamicTableItemDelegate::~DynamicTableItemDelegate()
 // -----------------------------------------------------------------------------
 QWidget* DynamicTableItemDelegate::createEditor(QWidget* parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-	QLineEdit* editor = new QLineEdit(parent);
+	DREAM3DLineEdit* editor = new DREAM3DLineEdit(parent);
 	QDoubleValidator* validator = new QDoubleValidator();
 	validator->setDecimals(5);
 	validator->setNotation(QDoubleValidator::StandardNotation);
@@ -74,7 +75,7 @@ QWidget* DynamicTableItemDelegate::createEditor(QWidget* parent, const QStyleOpt
 void DynamicTableItemDelegate::setEditorData(QWidget* editor, const QModelIndex &index) const
 {
 	QString value = index.model()->data(index, Qt::EditRole).toString();
-	QLineEdit* line = static_cast<QLineEdit*>(editor);
+	DREAM3DLineEdit* line = static_cast<DREAM3DLineEdit*>(editor);
 	line->setText(value);
 }
 
@@ -83,7 +84,7 @@ void DynamicTableItemDelegate::setEditorData(QWidget* editor, const QModelIndex 
 // -----------------------------------------------------------------------------
 void DynamicTableItemDelegate::setModelData(QWidget* editor, QAbstractItemModel* model, const QModelIndex &index) const
 {
-	QLineEdit* line = static_cast<QLineEdit*>(editor);
+	DREAM3DLineEdit* line = static_cast<DREAM3DLineEdit*>(editor);
 	QString value = line->text();
 	model->setData(index, value);
 }

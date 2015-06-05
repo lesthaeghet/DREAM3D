@@ -117,7 +117,7 @@ class InitializeSyntheticVolumeWidget : public FilterParameterWidget, private Ui
      * @param lineEdit
      * @return
      */
-    bool verifyPathExists(QString outFilePath, QLineEdit* lineEdit);
+    bool verifyPathExists(QString outFilePath, DREAM3DLineEdit* lineEdit);
 
     /**
      * @brief estimate_numFeatures

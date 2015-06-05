@@ -130,7 +130,7 @@ class ReadH5EbsdWidget : public FilterParameterWidget, private Ui::ReadH5EbsdWid
      * @param lineEdit
      * @return
      */
-    bool verifyPathExists(QString outFilePath, QLineEdit* lineEdit);
+    bool verifyPathExists(QString outFilePath, DREAM3DLineEdit* lineEdit);
 
     /**
      * @brief resetGuiFileInfoWidgets

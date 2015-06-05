@@ -57,7 +57,7 @@ QLineEdit(parent)
 //
 // -----------------------------------------------------------------------------
 DREAM3DLineEdit::DREAM3DLineEdit(const QString &title, QWidget* parent) :
-QLineEdit(title, parent)
+DREAM3DLineEdit(title, parent)
 {
   setupGui();
 }
@@ -79,5 +79,5 @@ void DREAM3DLineEdit::setupGui()
   setMinimumSize(120, 0);
 
   // Set the size policy
-  QLineEdit::setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+  DREAM3DLineEdit::setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 }

@@ -41,13 +41,13 @@
 #include <QtCore/QModelIndex>
 #include <QtGui/QPainter>
 #include <QtWidgets/QStyleOptionViewItemV4>
-#include <QtWidgets/QLineEdit>
 #include <QtGui/QDoubleValidator>
 #include <QtWidgets/QStyledItemDelegate>
 
 #include "EbsdLib/EbsdConstants.h"
 
 #include "QtSupportLib/DREAM3DComboBox.h"
+#include "QtSupportLib/DREAM3DLineEdit.h"
 
 #include "OrientationLib/Texture/StatsGen.hpp"
 #include "StatsGenerator/TableModels/SGODFTableModel.h"
@@ -83,7 +83,7 @@ class SGODFItemDelegate : public QStyledItemDelegate
     // -----------------------------------------------------------------------------
     QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const
     {
-      QLineEdit* editor;
+      DREAM3DLineEdit* editor;
       QDoubleValidator* validator;
       unsigned int sigma_top = 1;
       if ( Ebsd::CrystalStructure::Cubic_High == m_CrystalStructure )
@@ -97,7 +97,7 @@ class SGODFItemDelegate : public QStyledItemDelegate
       qint32 col = index.column();
       if (col == SGODFTableModel::Sigma)
       {
-        editor = new QLineEdit(parent);
+        editor = new DREAM3DLineEdit(parent);
         editor->setFrame(false);
         validator = new QDoubleValidator(editor);
         validator->setDecimals(0);
@@ -108,7 +108,7 @@ class SGODFItemDelegate : public QStyledItemDelegate
       }
       else if (col < SGODFTableModel::ColumnCount)
       {
-        editor = new QLineEdit(parent);
+        editor = new DREAM3DLineEdit(parent);
         editor->setFrame(false);
         validator = new QDoubleValidator(editor);
         validator->setDecimals(4);
@@ -126,7 +126,7 @@ class SGODFItemDelegate : public QStyledItemDelegate
       qint32 col = index.column();
       if (col < SGODFTableModel::ColumnCount)
       {
-        QLineEdit* lineEdit = qobject_cast<QLineEdit* > (editor);
+        DREAM3DLineEdit* lineEdit = qobject_cast<DREAM3DLineEdit* > (editor);
         Q_ASSERT(lineEdit);
         lineEdit->setText(index.model()->data(index).toString());
       }
@@ -141,7 +141,7 @@ class SGODFItemDelegate : public QStyledItemDelegate
       qint32 col = index.column();
       if (col < SGODFTableModel::ColumnCount)
       {
-        QLineEdit* lineEdit = qobject_cast<QLineEdit* > (editor);
+        DREAM3DLineEdit* lineEdit = qobject_cast<DREAM3DLineEdit* > (editor);
         Q_ASSERT(lineEdit);
         bool ok = false;
         double v = lineEdit->text().toFloat(&ok);

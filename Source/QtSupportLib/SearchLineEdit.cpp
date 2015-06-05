@@ -140,7 +140,7 @@ bool SearchLineEditPrivate::eventFilter(QObject* obj, QEvent* event)
 //
 // -----------------------------------------------------------------------------
 SearchLineEdit::SearchLineEdit(QWidget* parent) :
-  QLineEdit(parent),
+  DREAM3DLineEdit(parent),
   d(new SearchLineEditPrivate(this))
 {
   ensurePolished();

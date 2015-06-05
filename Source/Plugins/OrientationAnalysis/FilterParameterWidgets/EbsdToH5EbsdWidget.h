@@ -121,7 +121,7 @@ class EbsdToH5EbsdWidget : public FilterParameterWidget, private Ui::EbsdToH5Ebs
     void on_m_ZEndIndex_valueChanged(int value);
     void on_m_zSpacing_textChanged(const QString& string);
 
-    // slots to catch signals emitted by the various QLineEdit widgets
+    // slots to catch signals emitted by the various DREAM3DLineEdit widgets
     void on_m_InputDir_textChanged(const QString& text);
     void on_m_OutputFile_textChanged(const QString& text);
 
@@ -147,7 +147,7 @@ class EbsdToH5EbsdWidget : public FilterParameterWidget, private Ui::EbsdToH5Ebs
      * @param lineEdit
      * @return
      */
-    bool verifyPathExists(QString outFilePath, QLineEdit* lineEdit);
+    bool verifyPathExists(QString outFilePath, DREAM3DLineEdit* lineEdit);
 
     /**
      * @brief setWidgetListEnabled

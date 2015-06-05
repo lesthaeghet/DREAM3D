@@ -52,7 +52,7 @@
    <item row="2" column="0">
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QLineEdit" name="outputDir">
+      <widget class="DREAM3DLineEdit" name="outputDir">
        <property name="alignment">
         <set>Qt::AlignCenter</set>
        </property>

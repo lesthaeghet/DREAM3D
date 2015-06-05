@@ -36,10 +36,11 @@
 #include "PrimaryRolledPresetDialog.h"
 #include <QtWidgets/QFormLayout>
 #include <QtWidgets/QLabel>
-#include <QtWidgets/QLineEdit>
 #include <QtWidgets/QDialogButtonBox>
 #include <QtGui/QDoubleValidator>
 #include <QtWidgets/QApplication>
+
+#include "QtSupportLib/DREAM3DLineEdit.h"
 
 // -----------------------------------------------------------------------------
 //
@@ -72,7 +73,7 @@ void PrimaryRolledPresetDialog::setupGui()
   ALabel->setObjectName(QString::fromUtf8("A Label"));
   formLayout->setWidget(0, QFormLayout::LabelRole, ALabel);
 
-  A = new QLineEdit(this);
+  A = new DREAM3DLineEdit(this);
   A->setText(QString("1.0"));
   A->setObjectName(QString::fromUtf8("A"));
   formLayout->setWidget(0, QFormLayout::FieldRole, A);
@@ -83,7 +84,7 @@ void PrimaryRolledPresetDialog::setupGui()
   BLabel->setObjectName(QString::fromUtf8("B Label"));
   formLayout->setWidget(1, QFormLayout::LabelRole, BLabel);
 
-  B = new QLineEdit(this);
+  B = new DREAM3DLineEdit(this);
   B->setText(QString("1.0"));
   B->setObjectName(QString::fromUtf8("B"));
   formLayout->setWidget(1, QFormLayout::FieldRole, B);
@@ -94,7 +95,7 @@ void PrimaryRolledPresetDialog::setupGui()
   CLabel->setObjectName(QString::fromUtf8("C Label"));
   formLayout->setWidget(2, QFormLayout::LabelRole, CLabel);
 
-  C = new QLineEdit(this);
+  C = new DREAM3DLineEdit(this);
   C->setText(QString("1.0"));
   C->setObjectName(QString::fromUtf8("B"));
   formLayout->setWidget(2, QFormLayout::FieldRole, C);

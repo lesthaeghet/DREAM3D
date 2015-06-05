@@ -34,14 +34,14 @@
       </widget>
      </item>
      <item row="4" column="1">
-      <widget class="QLineEdit" name="BoxSizeYLE">
+      <widget class="DREAM3DLineEdit" name="BoxSizeYLE">
        <property name="text">
         <string>100</string>
        </property>
       </widget>
      </item>
      <item row="5" column="1">
-      <widget class="QLineEdit" name="BoxSizeZLE">
+      <widget class="DREAM3DLineEdit" name="BoxSizeZLE">
        <property name="text">
         <string>100</string>
        </property>
@@ -55,7 +55,7 @@
       </widget>
      </item>
      <item row="3" column="1">
-      <widget class="QLineEdit" name="BoxSizeXLE">
+      <widget class="DREAM3DLineEdit" name="BoxSizeXLE">
        <property name="text">
         <string>100</string>
        </property>
@@ -69,7 +69,7 @@
       </widget>
      </item>
      <item row="1" column="1">
-      <widget class="QLineEdit" name="maxDistLE">
+      <widget class="DREAM3DLineEdit" name="maxDistLE">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -82,7 +82,7 @@
       </widget>
      </item>
      <item row="2" column="1">
-      <widget class="QLineEdit" name="numBinsLE">
+      <widget class="DREAM3DLineEdit" name="numBinsLE">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -95,7 +95,7 @@
       </widget>
      </item>
      <item row="0" column="1">
-      <widget class="QLineEdit" name="minDistLE">
+      <widget class="DREAM3DLineEdit" name="minDistLE">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
          <horstretch>0</horstretch>

@@ -39,8 +39,9 @@
 #include <QtCore/QFileInfo>
 #include <QtCore/QDir>
 
-#include <QtWidgets/QLineEdit>
 #include <QtWidgets/QMessageBox>
+
+#include "QtSupportLib/DREAM3DLineEdit.h"
 
 // -----------------------------------------------------------------------------
 //
@@ -61,7 +62,7 @@ DREAM3DPluginFrame::~DREAM3DPluginFrame()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-bool DREAM3DPluginFrame::verifyOutputPathParentExists(QString outFilePath, QLineEdit* lineEdit)
+bool DREAM3DPluginFrame::verifyOutputPathParentExists(QString outFilePath, DREAM3DLineEdit* lineEdit)
 {
   QFileInfo fileinfo(outFilePath);
   QDir parent (fileinfo.dir() );
@@ -80,7 +81,7 @@ bool DREAM3DPluginFrame::verifyOutputPathParentExists(QString outFilePath, QLine
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-bool DREAM3DPluginFrame::verifyPathExists(QString outFilePath, QLineEdit* lineEdit)
+bool DREAM3DPluginFrame::verifyPathExists(QString outFilePath, DREAM3DLineEdit* lineEdit)
 {
   //  qDebug() << "outFilePath: " << outFilePath() << "\n";
   QFileInfo fileinfo(outFilePath);
@@ -115,7 +116,7 @@ QStatusBar* DREAM3DPluginFrame::statusBar()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-bool DREAM3DPluginFrame::sanityCheckOutputDirectory(QLineEdit* le, QString msgTitle)
+bool DREAM3DPluginFrame::sanityCheckOutputDirectory(DREAM3DLineEdit* le, QString msgTitle)
 {
 
   if (le->text().isEmpty() == true)

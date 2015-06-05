@@ -200,7 +200,7 @@ void FileListInfoWidget::validateInputFile()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-bool FileListInfoWidget::verifyPathExists(QString outFilePath, QLineEdit* lineEdit)
+bool FileListInfoWidget::verifyPathExists(QString outFilePath, DREAM3DLineEdit* lineEdit)
 {
   //  std::cout << "outFilePath: " << outFilePath << std::endl;
   QFileInfo fileinfo(outFilePath);

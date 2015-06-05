@@ -146,16 +146,16 @@ class StatsGeneratorUI : public QMainWindow, private Ui::StatsGeneratorUI
     /**
      * @brief Verifies that a path exists on the file system.
      * @param outFilePath The file path to check
-     * @param lineEdit The QLineEdit object to modify visuals of (Usually by placing a red line around the QLineEdit widget)
+     * @param lineEdit The DREAM3DLineEdit object to modify visuals of (Usually by placing a red line around the DREAM3DLineEdit widget)
      */
-    bool verifyPathExists(QString outFilePath, QLineEdit* lineEdit);
+    bool verifyPathExists(QString outFilePath, DREAM3DLineEdit* lineEdit);
 
     /**
      * @brief Verifies that a parent path exists on the file system.
      * @param outFilePath The parent file path to check
-     * @param lineEdit The QLineEdit object to modify visuals of (Usually by placing a red line around the QLineEdit widget)
+     * @param lineEdit The DREAM3DLineEdit object to modify visuals of (Usually by placing a red line around the DREAM3DLineEdit widget)
      */
-    bool verifyOutputPathParentExists(QString outFilePath, QLineEdit* lineEdit);
+    bool verifyOutputPathParentExists(QString outFilePath, DREAM3DLineEdit* lineEdit);
 
 
   private slots:

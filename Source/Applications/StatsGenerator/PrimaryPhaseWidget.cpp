@@ -47,7 +47,6 @@
 #include <QtConcurrent/QtConcurrentRun>
 #include <QtWidgets/QMessageBox>
 #include <QtWidgets/QProgressDialog>
-#include <QtWidgets/QLineEdit>
 #include <QtGui/QIntValidator>
 #include <QtGui/QDoubleValidator>
 
@@ -73,6 +72,8 @@
 #include "DREAM3DLib/DataArrays/StatsDataArray.h"
 #include "DREAM3DLib/StatsData/StatsData.h"
 #include "DREAM3DLib/StatsData/PrimaryStatsData.h"
+
+#include "QtSupportLib/DREAM3DLineEdit.h"
 
 #include "OrientationLib/Texture/StatsGen.hpp"
 
@@ -475,7 +476,7 @@ void PrimaryPhaseWidget::on_m_GenerateDefaultData_clicked()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-bool PrimaryPhaseWidget::validateValue(QDoubleValidator* val, QLineEdit* lineEdit)
+bool PrimaryPhaseWidget::validateValue(QDoubleValidator* val, DREAM3DLineEdit* lineEdit)
 {
   QString value(lineEdit->text());
   int not_used = 0;

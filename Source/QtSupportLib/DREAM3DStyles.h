@@ -40,7 +40,7 @@
 
 #include "QtSupportLib/QtSupportLib.h"
 
-class QLineEdit;
+class DREAM3DLineEdit;
 
 class QtSupportLib_EXPORT DREAM3DStyles : public QObject
 {
@@ -54,8 +54,8 @@ class QtSupportLib_EXPORT DREAM3DStyles : public QObject
     static QFont GetBrandingLabelFont();
     static QFont GetCategoryFont();
     static QFont GetTitleFont();
-    static void LineEditErrorStyle(QLineEdit* lineEdit);
-    static void LineEditClearStyle(QLineEdit* lineEdit);
+    static void LineEditErrorStyle(DREAM3DLineEdit* lineEdit);
+    static void LineEditClearStyle(DREAM3DLineEdit* lineEdit);
 
 };
 

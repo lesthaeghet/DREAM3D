@@ -36,10 +36,11 @@
 #include "PrimaryRecrystallizedPresetDialog.h"
 #include <QtWidgets/QFormLayout>
 #include <QtWidgets/QLabel>
-#include <QtWidgets/QLineEdit>
 #include <QtWidgets/QDialogButtonBox>
 #include <QtGui/QDoubleValidator>
 #include <QtWidgets/QApplication>
+
+#include "QtSupportLib/DREAM3DLineEdit.h"
 
 // -----------------------------------------------------------------------------
 //
@@ -72,7 +73,7 @@ void PrimaryRecrystallizedPresetDialog::setupGui()
   percentRecystallizedLabel->setObjectName(QString::fromUtf8("Percent Recrystallized Label"));
   formLayout->setWidget(0, QFormLayout::LabelRole, percentRecystallizedLabel);
 
-  percentRecystallized = new QLineEdit(this);
+  percentRecystallized = new DREAM3DLineEdit(this);
   percentRecystallized->setText(QString("1.0"));
   percentRecystallized->setObjectName(QString::fromUtf8("percentRecystallized"));
   formLayout->setWidget(0, QFormLayout::FieldRole, percentRecystallized);
