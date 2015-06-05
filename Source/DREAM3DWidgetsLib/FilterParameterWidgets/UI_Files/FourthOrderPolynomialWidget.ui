@@ -23,18 +23,12 @@
    <property name="bottomMargin">
     <number>2</number>
    </property>
-   <item row="1" column="4">
-    <widget class="DREAM3DLineEdit" name="c04"/>
-   </item>
    <item row="1" column="7">
     <widget class="QLabel" name="label_14">
      <property name="text">
       <string>*x^3*y + </string>
      </property>
     </widget>
-   </item>
-   <item row="1" column="8">
-    <widget class="DREAM3DLineEdit" name="c13"/>
    </item>
    <item row="1" column="11">
     <widget class="QLabel" name="label_16">
@@ -43,21 +37,12 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="2">
-    <widget class="DREAM3DLineEdit" name="c40"/>
-   </item>
    <item row="4" column="26">
     <widget class="QLabel" name="label_7">
      <property name="text">
       <string/>
      </property>
     </widget>
-   </item>
-   <item row="1" column="10">
-    <widget class="DREAM3DLineEdit" name="c22"/>
-   </item>
-   <item row="1" column="6">
-    <widget class="DREAM3DLineEdit" name="c31"/>
    </item>
    <item row="1" column="9">
     <widget class="QLabel" name="label_15">
@@ -87,20 +72,10 @@
      </property>
     </widget>
    </item>
-   <item row="3" column="2">
-    <widget class="DREAM3DLineEdit" name="c02"/>
-   </item>
    <item row="3" column="3">
     <widget class="QLabel" name="label_3">
      <property name="text">
       <string>*y^2 + </string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="4">
-    <widget class="DREAM3DLineEdit" name="c11">
-     <property name="text">
-      <string/>
      </property>
     </widget>
    </item>
@@ -111,9 +86,6 @@
      </property>
     </widget>
    </item>
-   <item row="3" column="6">
-    <widget class="DREAM3DLineEdit" name="c10"/>
-   </item>
    <item row="3" column="7">
     <widget class="QLabel" name="label_5">
      <property name="text">
@@ -121,18 +93,12 @@
      </property>
     </widget>
    </item>
-   <item row="3" column="8">
-    <widget class="DREAM3DLineEdit" name="c01"/>
-   </item>
    <item row="3" column="9">
     <widget class="QLabel" name="label_6">
      <property name="text">
       <string>*y + </string>
      </property>
     </widget>
-   </item>
-   <item row="3" column="10">
-    <widget class="DREAM3DLineEdit" name="c00"/>
    </item>
    <item row="3" column="11">
     <spacer name="horizontalSpacer_2">
@@ -154,18 +120,12 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="10">
-    <widget class="DREAM3DLineEdit" name="c20"/>
-   </item>
    <item row="2" column="9">
     <widget class="QLabel" name="label_11">
      <property name="text">
       <string>*x*y^2 + </string>
      </property>
     </widget>
-   </item>
-   <item row="2" column="8">
-    <widget class="DREAM3DLineEdit" name="c12"/>
    </item>
    <item row="2" column="7">
     <widget class="QLabel" name="label_10">
@@ -174,9 +134,6 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="6">
-    <widget class="DREAM3DLineEdit" name="c21"/>
-   </item>
    <item row="2" column="5">
     <widget class="QLabel" name="label_9">
      <property name="text">
@@ -184,18 +141,12 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="4">
-    <widget class="DREAM3DLineEdit" name="c03"/>
-   </item>
    <item row="2" column="3">
     <widget class="QLabel" name="label_8">
      <property name="text">
       <string>*x^3 + </string>
      </property>
     </widget>
-   </item>
-   <item row="2" column="2">
-    <widget class="DREAM3DLineEdit" name="c30"/>
    </item>
    <item row="1" column="14">
     <spacer name="horizontalSpacer">
@@ -222,6 +173,51 @@
       </size>
      </property>
     </spacer>
+   </item>
+   <item row="3" column="10">
+    <widget class="DREAM3DLineEdit" name="c00"/>
+   </item>
+   <item row="3" column="8">
+    <widget class="DREAM3DLineEdit" name="c01"/>
+   </item>
+   <item row="3" column="6">
+    <widget class="DREAM3DLineEdit" name="c10"/>
+   </item>
+   <item row="3" column="4">
+    <widget class="DREAM3DLineEdit" name="c11"/>
+   </item>
+   <item row="3" column="2">
+    <widget class="DREAM3DLineEdit" name="c02"/>
+   </item>
+   <item row="2" column="4">
+    <widget class="DREAM3DLineEdit" name="c03"/>
+   </item>
+   <item row="1" column="4">
+    <widget class="DREAM3DLineEdit" name="c04"/>
+   </item>
+   <item row="2" column="8">
+    <widget class="DREAM3DLineEdit" name="c12"/>
+   </item>
+   <item row="1" column="8">
+    <widget class="DREAM3DLineEdit" name="c13"/>
+   </item>
+   <item row="2" column="10">
+    <widget class="DREAM3DLineEdit" name="c20"/>
+   </item>
+   <item row="2" column="6">
+    <widget class="DREAM3DLineEdit" name="c21"/>
+   </item>
+   <item row="1" column="10">
+    <widget class="DREAM3DLineEdit" name="c22"/>
+   </item>
+   <item row="2" column="2">
+    <widget class="DREAM3DLineEdit" name="c30"/>
+   </item>
+   <item row="1" column="6">
+    <widget class="DREAM3DLineEdit" name="c31"/>
+   </item>
+   <item row="1" column="2">
+    <widget class="DREAM3DLineEdit" name="c40"/>
    </item>
   </layout>
  </widget>

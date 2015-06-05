@@ -64,12 +64,6 @@
    <header location="global">DREAM3DLineEdit.h</header>
   </customwidget>
  </customwidgets>
- <tabstops>
-  <tabstop>aData</tabstop>
-  <tabstop>bData</tabstop>
-  <tabstop>cData</tabstop>
-  <tabstop>dData</tabstop>
- </tabstops>
  <resources>
   <include location="../../../../Resources/icons/images/Icons.qrc"/>
  </resources>

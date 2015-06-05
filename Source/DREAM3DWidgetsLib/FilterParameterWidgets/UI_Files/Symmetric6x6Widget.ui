@@ -26,14 +26,20 @@
    <item row="3" column="7">
     <widget class="DREAM3DLineEdit" name="v24"/>
    </item>
+   <item row="3" column="8">
+    <widget class="DREAM3DLineEdit" name="v25"/>
+   </item>
+   <item row="3" column="6">
+    <widget class="DREAM3DLineEdit" name="v23"/>
+   </item>
    <item row="3" column="3">
     <widget class="DREAM3DLineEdit" name="v22"/>
    </item>
-   <item row="2" column="3">
-    <widget class="DREAM3DLineEdit" name="v12"/>
+   <item row="3" column="9">
+    <widget class="DREAM3DLineEdit" name="v26"/>
    </item>
-   <item row="4" column="7">
-    <widget class="DREAM3DLineEdit" name="v34"/>
+   <item row="6" column="8">
+    <widget class="DREAM3DLineEdit" name="v55"/>
    </item>
    <item row="4" column="6">
     <widget class="DREAM3DLineEdit" name="v33"/>
@@ -41,62 +47,61 @@
    <item row="5" column="7">
     <widget class="DREAM3DLineEdit" name="v44"/>
    </item>
-   <item row="2" column="7">
-    <widget class="DREAM3DLineEdit" name="v14"/>
-   </item>
-   <item row="2" column="2">
-    <widget class="DREAM3DLineEdit" name="v11"/>
-   </item>
-   <item row="4" column="9">
-    <widget class="DREAM3DLineEdit" name="v36"/>
-   </item>
-   <item row="7" column="9">
-    <widget class="DREAM3DLineEdit" name="v66"/>
-   </item>
-   <item row="4" column="8">
-    <widget class="DREAM3DLineEdit" name="v35"/>
-   </item>
-   <item row="3" column="9">
-    <widget class="DREAM3DLineEdit" name="v26"/>
-   </item>
    <item row="5" column="8">
     <widget class="DREAM3DLineEdit" name="v45"/>
-   </item>
-   <item row="6" column="8">
-    <widget class="DREAM3DLineEdit" name="v55"/>
-   </item>
-   <item row="2" column="8">
-    <widget class="DREAM3DLineEdit" name="v15"/>
-   </item>
-   <item row="6" column="9">
-    <widget class="DREAM3DLineEdit" name="v56"/>
    </item>
    <item row="2" column="9">
     <widget class="DREAM3DLineEdit" name="v16"/>
    </item>
-   <item row="3" column="6">
-    <widget class="DREAM3DLineEdit" name="v23"/>
+   <item row="4" column="8">
+    <widget class="DREAM3DLineEdit" name="v35"/>
+   </item>
+   <item row="4" column="9">
+    <widget class="DREAM3DLineEdit" name="v36"/>
+   </item>
+   <item row="4" column="7">
+    <widget class="DREAM3DLineEdit" name="v34"/>
    </item>
    <item row="5" column="9">
     <widget class="DREAM3DLineEdit" name="v46"/>
    </item>
-   <item row="2" column="6">
-    <widget class="DREAM3DLineEdit" name="v13">
+   <item row="6" column="9">
+    <widget class="DREAM3DLineEdit" name="v56"/>
+   </item>
+   <item row="1" column="3">
+    <widget class="QLabel" name="cBLabel">
      <property name="text">
-      <string/>
+      <string>Crystal Structure:</string>
      </property>
     </widget>
    </item>
-   <item row="3" column="8">
-    <widget class="DREAM3DLineEdit" name="v25"/>
+   <item row="2" column="1">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>Property</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="10">
+    <spacer name="horizontalSpacer">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>40</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
    </item>
    <item row="1" column="6" colspan="2">
     <widget class="DREAM3DComboBox" name="comboBox">
      <property name="toolTip">
-      <string>Select An Item</string>
+      <string>Select A Crystal Structure</string>
      </property>
      <property name="statusTip">
-      <string>Select An Item</string>
+      <string>Select A Crystal Structure</string>
      </property>
      <property name="editable">
       <bool>false</bool>
@@ -157,32 +162,23 @@
      </item>
     </widget>
    </item>
-   <item row="2" column="1">
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>Property</string>
-     </property>
-    </widget>
+   <item row="2" column="2">
+    <widget class="DREAM3DLineEdit" name="v11"/>
    </item>
-   <item row="1" column="3">
-    <widget class="QLabel" name="cBLabel">
-     <property name="text">
-      <string>Crystal Structure:</string>
-     </property>
-    </widget>
+   <item row="2" column="6">
+    <widget class="DREAM3DLineEdit" name="v13"/>
    </item>
-   <item row="4" column="10">
-    <spacer name="horizontalSpacer">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>40</width>
-       <height>20</height>
-      </size>
-     </property>
-    </spacer>
+   <item row="2" column="3">
+    <widget class="DREAM3DLineEdit" name="v12"/>
+   </item>
+   <item row="2" column="7">
+    <widget class="DREAM3DLineEdit" name="v14"/>
+   </item>
+   <item row="2" column="8">
+    <widget class="DREAM3DLineEdit" name="v15"/>
+   </item>
+   <item row="7" column="9">
+    <widget class="DREAM3DLineEdit" name="v66"/>
    </item>
   </layout>
  </widget>
@@ -200,27 +196,6 @@
  </customwidgets>
  <tabstops>
   <tabstop>comboBox</tabstop>
-  <tabstop>v11</tabstop>
-  <tabstop>v12</tabstop>
-  <tabstop>v13</tabstop>
-  <tabstop>v14</tabstop>
-  <tabstop>v15</tabstop>
-  <tabstop>v16</tabstop>
-  <tabstop>v22</tabstop>
-  <tabstop>v23</tabstop>
-  <tabstop>v24</tabstop>
-  <tabstop>v25</tabstop>
-  <tabstop>v26</tabstop>
-  <tabstop>v33</tabstop>
-  <tabstop>v34</tabstop>
-  <tabstop>v35</tabstop>
-  <tabstop>v36</tabstop>
-  <tabstop>v44</tabstop>
-  <tabstop>v45</tabstop>
-  <tabstop>v46</tabstop>
-  <tabstop>v55</tabstop>
-  <tabstop>v56</tabstop>
-  <tabstop>v66</tabstop>
  </tabstops>
  <resources>
   <include location="../../../../Resources/icons/images/Icons.qrc"/>

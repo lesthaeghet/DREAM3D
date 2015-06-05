@@ -38,74 +38,32 @@
    </item>
    <item>
     <widget class="DREAM3DComboBox" name="dataContainerList">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Fixed" vsizetype="Maximum">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
      <property name="toolTip">
       <string>Select A Data Container</string>
      </property>
      <property name="statusTip">
       <string>Select A Data Container</string>
      </property>
-     <property name="sizeAdjustPolicy">
-      <enum>QComboBox::AdjustToContents</enum>
-     </property>
-     <item>
-      <property name="text">
-       <string>VolumeDataContainer</string>
-      </property>
-     </item>
     </widget>
    </item>
    <item>
     <widget class="DREAM3DComboBox" name="attributeMatrixList">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Fixed" vsizetype="Maximum">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
      <property name="toolTip">
       <string>Select An Attribute Matrix</string>
      </property>
      <property name="statusTip">
       <string>Select An Attribute Matrix</string>
      </property>
-     <property name="sizeAdjustPolicy">
-      <enum>QComboBox::AdjustToContents</enum>
-     </property>
-     <item>
-      <property name="text">
-       <string>CellFeatureData</string>
-      </property>
-     </item>
     </widget>
    </item>
    <item>
     <widget class="DREAM3DComboBox" name="attributeArrayList">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Fixed" vsizetype="Maximum">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
      <property name="toolTip">
       <string>Select An Attribute Array</string>
      </property>
      <property name="statusTip">
       <string>Select An Attribute Array</string>
      </property>
-     <property name="sizeAdjustPolicy">
-      <enum>QComboBox::AdjustToContents</enum>
-     </property>
-     <item>
-      <property name="text">
-       <string>Dictionary Euler Angles</string>
-      </property>
-     </item>
     </widget>
    </item>
    <item>

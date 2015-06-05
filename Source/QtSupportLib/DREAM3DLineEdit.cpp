@@ -77,4 +77,7 @@ void DREAM3DLineEdit::setupGui()
 {
   // Set the minimum size of the line edit
   setMinimumSize(120, 0);
+
+  // Set the size policy
+  QLineEdit::setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 }

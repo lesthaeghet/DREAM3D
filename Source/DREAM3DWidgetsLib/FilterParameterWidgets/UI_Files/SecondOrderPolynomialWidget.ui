@@ -23,45 +23,12 @@
    <property name="bottomMargin">
     <number>2</number>
    </property>
-   <item row="1" column="12">
-    <widget class="QLabel" name="label_6">
-     <property name="text">
-      <string>*y + </string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="2">
-    <widget class="DREAM3DLineEdit" name="c20"/>
-   </item>
-   <item row="1" column="7">
-    <widget class="DREAM3DLineEdit" name="c11">
-     <property name="text">
-      <string/>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="1">
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>Property</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="4">
-    <widget class="DREAM3DLineEdit" name="c02"/>
-   </item>
-   <item row="1" column="10">
+   <item row="1" column="9">
     <widget class="QLabel" name="label_5">
      <property name="text">
       <string>*x + </string>
      </property>
     </widget>
-   </item>
-   <item row="1" column="13">
-    <widget class="DREAM3DLineEdit" name="c00"/>
-   </item>
-   <item row="1" column="11">
-    <widget class="DREAM3DLineEdit" name="c01"/>
    </item>
    <item row="1" column="5">
     <widget class="QLabel" name="label_3">
@@ -70,7 +37,7 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="8">
+   <item row="2" column="7">
     <widget class="QLabel" name="label_7">
      <property name="text">
       <string/>
@@ -84,17 +51,28 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="8">
+   <item row="1" column="11">
+    <widget class="QLabel" name="label_6">
+     <property name="text">
+      <string>*y + </string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>Property</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="7">
     <widget class="QLabel" name="label_4">
      <property name="text">
       <string>*xy + </string>
      </property>
     </widget>
    </item>
-   <item row="1" column="9">
-    <widget class="DREAM3DLineEdit" name="c10"/>
-   </item>
-   <item row="1" column="14">
+   <item row="1" column="13">
     <spacer name="horizontalSpacer">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -107,6 +85,24 @@
      </property>
     </spacer>
    </item>
+   <item row="1" column="6">
+    <widget class="DREAM3DLineEdit" name="c11"/>
+   </item>
+   <item row="1" column="12">
+    <widget class="DREAM3DLineEdit" name="c00"/>
+   </item>
+   <item row="1" column="10">
+    <widget class="DREAM3DLineEdit" name="c01"/>
+   </item>
+   <item row="1" column="8">
+    <widget class="DREAM3DLineEdit" name="c10"/>
+   </item>
+   <item row="1" column="4">
+    <widget class="DREAM3DLineEdit" name="c02"/>
+   </item>
+   <item row="1" column="2">
+    <widget class="DREAM3DLineEdit" name="c20"/>
+   </item>
   </layout>
  </widget>
  <customwidgets>
@@ -116,11 +112,6 @@
    <header location="global">DREAM3DLineEdit.h</header>
   </customwidget>
  </customwidgets>
- <tabstops>
-  <tabstop>c20</tabstop>
-  <tabstop>c02</tabstop>
-  <tabstop>c11</tabstop>
- </tabstops>
  <resources>
   <include location="../../../../Resources/icons/images/Icons.qrc"/>
  </resources>

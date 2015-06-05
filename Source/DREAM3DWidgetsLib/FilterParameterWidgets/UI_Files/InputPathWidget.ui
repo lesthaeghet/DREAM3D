@@ -11,7 +11,16 @@
    </rect>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
-   <property name="margin">
+   <property name="leftMargin">
+    <number>2</number>
+   </property>
+   <property name="topMargin">
+    <number>2</number>
+   </property>
+   <property name="rightMargin">
+    <number>2</number>
+   </property>
+   <property name="bottomMargin">
     <number>2</number>
    </property>
    <item>
@@ -22,7 +31,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QFSDropLineEdit" name="value"/>
+    <widget class="DREAM3DLineEdit" name="value"/>
    </item>
    <item>
     <widget class="QPushButton" name="selectBtn">
@@ -35,9 +44,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QFSDropLineEdit</class>
+   <class>DREAM3DLineEdit</class>
    <extends>QLineEdit</extends>
-   <header location="global">QFSDropLineEdit.h</header>
+   <header location="global">DREAM3DLineEdit.h</header>
   </customwidget>
  </customwidgets>
  <resources>

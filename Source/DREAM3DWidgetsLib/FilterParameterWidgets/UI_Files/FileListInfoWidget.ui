@@ -143,16 +143,6 @@ font-size: 11px;
        </property>
       </widget>
      </item>
-     <item row="0" column="1">
-      <widget class="DREAM3DLineEdit" name="m_FilePrefix">
-       <property name="toolTip">
-        <string>The front part of the input file name</string>
-       </property>
-       <property name="text">
-        <string>Slice_</string>
-       </property>
-      </widget>
-     </item>
      <item row="0" column="2">
       <widget class="QLabel" name="label_13">
        <property name="styleSheet">
@@ -166,13 +156,6 @@ font-size: 11px;
        </property>
        <property name="alignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="3">
-      <widget class="DREAM3DLineEdit" name="m_FileSuffix">
-       <property name="toolTip">
-        <string>The part of the filename that comes AFTER the slice index</string>
        </property>
       </widget>
      </item>
@@ -194,11 +177,18 @@ font-size: 11px;
      </item>
      <item row="0" column="5">
       <widget class="DREAM3DLineEdit" name="m_FileExt">
-       <property name="toolTip">
-        <string>The file extension of the input files</string>
-       </property>
        <property name="text">
         <string>tif</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="3">
+      <widget class="DREAM3DLineEdit" name="m_FileSuffix"/>
+     </item>
+     <item row="0" column="1">
+      <widget class="DREAM3DLineEdit" name="m_FilePrefix">
+       <property name="text">
+        <string>Slice_</string>
        </property>
       </widget>
      </item>
@@ -269,9 +259,6 @@ font-size: 11px;
        </property>
       </widget>
      </item>
-     <item row="1" column="1">
-      <widget class="QFSDropLineEdit" name="m_InputDir"/>
-     </item>
      <item row="1" column="2">
       <widget class="QPushButton" name="m_InputDirBtn">
        <property name="text">
@@ -298,6 +285,9 @@ font-size: 11px;
         <string>0</string>
        </property>
       </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QFSDropLineEdit" name="m_InputDir"/>
      </item>
     </layout>
    </item>
@@ -447,17 +437,18 @@ font-size: 11px;
  </widget>
  <customwidgets>
   <customwidget>
+   <class>DREAM3DLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header location="global">DREAM3DLineEdit.h</header>
+  </customwidget>
+  <customwidget>
    <class>QFSDropLineEdit</class>
    <extends>QLineEdit</extends>
    <header location="global">QFSDropLineEdit.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>m_InputDir</tabstop>
   <tabstop>m_InputDirBtn</tabstop>
-  <tabstop>m_FilePrefix</tabstop>
-  <tabstop>m_FileSuffix</tabstop>
-  <tabstop>m_FileExt</tabstop>
   <tabstop>m_StartIndex</tabstop>
   <tabstop>m_EndIndex</tabstop>
   <tabstop>m_TotalDigits</tabstop>
