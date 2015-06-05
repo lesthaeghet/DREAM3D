@@ -38,7 +38,6 @@
 #include <QtCore/QMetaProperty>
 #include <QtCore/QList>
 
-#include <QtWidgets/QComboBox>
 #include <QtWidgets/QLabel>
 
 #include "DREAM3DLib/Common/PhaseType.h"
@@ -46,6 +45,8 @@
 #include "DREAM3DLib/FilterParameters/PhaseTypesFilterParameter.h"
 #include "DREAM3DLib/Utilities/QMetaObjectUtilities.h"
 #include "DREAM3DWidgetsLib/DREAM3DWidgetsLibConstants.h"
+
+#include "QtSupportLib/DREAM3DComboBox.h"
 
 #include "FilterParameterWidgetsDialogs.h"
 
@@ -397,7 +398,7 @@ void PhaseTypeSelectionWidget::updatePhaseComboBoxes()
   //for (int i = 0; i < size; i++)
   for (int i = 1; i < phaseCount; i++)
   {
-    QComboBox* cb = new QComboBox(NULL);
+    DREAM3DComboBox* cb = new DREAM3DComboBox(NULL);
     for (qint32 s = 0; s < phaseTypestrings.size(); ++s)
     {
       cb->addItem((phaseTypestrings[s]), phaseTypeEnums[s]);
@@ -437,7 +438,7 @@ void PhaseTypeSelectionWidget::resetPhaseComboBoxes()
 
   for (int i = 0; i < count; ++i)
   {
-    QComboBox* cb = qobject_cast<QComboBox*>(phaseListWidget->itemWidget(phaseListWidget->item(i)));
+    DREAM3DComboBox* cb = qobject_cast<DREAM3DComboBox*>(phaseListWidget->itemWidget(phaseListWidget->item(i)));
     if (cb) { cb->setCurrentIndex(-1); }
   }
 }
@@ -493,7 +494,7 @@ void PhaseTypeSelectionWidget::filterNeedsInputParameters(AbstractFilter* filter
   phaseTypes[0] = DREAM3D::PhaseType::UnknownPhaseType;
   for (int i = 0; i < count; ++i)
   {
-    QComboBox* cb = qobject_cast<QComboBox*>(phaseListWidget->itemWidget(phaseListWidget->item(i)));
+    DREAM3DComboBox* cb = qobject_cast<DREAM3DComboBox*>(phaseListWidget->itemWidget(phaseListWidget->item(i)));
     unsigned int sType = static_cast<unsigned int>(cb->itemData(cb->currentIndex(), Qt::UserRole).toUInt(&ok));
     //phaseTypes[i+1] = sType;
     phaseTypes[i + 1] = sType;

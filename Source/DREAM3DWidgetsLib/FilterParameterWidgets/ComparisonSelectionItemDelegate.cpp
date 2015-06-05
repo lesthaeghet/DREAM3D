@@ -42,9 +42,10 @@
 #include <QtWidgets/QStyleOptionViewItemV4>
 #include <QtWidgets/QLineEdit>
 #include <QtGui/QDoubleValidator>
-#include <QtWidgets/QComboBox>
 #include <QtGui/QPainter>
 #include <QtCore/QDebug>
+
+#include "QtSupportLib/DREAM3DComboBox.h"
 
 #include "DREAM3DWidgetsLib/FilterParameterWidgets/ComparisonSelectionTableModel.h"
 
@@ -94,7 +95,7 @@ QWidget* ComparisonSelectionItemDelegate::createEditor(QWidget* widgetParent, co
 {
   QLineEdit* featureValue = NULL;
   QDoubleValidator* featureValueValidator = NULL;
-  QComboBox* operatorCombo = NULL;
+  DREAM3DComboBox* operatorCombo = NULL;
 
   ComparisonSelectionTableModel* tableModel = qobject_cast<ComparisonSelectionTableModel*>(parent());
 
@@ -103,7 +104,7 @@ QWidget* ComparisonSelectionItemDelegate::createEditor(QWidget* widgetParent, co
             << (DREAM3D::Comparison::Strings::GreaterThan)
             << (DREAM3D::Comparison::Strings::Equal);
 
-  //QComboBox* phaseCombo = NULL;
+  //DREAM3DComboBox* phaseCombo = NULL;
   QStringList phases;
   for(int i = 0; i < m_NumberOfPhases; ++i)
   {
@@ -114,7 +115,7 @@ QWidget* ComparisonSelectionItemDelegate::createEditor(QWidget* widgetParent, co
   switch(col)
   {
     case ComparisonSelectionTableModel::FeatureName:
-      operatorCombo = new QComboBox(widgetParent);
+      operatorCombo = new DREAM3DComboBox(widgetParent);
       operatorCombo->addItems(m_FeatureList);
       operatorCombo->setAutoFillBackground(true);
       if(tableModel)
@@ -140,7 +141,7 @@ QWidget* ComparisonSelectionItemDelegate::createEditor(QWidget* widgetParent, co
       return featureValue;
     }
     case ComparisonSelectionTableModel::FeatureOperator:
-      operatorCombo = new QComboBox(widgetParent);
+      operatorCombo = new DREAM3DComboBox(widgetParent);
       operatorCombo->addItems(operators);
       operatorCombo->setAutoFillBackground(true);
       if (tableModel)
@@ -150,7 +151,7 @@ QWidget* ComparisonSelectionItemDelegate::createEditor(QWidget* widgetParent, co
       }
       return operatorCombo;
       //        case ComparisonSelectionTableModel::FeaturePhaseValue:
-      //          phaseCombo = new QComboBox(parent);
+      //          phaseCombo = new DREAM3DComboBox(parent);
       //          phaseCombo->addItems(phases);
       //          phaseCombo->setAutoFillBackground(true);
       //          return phaseCombo;
@@ -173,7 +174,7 @@ void ComparisonSelectionItemDelegate::setEditorData(QWidget* editor, const QMode
   {
     QString objName = QString::number(index.row()) + "," + QString::number(ComparisonSelectionTableModel::FeatureName);
     QString state = index.model()->data(index).toString();
-    QComboBox* comboBox = qobject_cast<QComboBox* > (editor);
+    DREAM3DComboBox* comboBox = qobject_cast<DREAM3DComboBox* > (editor);
     Q_ASSERT(comboBox);
     comboBox->setObjectName(objName);
     comboBox->setCurrentIndex(comboBox->findText(state));
@@ -193,7 +194,7 @@ void ComparisonSelectionItemDelegate::setEditorData(QWidget* editor, const QMode
   {
     QString objName = QString::number(index.row()) + "," + QString::number(ComparisonSelectionTableModel::FeatureOperator);
     QString state = index.model()->data(index).toString();
-    QComboBox* comboBox = qobject_cast<QComboBox* > (editor);
+    DREAM3DComboBox* comboBox = qobject_cast<DREAM3DComboBox* > (editor);
     Q_ASSERT(comboBox);
     comboBox->setObjectName(objName);
     comboBox->setCurrentIndex(comboBox->findText(state));
@@ -209,7 +210,7 @@ void ComparisonSelectionItemDelegate::setModelData(QWidget* editor, QAbstractIte
   qint32 col = index.column();
   if (col == ComparisonSelectionTableModel::FeatureName)
   {
-    QComboBox* comboBox = qobject_cast<QComboBox* > (editor);
+    DREAM3DComboBox* comboBox = qobject_cast<DREAM3DComboBox* > (editor);
     Q_ASSERT(comboBox);
     model->setData(index, comboBox->currentText());
   }
@@ -223,7 +224,7 @@ void ComparisonSelectionItemDelegate::setModelData(QWidget* editor, QAbstractIte
   }
   else if (col == ComparisonSelectionTableModel::FeatureOperator)
   {
-    QComboBox* comboBox = qobject_cast<QComboBox* > (editor);
+    DREAM3DComboBox* comboBox = qobject_cast<DREAM3DComboBox* > (editor);
     Q_ASSERT(comboBox);
     model->setData(index, comboBox->currentText());
   }

@@ -38,7 +38,6 @@
 
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QMessageBox>
-#include <QtWidgets/QComboBox>
 
 #include "EbsdLib/EbsdConstants.h"
 #include "EbsdLib/H5EbsdVolumeInfo.h"
@@ -54,6 +53,7 @@
 #include "QtSupportLib/QFileCompleter.h"
 #include "QtSupportLib/DREAM3DQtMacros.h"
 #include "QtSupportLib/DREAM3DHelpUrlGenerator.h"
+#include "QtSupportLib/DREAM3DComboBox.h"
 
 
 #include "OrientationAnalysis/OrientationAnalysisFilters/ReadH5Ebsd.h"

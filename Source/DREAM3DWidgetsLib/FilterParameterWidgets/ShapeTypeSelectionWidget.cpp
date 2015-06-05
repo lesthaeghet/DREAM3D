@@ -38,7 +38,6 @@
 #include <QtCore/QMetaProperty>
 #include <QtCore/QList>
 
-#include <QtWidgets/QComboBox>
 #include <QtWidgets/QLabel>
 
 #include "DREAM3DLib/Common/ShapeType.h"
@@ -46,6 +45,8 @@
 #include "DREAM3DLib/FilterParameters/ShapeTypesFilterParameter.h"
 #include "DREAM3DLib/Utilities/QMetaObjectUtilities.h"
 #include "DREAM3DWidgetsLib/DREAM3DWidgetsLibConstants.h"
+
+#include "QtSupportLib/DREAM3DComboBox.h"
 
 #include "FilterParameterWidgetsDialogs.h"
 
@@ -172,7 +173,7 @@ void ShapeTypeSelectionWidget::updateComboBoxes()
 
     formLayout_2->setWidget(i, QFormLayout::LabelRole, shapeTypeLabel);
 
-    QComboBox* cb = new QComboBox(m_ShapeTypeScrollContents);
+    DREAM3DComboBox* cb = new DREAM3DComboBox(m_ShapeTypeScrollContents);
     str.append(" ComboBox");
     cb->setObjectName(str);
     for (int32_t s = 0; s < shapeTypeStrings.size(); ++s)
@@ -238,7 +239,7 @@ void ShapeTypeSelectionWidget::filterNeedsInputParameters(AbstractFilter* filter
   bool ok = false;
   for (int i = 0; i < count; ++i)
   {
-    QComboBox* cb = m_ShapeTypeCombos.at(i);
+    DREAM3DComboBox* cb = m_ShapeTypeCombos.at(i);
     unsigned int sType = static_cast<unsigned int>(cb->itemData(cb->currentIndex(), Qt::UserRole).toUInt(&ok));
     shapeTypes[i + 1] = sType;
   }

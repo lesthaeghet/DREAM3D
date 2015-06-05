@@ -37,14 +37,14 @@
 #ifndef _COLORCOMBOPICKER_H_
 #define _COLORCOMBOPICKER_H_
 
-#include <QComboBox>
+#include "QtSupportLib/DREAM3DComboBox.h"
 
 #include "QtSupportLib/QtSupportLib.h"
 
 class QColor;
 class QWidget;
 
-class QtSupportLib_EXPORT ColorComboPicker : public QComboBox
+class QtSupportLib_EXPORT ColorComboPicker : public DREAM3DComboBox
 {
     Q_OBJECT
     Q_PROPERTY(QColor color READ color WRITE setColor USER true)

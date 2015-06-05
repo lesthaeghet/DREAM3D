@@ -49,7 +49,7 @@
 
 #include "SyntheticBuilding/ui_InitializeSyntheticVolumeWidget.h"
 
-class QComboBox;
+class DREAM3DComboBox;
 class InitializeSyntheticVolume;
 
 
@@ -168,7 +168,7 @@ class InitializeSyntheticVolumeWidget : public FilterParameterWidget, private Ui
 
     DataContainer::Pointer      m_DataContainer;
     QList<QLabel*>                    m_ShapeTypeLabels;
-    QList<QComboBox*>                 m_ShapeTypeCombos;
+    QList<DREAM3DComboBox*>                 m_ShapeTypeCombos;
 
 
     FilterParameter::Pointer     m_StatsArrayPath;

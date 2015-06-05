@@ -41,7 +41,7 @@
    <item>
     <layout class="QGridLayout" name="widgetLayout">
      <item row="2" column="2">
-      <widget class="QComboBox" name="howOften">
+      <widget class="DREAM3DComboBox" name="howOften">
        <item>
         <property name="text">
          <string>Daily</string>

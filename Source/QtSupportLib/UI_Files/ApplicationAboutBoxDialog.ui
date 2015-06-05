@@ -84,7 +84,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QComboBox" name="licenseCombo"/>
+      <widget class="DREAM3DComboBox" name="licenseCombo"/>
      </item>
     </layout>
    </item>

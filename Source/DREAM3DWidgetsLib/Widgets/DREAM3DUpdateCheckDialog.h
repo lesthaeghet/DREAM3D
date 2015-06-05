@@ -91,7 +91,7 @@ class DREAM3DWidgetsLib_EXPORT DREAM3DUpdateCheckDialog : public QDialog, privat
 
     QRadioButton* getAutomaticallyBtn();
     QRadioButton* getManuallyBtn();
-    QComboBox* getHowOftenComboBox();
+    DREAM3DComboBox* getHowOftenComboBox();
     QPushButton* getCheckNowBtn();
 
     static QString getUpdatePreferencesGroup();

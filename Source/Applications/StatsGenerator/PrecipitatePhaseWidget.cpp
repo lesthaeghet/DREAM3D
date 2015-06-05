@@ -144,7 +144,7 @@ void PrecipitatePhaseWidget::on_microstructurePresetCombo_currentIndexChanged(in
 //
 // -----------------------------------------------------------------------------
 template<typename T>
-AbstractMicrostructurePresetFactory::Pointer RegisterPresetFactory(QComboBox* microstructurePresetCombo)
+AbstractMicrostructurePresetFactory::Pointer RegisterPresetFactory(DREAM3DComboBox* microstructurePresetCombo)
 {
   AbstractMicrostructurePresetFactory::Pointer presetFactory = T::New();
   MicrostructurePresetManager::registerFactory(presetFactory);

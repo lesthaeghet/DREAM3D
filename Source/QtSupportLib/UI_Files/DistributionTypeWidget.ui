@@ -76,7 +76,7 @@ font-size: 12px;
     </widget>
    </item>
    <item>
-    <widget class="QComboBox" name="distributionTypeCombo"/>
+    <widget class="DREAM3DComboBox" name="distributionTypeCombo"/>
    </item>
    <item>
     <spacer name="horizontalSpacer">

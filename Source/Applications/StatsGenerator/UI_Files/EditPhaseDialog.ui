@@ -43,7 +43,7 @@
       </widget>
      </item>
      <item row="0" column="1">
-      <widget class="QComboBox" name="xtalCombo">
+      <widget class="DREAM3DComboBox" name="xtalCombo">
        <item>
         <property name="text">
          <string>Hexagonal</string>
@@ -126,7 +126,7 @@
       </widget>
      </item>
      <item row="3" column="1">
-      <widget class="QComboBox" name="phaseTypeCombo">
+      <widget class="DREAM3DComboBox" name="phaseTypeCombo">
        <item>
         <property name="text">
          <string>Primary</string>

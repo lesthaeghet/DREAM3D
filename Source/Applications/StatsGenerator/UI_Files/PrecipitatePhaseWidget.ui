@@ -74,7 +74,7 @@ font-size: 150%;
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout">
          <item>
-          <widget class="QComboBox" name="distributionTypeCombo">
+          <widget class="DREAM3DComboBox" name="distributionTypeCombo">
            <property name="enabled">
             <bool>false</bool>
            </property>
@@ -432,7 +432,7 @@ font-size: 12px;
           </widget>
          </item>
          <item>
-          <widget class="QComboBox" name="microstructurePresetCombo">
+          <widget class="DREAM3DComboBox" name="microstructurePresetCombo">
            <property name="enabled">
             <bool>true</bool>
            </property>

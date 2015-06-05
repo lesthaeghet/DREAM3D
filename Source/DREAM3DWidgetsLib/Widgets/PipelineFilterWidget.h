@@ -57,7 +57,7 @@ class QMouseEvent;
 class AbstractFilter;
 class QFormLayout;
 class QLabel;
-class QComboBox;
+class DREAM3DComboBox;
 
 /**
  * @class PipelineFilterWidget PipelineFilterWidget.h FilterWidgets/PipelineFilterWidget.h

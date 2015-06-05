@@ -138,7 +138,7 @@ QRadioButton* DREAM3DUpdateCheckDialog::getManuallyBtn()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-QComboBox* DREAM3DUpdateCheckDialog::getHowOftenComboBox()
+DREAM3DComboBox* DREAM3DUpdateCheckDialog::getHowOftenComboBox()
 {
   return howOften;
 }

@@ -52,7 +52,7 @@
 
 #include "DREAM3DWidgetsLib/ui_PhaseTypeSelectionWidget.h"
 
-class QComboBox;
+class DREAM3DComboBox;
 class QLabel;
 
 /**
@@ -121,7 +121,7 @@ class DREAM3DWidgetsLib_EXPORT PhaseTypeSelectionWidget : public FilterParameter
     bool              m_DidCausePreflight;
 
 //    QList<QLabel*>              m_PhaseTypeLabels;
-//    QList<QComboBox*>           m_PhaseTypeCombos;
+//    QList<DREAM3DComboBox*>           m_PhaseTypeCombos;
 
     DataContainerArrayProxy m_DcaProxy;
 

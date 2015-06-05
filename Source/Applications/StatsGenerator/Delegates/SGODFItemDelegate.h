@@ -39,7 +39,6 @@
 #include <iostream>
 
 #include <QtCore/QModelIndex>
-#include <QtWidgets/QComboBox>
 #include <QtGui/QPainter>
 #include <QtWidgets/QStyleOptionViewItemV4>
 #include <QtWidgets/QLineEdit>
@@ -47,6 +46,8 @@
 #include <QtWidgets/QStyledItemDelegate>
 
 #include "EbsdLib/EbsdConstants.h"
+
+#include "QtSupportLib/DREAM3DComboBox.h"
 
 #include "OrientationLib/Texture/StatsGen.hpp"
 #include "StatsGenerator/TableModels/SGODFTableModel.h"

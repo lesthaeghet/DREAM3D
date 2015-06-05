@@ -145,7 +145,7 @@ void TransformationPhaseWidget::on_microstructurePresetCombo_currentIndexChanged
 //
 // -----------------------------------------------------------------------------
 template<typename T>
-AbstractMicrostructurePresetFactory::Pointer RegisterPresetFactory(QComboBox* microstructurePresetCombo)
+AbstractMicrostructurePresetFactory::Pointer RegisterPresetFactory(DREAM3DComboBox* microstructurePresetCombo)
 {
   AbstractMicrostructurePresetFactory::Pointer presetFactory = T::New();
   MicrostructurePresetManager::registerFactory(presetFactory);

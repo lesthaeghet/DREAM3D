@@ -62,7 +62,7 @@ DREAM3DComboBox::~DREAM3DComboBox()
 void DREAM3DComboBox::setupGui()
 {
   // Set the combo box to adjust to contents
-  setSizeAdjustPolicy(QComboBox::AdjustToContents);
+  setSizeAdjustPolicy(DREAM3DComboBox::AdjustToContents);
 
   // Set the size policy so that the combo box doesn't move
   setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);

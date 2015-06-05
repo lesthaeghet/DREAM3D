@@ -39,7 +39,6 @@
 #include <iostream>
 
 #include <QtCore/QModelIndex>
-#include <QtWidgets/QComboBox>
 #include <QtGui/QPainter>
 #include <QtWidgets/QStyleOptionViewItemV4>
 #include <QtWidgets/QLineEdit>
@@ -48,6 +47,7 @@
 
 #include "OrientationLib/Texture/StatsGen.hpp"
 #include "QtSupportLib/ColorComboPicker.h"
+#include "QtSupportLib/DREAM3DComboBox.h"
 #include "StatsGenerator/TableModels/SGLogNormalTableModel.h"
 
 /**
@@ -84,7 +84,7 @@ class SGLogNormalItemDelegate : public QStyledItemDelegate
       QLineEdit* stdDev;
       QDoubleValidator* avgValidator;
       QDoubleValidator* stdDevValidator;
-      QComboBox* colorCombo;
+      DREAM3DComboBox* colorCombo;
 
       qint32 col = index.column();
       switch(col)

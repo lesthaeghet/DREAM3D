@@ -52,7 +52,7 @@
 
 #include "DREAM3DWidgetsLib/ui_ShapeTypeSelectionWidget.h"
 
-class QComboBox;
+class DREAM3DComboBox;
 class QLabel;
 
 /**
@@ -103,7 +103,7 @@ class DREAM3DWidgetsLib_EXPORT ShapeTypeSelectionWidget : public FilterParameter
     bool              m_DidCausePreflight;
 
     QList<QLabel*>              m_ShapeTypeLabels;
-    QList<QComboBox*>           m_ShapeTypeCombos;
+    QList<DREAM3DComboBox*>           m_ShapeTypeCombos;
 
 
     ShapeTypeSelectionWidget(const ShapeTypeSelectionWidget&); // Copy Constructor Not Implemented

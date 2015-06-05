@@ -41,7 +41,6 @@
 #include <QtWidgets/QMessageBox>
 #include <QtWidgets/QListWidget>
 #include <QtWidgets/QListWidgetItem>
-#include <QtWidgets/QComboBox>
 #include <QtWidgets/QFileDialog>
 
 #include "H5Support/H5Utilities.h"
@@ -63,6 +62,7 @@
 
 
 #include "QtSupportLib/QFileCompleter.h"
+#include "QtSupportLib/DREAM3DComboBox.h"
 //#include "QtSupportLib/DREAM3DQtMacros.h"
 //#include "QtSupportLib/DREAM3DHelpUrlGenerator.h"
 
@@ -343,7 +343,7 @@ void InitializeSyntheticVolumeWidget::on_m_InputFile_textChanged(const QString& 
 
     formLayout_2->setWidget(i, QFormLayout::LabelRole, shapeTypeLabel);
 
-    QComboBox* cb = new QComboBox(m_ShapeTypeScrollContents);
+    DREAM3DComboBox* cb = new DREAM3DComboBox(m_ShapeTypeScrollContents);
     str.append(" ComboBox");
     cb->setObjectName(str);
     for (size_t s = 0; s < shapeTypeStrings.size(); ++s)
@@ -686,7 +686,7 @@ void InitializeSyntheticVolumeWidget::getGuiParametersFromFilter(AbstractFilter*
   int count = shapeTypes.size();
   for (int i = 0; i < count; ++i)
   {
-    QComboBox* cb = new QComboBox(this);
+    DREAM3DComboBox* cb = new DREAM3DComboBox(this);
     cb->setItemData(cb->currentIndex(), shapeTypes[i + 1], Qt::UserRole);
     m_ShapeTypeCombos.push_back(cb);
   }
@@ -714,7 +714,7 @@ AbstractFilter::Pointer InitializeSyntheticVolumeWidget::getFilter(bool defaultV
   bool ok = false;
   for (int i = 0; i < count; ++i)
   {
-    QComboBox* cb = m_ShapeTypeCombos.at(i);
+    DREAM3DComboBox* cb = m_ShapeTypeCombos.at(i);
     unsigned int sType = static_cast<unsigned int>(cb->itemData(cb->currentIndex(), Qt::UserRole).toUInt(&ok));
     shapeTypes[i + 1] = sType;
   }
@@ -748,7 +748,7 @@ QFilterWidget* InitializeSyntheticVolumeWidget::createDeepCopy()
   //  bool ok = false;
   //  for (int i = 0; i < count; ++i)
   //  {
-  //    QComboBox* cb = m_ShapeTypeCombos.at(i);
+  //    DREAM3DComboBox* cb = m_ShapeTypeCombos.at(i);
   //    unsigned int sType = static_cast<unsigned int>(cb->itemData(cb->currentIndex(), Qt::UserRole).toUInt(&ok));
   //    shapeTypes->SetValue(i+1, sType);
   //  }

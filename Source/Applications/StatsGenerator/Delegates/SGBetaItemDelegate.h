@@ -39,7 +39,6 @@
 #include <iostream>
 
 #include <QtCore/QModelIndex>
-#include <QtWidgets/QComboBox>
 #include <QtGui/QPainter>
 #include <QtWidgets/QStyleOptionViewItemV4>
 #include <QtWidgets/QLineEdit>
@@ -84,7 +83,7 @@ class SGBetaItemDelegate : public QStyledItemDelegate
       QLineEdit* beta;
       QDoubleValidator* alphaValidator;
       QDoubleValidator* betaValidator;
-      QComboBox* colorCombo;
+      DREAM3DComboBox* colorCombo;
 
       qint32 col = index.column();
       switch(col)

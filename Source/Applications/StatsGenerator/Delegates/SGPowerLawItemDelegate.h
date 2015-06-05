@@ -39,12 +39,13 @@
 #include <iostream>
 
 #include <QtCore/QModelIndex>
-#include <QtWidgets/QComboBox>
 #include <QtGui/QPainter>
 #include <QtWidgets/QStyleOptionViewItemV4>
 #include <QtWidgets/QLineEdit>
 #include <QtGui/QDoubleValidator>
 #include <QtWidgets/QStyledItemDelegate>
+
+#include "QtSupportLib/DREAM3DComboBox.h"
 
 #include "OrientationLib/Texture/StatsGen.hpp"
 #include "QtSupportLib/ColorComboPicker.h"
@@ -87,7 +88,7 @@ class SGPowerLawItemDelegate : public QStyledItemDelegate
       QLineEdit* k;
       QDoubleValidator* kValidator;
 
-      QComboBox* colorCombo;
+      DREAM3DComboBox* colorCombo;
 
       qint32 col = index.column();
       switch(col)

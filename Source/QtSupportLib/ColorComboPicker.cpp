@@ -42,7 +42,7 @@
 //
 // -----------------------------------------------------------------------------
 ColorComboPicker::ColorComboPicker(QWidget* widget) :
-  QComboBox(widget)
+  DREAM3DComboBox(widget)
 {
   populateList();
 }
