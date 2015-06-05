@@ -31,12 +31,18 @@
     </widget>
    </item>
    <item>
-    <widget class="QComboBox" name="dataContainerList">
+    <widget class="DREAM3DComboBox" name="dataContainerList">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
+     </property>
+     <property name="toolTip">
+      <string>Select A Data Container</string>
+     </property>
+     <property name="statusTip">
+      <string>Select A Data Container</string>
      </property>
      <property name="sizeAdjustPolicy">
       <enum>QComboBox::AdjustToContents</enum>
@@ -44,12 +50,18 @@
     </widget>
    </item>
    <item>
-    <widget class="QComboBox" name="attributeMatrixList">
+    <widget class="DREAM3DComboBox" name="attributeMatrixList">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
+     </property>
+     <property name="toolTip">
+      <string>Select An Attribute Matrix</string>
+     </property>
+     <property name="statusTip">
+      <string>Select An Attribute Matrix</string>
      </property>
      <property name="sizeAdjustPolicy">
       <enum>QComboBox::AdjustToContents</enum>
@@ -127,6 +139,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>DREAM3DComboBox</class>
+   <extends>QComboBox</extends>
+   <header location="global">DREAM3DComboBox.h</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="../../../../Resources/icons/images/Icons.qrc"/>
  </resources>

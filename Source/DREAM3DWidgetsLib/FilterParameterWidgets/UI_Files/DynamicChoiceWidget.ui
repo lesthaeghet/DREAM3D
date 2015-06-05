@@ -31,7 +31,14 @@
     </widget>
    </item>
    <item>
-    <widget class="QComboBox" name="value"/>
+    <widget class="DREAM3DComboBox" name="value">
+     <property name="toolTip">
+      <string>Select An Item</string>
+     </property>
+     <property name="statusTip">
+      <string>Select An Item</string>
+     </property>
+    </widget>
    </item>
    <item>
     <spacer name="horizontalSpacer">
@@ -48,6 +55,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>DREAM3DComboBox</class>
+   <extends>QComboBox</extends>
+   <header location="global">DREAM3DComboBox.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

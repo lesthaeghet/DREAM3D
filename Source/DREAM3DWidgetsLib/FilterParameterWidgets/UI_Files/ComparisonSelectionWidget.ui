@@ -211,10 +211,37 @@
       </widget>
      </item>
      <item>
-      <widget class="QComboBox" name="dataContainerList"/>
+      <widget class="DREAM3DComboBox" name="dataContainerList">
+       <property name="toolTip">
+        <string>Select A Data Container</string>
+       </property>
+       <property name="statusTip">
+        <string>Select A Data Container</string>
+       </property>
+      </widget>
      </item>
      <item>
-      <widget class="QComboBox" name="attributeMatrixList"/>
+      <widget class="DREAM3DComboBox" name="attributeMatrixList">
+       <property name="toolTip">
+        <string>Select An Attribute Matrix</string>
+       </property>
+       <property name="statusTip">
+        <string>Select An Attribute Matrix</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
      </item>
     </layout>
    </item>
@@ -234,6 +261,13 @@ font-weight: bold;
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>DREAM3DComboBox</class>
+   <extends>QComboBox</extends>
+   <header location="global">DREAM3DComboBox.h</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="../../../../Resources/icons/images/Icons.qrc"/>
  </resources>

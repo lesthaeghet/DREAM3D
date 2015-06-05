@@ -37,7 +37,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QComboBox" name="dataContainerList">
+    <widget class="DREAM3DComboBox" name="dataContainerList">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Fixed" vsizetype="Maximum">
        <horstretch>0</horstretch>
@@ -45,7 +45,10 @@
       </sizepolicy>
      </property>
      <property name="toolTip">
-      <string>This is the DataContainer selection</string>
+      <string>Select A Data Container</string>
+     </property>
+     <property name="statusTip">
+      <string>Select A Data Container</string>
      </property>
      <property name="sizeAdjustPolicy">
       <enum>QComboBox::AdjustToContents</enum>
@@ -58,7 +61,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QComboBox" name="attributeMatrixList">
+    <widget class="DREAM3DComboBox" name="attributeMatrixList">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Fixed" vsizetype="Maximum">
        <horstretch>0</horstretch>
@@ -66,7 +69,10 @@
       </sizepolicy>
      </property>
      <property name="toolTip">
-      <string>This is the AttributeMatrix selection</string>
+      <string>Select An Attribute Matrix</string>
+     </property>
+     <property name="statusTip">
+      <string>Select An Attribute Matrix</string>
      </property>
      <property name="sizeAdjustPolicy">
       <enum>QComboBox::AdjustToContents</enum>
@@ -79,7 +85,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QComboBox" name="attributeArrayList">
+    <widget class="DREAM3DComboBox" name="attributeArrayList">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Fixed" vsizetype="Maximum">
        <horstretch>0</horstretch>
@@ -87,7 +93,10 @@
       </sizepolicy>
      </property>
      <property name="toolTip">
-      <string>This is the Data Array selection</string>
+      <string>Select An Attribute Array</string>
+     </property>
+     <property name="statusTip">
+      <string>Select An Attribute Array</string>
      </property>
      <property name="sizeAdjustPolicy">
       <enum>QComboBox::AdjustToContents</enum>
@@ -117,6 +126,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>DREAM3DComboBox</class>
+   <extends>QComboBox</extends>
+   <header location="global">DREAM3DComboBox.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

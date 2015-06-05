@@ -66,8 +66,4 @@ void DREAM3DComboBox::setupGui()
 
   // Set the size policy so that the combo box doesn't move
   setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-
-  // Set the default tool tip and status tip.
-  setToolTip("Choose An Item");
-  setStatusTip("Choose An Item From The Combo Box");
 }

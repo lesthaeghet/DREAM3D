@@ -31,16 +31,37 @@
     </widget>
    </item>
    <item>
-    <widget class="QComboBox" name="dataContainerList"/>
+    <widget class="DREAM3DComboBox" name="dataContainerList">
+     <property name="toolTip">
+      <string>Select A Data Container</string>
+     </property>
+     <property name="statusTip">
+      <string>Select A Data Container</string>
+     </property>
+    </widget>
    </item>
    <item>
-    <widget class="QComboBox" name="attributeMatrixList"/>
+    <widget class="DREAM3DComboBox" name="attributeMatrixList">
+     <property name="toolTip">
+      <string>Select An Attribute Matrix</string>
+     </property>
+     <property name="statusTip">
+      <string>Select An Attribute Matrix</string>
+     </property>
+    </widget>
    </item>
    <item>
     <widget class="QListWidget" name="phaseListWidget"/>
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>DREAM3DComboBox</class>
+   <extends>QComboBox</extends>
+   <header location="global">DREAM3DComboBox.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

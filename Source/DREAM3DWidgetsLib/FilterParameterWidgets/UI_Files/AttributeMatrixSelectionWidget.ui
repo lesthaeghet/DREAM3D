@@ -11,7 +11,16 @@
    </rect>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
-   <property name="margin">
+   <property name="leftMargin">
+    <number>2</number>
+   </property>
+   <property name="topMargin">
+    <number>2</number>
+   </property>
+   <property name="rightMargin">
+    <number>2</number>
+   </property>
+   <property name="bottomMargin">
     <number>2</number>
    </property>
    <item>
@@ -22,10 +31,24 @@
     </widget>
    </item>
    <item>
-    <widget class="QComboBox" name="dataContainerList"/>
+    <widget class="DREAM3DComboBox" name="dataContainerList">
+     <property name="toolTip">
+      <string>Select A Data Container</string>
+     </property>
+     <property name="statusTip">
+      <string>Select A Data Container</string>
+     </property>
+    </widget>
    </item>
    <item>
-    <widget class="QComboBox" name="attributeMatrixList"/>
+    <widget class="DREAM3DComboBox" name="attributeMatrixList">
+     <property name="toolTip">
+      <string>Select An Attribute Matrix</string>
+     </property>
+     <property name="statusTip">
+      <string>Select An Attribute Matrix</string>
+     </property>
+    </widget>
    </item>
    <item>
     <spacer name="horizontalSpacer">
@@ -42,6 +65,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>DREAM3DComboBox</class>
+   <extends>QComboBox</extends>
+   <header location="global">DREAM3DComboBox.h</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="../../../../Resources/icons/images/Icons.qrc"/>
  </resources>

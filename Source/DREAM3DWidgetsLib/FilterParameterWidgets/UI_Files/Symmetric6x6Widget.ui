@@ -11,7 +11,16 @@
    </rect>
   </property>
   <layout class="QGridLayout" name="gridLayout_2">
-   <property name="margin">
+   <property name="leftMargin">
+    <number>2</number>
+   </property>
+   <property name="topMargin">
+    <number>2</number>
+   </property>
+   <property name="rightMargin">
+    <number>2</number>
+   </property>
+   <property name="bottomMargin">
     <number>2</number>
    </property>
    <item row="3" column="7">
@@ -82,7 +91,13 @@
     <widget class="QLineEdit" name="v25"/>
    </item>
    <item row="1" column="6" colspan="2">
-    <widget class="QComboBox" name="comboBox">
+    <widget class="DREAM3DComboBox" name="comboBox">
+     <property name="toolTip">
+      <string>Select An Item</string>
+     </property>
+     <property name="statusTip">
+      <string>Select An Item</string>
+     </property>
      <property name="editable">
       <bool>false</bool>
      </property>
@@ -171,6 +186,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>DREAM3DComboBox</class>
+   <extends>QComboBox</extends>
+   <header location="global">DREAM3DComboBox.h</header>
+  </customwidget>
+ </customwidgets>
  <tabstops>
   <tabstop>comboBox</tabstop>
   <tabstop>v11</tabstop>
