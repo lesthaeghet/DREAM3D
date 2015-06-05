@@ -57,7 +57,7 @@ QLineEdit(parent)
 //
 // -----------------------------------------------------------------------------
 DREAM3DLineEdit::DREAM3DLineEdit(const QString &title, QWidget* parent) :
-DREAM3DLineEdit(title, parent)
+QLineEdit(title, parent)
 {
   setupGui();
 }
