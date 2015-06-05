@@ -213,20 +213,20 @@
      <item>
       <widget class="DREAM3DComboBox" name="dataContainerList">
        <property name="toolTip">
-        <string>Select A Data Container</string>
+        <string>Select An Attribute Matrix</string>
        </property>
        <property name="statusTip">
-        <string>Select A Data Container</string>
+        <string>Select An Attribute Matrix</string>
        </property>
       </widget>
      </item>
      <item>
       <widget class="DREAM3DComboBox" name="attributeMatrixList">
        <property name="toolTip">
-        <string>Select An Attribute Matrix</string>
+        <string>Select An Attribute Array</string>
        </property>
        <property name="statusTip">
-        <string>Select An Attribute Matrix</string>
+        <string>Select An Attribute Array</string>
        </property>
       </widget>
      </item>
