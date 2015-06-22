@@ -55,14 +55,11 @@ DataContainerArrayProxyFilterParameter::~DataContainerArrayProxyFilterParameter(
 //
 // -----------------------------------------------------------------------------
 DataContainerArrayProxyFilterParameter::Pointer DataContainerArrayProxyFilterParameter::New(const QString& humanLabel, const QString& propertyName,
-  const QString& widgetType, const QVariant& defaultValue,
-  DataContainerArrayProxy proxy, Qt::CheckState defValue,
-  Category category, int groupIndex)
+  const QVariant& defaultValue, DataContainerArrayProxy proxy, Qt::CheckState defValue, Category category, int groupIndex)
 {
   DataContainerArrayProxyFilterParameter::Pointer ptr = DataContainerArrayProxyFilterParameter::New();
   ptr->setHumanLabel(humanLabel);
   ptr->setPropertyName(propertyName);
-  ptr->setWidgetType(widgetType);
   ptr->setDefaultValue(defaultValue);
   ptr->setCategory(category);
   ptr->setUnits("");

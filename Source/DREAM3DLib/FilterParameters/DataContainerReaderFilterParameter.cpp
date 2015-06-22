@@ -57,13 +57,11 @@ DataContainerReaderFilterParameter::~DataContainerReaderFilterParameter()
 //
 // -----------------------------------------------------------------------------
 DataContainerReaderFilterParameter::Pointer DataContainerReaderFilterParameter::New(const QString& humanLabel, const QString& propertyName,
-  const QString& widgetType, const QVariant& defaultValue,
-  Category category, int groupIndex)
+  const QVariant& defaultValue, Category category, int groupIndex)
 {
   DataContainerReaderFilterParameter::Pointer ptr = DataContainerReaderFilterParameter::New();
   ptr->setHumanLabel(humanLabel);
   ptr->setPropertyName(ptr->getInputFileProperty());
-  ptr->setWidgetType(widgetType);
   ptr->setDefaultValue(defaultValue);
   ptr->setCategory(category);
   ptr->setUnits("");

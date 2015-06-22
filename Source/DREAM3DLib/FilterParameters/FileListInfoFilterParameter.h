@@ -37,6 +37,11 @@
 #ifndef _FileListInfoFilterParameter_H_
 #define _FileListInfoFilterParameter_H_
 
+#include <QtCore/QMetaType>
+#include <QtCore/QJsonObject>
+
+#include "DREAM3DLib/DREAM3DLib.h"
+#include "DREAM3DLib/Common/DREAM3DSetGetMacros.h"
 #include "DREAM3DLib/FilterParameters/FilterParameter.h"
 
 class DREAM3DLib_EXPORT FileListInfoFilterParameter : public FilterParameter

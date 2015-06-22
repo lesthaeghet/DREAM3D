@@ -48,9 +48,7 @@ public:
     DREAM3D_TYPE_MACRO_SUPER(DataContainerReaderFilterParameter, FilterParameter)
 
     static Pointer New(const QString& humanLabel, const QString& propertyName,
-    const QString& widgetType, const QVariant& defaultValue,
-    Category category,
-    int groupIndex = -1);
+    const QVariant& defaultValue, Category category, int groupIndex = -1);
 
   virtual ~DataContainerReaderFilterParameter();
 

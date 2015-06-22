@@ -54,7 +54,6 @@ set(DREAM3DLib_FilterParameters_HDRS
   ${DREAM3DLib_SOURCE_DIR}/FilterParameters/FourthOrderPolynomialFilterParameter.h
   ${DREAM3DLib_SOURCE_DIR}/FilterParameters/Symmetric6x6FilterParameter.h
   ${DREAM3DLib_SOURCE_DIR}/FilterParameters/AxisAngleFilterParameter.h
-  ${DREAM3DLib_SOURCE_DIR}/FilterParameters/UnknownFilterParameter.h
   ${DREAM3DLib_SOURCE_DIR}/FilterParameters/DataArraySelectionFilterParameter.h
   ${DREAM3DLib_SOURCE_DIR}/FilterParameters/AttributeMatrixSelectionFilterParameter.h
   ${DREAM3DLib_SOURCE_DIR}/FilterParameters/DataBundleSelectionFilterParameter.h
@@ -106,7 +105,6 @@ set(DREAM3DLib_FilterParameters_SRCS
   ${DREAM3DLib_SOURCE_DIR}/FilterParameters/FourthOrderPolynomialFilterParameter.cpp
   ${DREAM3DLib_SOURCE_DIR}/FilterParameters/Symmetric6x6FilterParameter.cpp
   ${DREAM3DLib_SOURCE_DIR}/FilterParameters/AxisAngleFilterParameter.cpp
-  ${DREAM3DLib_SOURCE_DIR}/FilterParameters/UnknownFilterParameter.cpp
   ${DREAM3DLib_SOURCE_DIR}/FilterParameters/DataArraySelectionFilterParameter.cpp
   ${DREAM3DLib_SOURCE_DIR}/FilterParameters/AttributeMatrixSelectionFilterParameter.cpp
   ${DREAM3DLib_SOURCE_DIR}/FilterParameters/DataBundleSelectionFilterParameter.cpp

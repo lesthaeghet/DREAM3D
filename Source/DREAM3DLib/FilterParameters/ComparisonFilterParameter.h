@@ -47,11 +47,8 @@ public:
     DREAM3D_TYPE_MACRO_SUPER(ComparisonFilterParameter, FilterParameter)
 
     static Pointer New(const QString& humanLabel, const QString& propertyName,
-    const QString& widgetType, const QVariant& defaultValue,
-    QVector<QString> choices,
-    bool showOperators,
-    Category category,
-    int groupIndex = -1);
+    const QVariant& defaultValue, QVector<QString> choices,
+    bool showOperators, Category category, int groupIndex = -1);
 
 
   virtual ~ComparisonFilterParameter();

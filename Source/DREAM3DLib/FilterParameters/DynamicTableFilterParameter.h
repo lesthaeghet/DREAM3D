@@ -47,10 +47,9 @@ public:
     DREAM3D_TYPE_MACRO_SUPER(DynamicTableFilterParameter, FilterParameter)
 
     static Pointer New(const QString& humanLabel, const QString& propertyName,
-    const QString& widgetType, QStringList rHeaders,
-    QStringList cHeaders, std::vector<std::vector<double> > defaultTable,
-    FilterParameter::Category category, bool isRowsDynamic = true,
-    bool isColsDynamic = true, int minRowCount = 0, int minColCount = 0);
+    QStringList rHeaders, QStringList cHeaders, std::vector<std::vector<double> > defaultTable,
+    FilterParameter::Category category, bool isRowsDynamic = true, bool isColsDynamic = true, 
+    int minRowCount = 0, int minColCount = 0);
 
   virtual ~DynamicTableFilterParameter();
 
