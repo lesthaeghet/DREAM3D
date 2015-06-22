@@ -204,6 +204,11 @@ endif()
 # ------------------------------------------------------------------------------
 include(${CMP_SOURCE_DIR}/ExtLib/QwtSupport.cmake)
 
+# ------------------------------------------------------------------------------
+#  Qhull Section. Find Qhull and setup copy and install rules
+# ------------------------------------------------------------------------------
+include(${CMP_SOURCE_DIR}/ExtLib/QhullSupport.cmake)
+
 # --------------------------------------------------------------------
 # Now that we have found all of our required libraries and packages we can start the all
 # the tests

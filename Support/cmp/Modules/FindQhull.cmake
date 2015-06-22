@@ -1,0 +1,144 @@
+
+# - Find QHULL library
+# - Derived from the FindQwt.cmake that is included with cmake
+# Find the native QHULL includes and library
+# This module defines
+#  QHULL_INCLUDE_DIR, where to find QHULL.h, etc.
+#  QHULL_LIBRARIES, libraries to link against to use QHULL.
+#  QHULL_FOUND, If false, do not try to use QHULL.
+# also defined, but not for general use are
+#  QHULL_LIBRARY, where to find the QHULL library.
+#  QHULL_LIBRARY_DEBUG - Debug version of QHULL library
+#  QHULL_LIBRARY_RELEASE - Release Version of QHULL library
+
+
+set(QHULL_CMAKE_DEBUG 0)
+if(QHULL_CMAKE_DEBUG)
+    MESSAGE (STATUS "Finding QHULL library and headers..." )
+endif()
+
+# Only set QHULL_INSTALL to the environment variable if it is blank
+if("${QHULL_INSTALL}" STREQUAL "")
+set(QHULL_INSTALL  $ENV{QHULL_INSTALL})
+endif()
+
+# Look for the header file.
+SET(QHULL_INCLUDE_SEARCH_DIRS
+  ${QHULL_INSTALL}/include
+)
+
+set(QHULL_LIB_SEARCH_DIRS
+  ${QHULL_INSTALL}/lib
+  )
+
+set(QHULL_BIN_SEARCH_DIRS
+  ${QHULL_INSTALL}/bin
+)
+
+FIND_PATH(QHULL_INCLUDE_DIR
+  NAMES libqhull/libqhull.h libqhullcpp/Qhull.h
+  PATHS ${QHULL_INCLUDE_SEARCH_DIRS}
+)
+
+set(QHULL_SEARCH_DEBUG_NAMES "qhull_d")
+set(QHULL_SEARCH_RELEASE_NAMES "qhull")
+
+# Look for the library.
+FIND_LIBRARY(QHULL_LIBRARY_DEBUG
+  NAMES ${QHULL_SEARCH_DEBUG_NAMES}
+  PATHS ${QHULL_LIB_SEARCH_DIRS}
+  NO_DEFAULT_PATH
+)
+
+FIND_LIBRARY(QHULL_LIBRARY_RELEASE
+  NAMES ${QHULL_SEARCH_RELEASE_NAMES}
+  PATHS ${QHULL_LIB_SEARCH_DIRS}
+  NO_DEFAULT_PATH
+)
+
+if( QHULL_CMAKE_DEBUG )
+  message(STATUS "QHULL_INCLUDE_SEARCH_DIRS: ${QHULL_INCLUDE_SEARCH_DIRS}")
+  message(STATUS "QHULL_LIB_SEARCH_DIRS: ${QHULL_LIB_SEARCH_DIRS}")
+  message(STATUS "QHULL_BIN_SEARCH_DIRS: ${QHULL_BIN_SEARCH_DIRS}")
+  message(STATUS "QHULL_SEARCH_DEBUG_NAMES: ${QHULL_SEARCH_DEBUG_NAMES}")
+  message(STATUS "QHULL_SEARCH_RELEASE_NAMES: ${QHULL_SEARCH_RELEASE_NAMES}")
+
+  MESSAGE(STATUS "QHULL_INCLUDE_DIR: ${QHULL_INCLUDE_DIR}")
+  MESSAGE(STATUS "QHULL_LIBRARY_DEBUG: ${QHULL_LIBRARY_DEBUG}")
+  MESSAGE(STATUS "QHULL_LIBRARY_RELEASE: ${QHULL_LIBRARY_RELEASE}")
+  MESSAGE(STATUS "CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
+endif()
+
+# include the macro to adjust libraries
+INCLUDE (${CMP_MODULES_SOURCE_DIR}/cmpAdjustLibVars.cmake)
+cmp_ADJUST_LIB_VARS(QHULL)
+
+if(QHULL_INCLUDE_DIR AND QHULL_LIBRARY)
+  SET(QHULL_FOUND 1)
+  SET(QHULL_LIBRARIES ${QHULL_LIBRARY})
+  SET(QHULL_INCLUDE_DIRS ${QHULL_INCLUDE_DIR})
+  if(QHULL_LIBRARY_DEBUG)
+    GET_FILENAME_COMPONENT(QHULL_LIBRARY_PATH ${QHULL_LIBRARY_DEBUG} PATH)
+    SET(QHULL_LIB_DIR  ${QHULL_LIBRARY_PATH})
+  ELSEif(QHULL_LIBRARY_RELEASE)
+    GET_FILENAME_COMPONENT(QHULL_LIBRARY_PATH ${QHULL_LIBRARY_RELEASE} PATH)
+    SET(QHULL_LIB_DIR  ${QHULL_LIBRARY_PATH})
+  ENDif(QHULL_LIBRARY_DEBUG)
+
+  if(QHULL_DUMP_PROG)
+    GET_FILENAME_COMPONENT(QHULL_BIN_PATH ${QHULL_DUMP_PROG} PATH)
+    SET(QHULL_BIN_DIR  ${QHULL_BIN_PATH})
+  endif(QHULL_DUMP_PROG)
+ELSE(QHULL_INCLUDE_DIR AND QHULL_LIBRARY)
+  SET(QHULL_FOUND 0)
+  SET(QHULL_LIBRARIES)
+  SET(QHULL_INCLUDE_DIRS)
+ENDif(QHULL_INCLUDE_DIR AND QHULL_LIBRARY)
+
+# Report the results.
+if(NOT QHULL_FOUND)
+  SET(QHULL_DIR_MESSAGE
+    "QHULL was not found. Make sure QHULL_LIBRARY and QHULL_INCLUDE_DIR are set or set the QHULL_INSTALL environment variable.")
+  if(NOT QHULL_FIND_QUIETLY)
+    MESSAGE(STATUS "${QHULL_DIR_MESSAGE}")
+  ELSE(NOT QHULL_FIND_QUIETLY)
+    if(QHULL_FIND_REQUIRED)
+      MESSAGE(FATAL_ERROR "QHULL was NOT found and is Required by this project")
+    ENDif(QHULL_FIND_REQUIRED)
+  ENDif(NOT QHULL_FIND_QUIETLY)
+ENDif(NOT QHULL_FOUND)
+
+
+set(QHULL_COMPONENTS QHULL)
+
+set(TYPES Debug Release)
+set(SUPPORT_LIB_OPTION 1)
+if(MSVC_IDE)
+  set(SUPPORT_LIB_OPTION 0)
+elseif(APPLE) # Apple systems do NOT need this so just skip this entirely
+  set(SUPPORT_LIB_OPTION 2)
+elseif(UNIX AND NOT MSVC)
+  set(SUPPORT_LIB_OPTION 3)
+endif()
+if( ${SUPPORT_LIB_OPTION} EQUAL 1)
+  set(TYPES ${CMAKE_BUILD_TYPE})
+endif()
+
+FOREACH(BTYPE ${TYPES})
+
+ # message(STATUS "Looking for ${BTYPE} DLL Version of QHULL")
+  STRING(TOUPPER ${BTYPE} TYPE)
+  get_filename_component(lib_path ${QHULL_LIBRARY_${TYPE}} PATH)
+  get_filename_component(lib_name ${QHULL_LIBRARY_${TYPE}} NAME_WE)
+ 
+
+  find_file(QHULL_LIBRARY_DLL_${TYPE}
+              NAMES ${lib_name}.dll
+              PATHS  ${lib_path}/../bin ${lib_path}/.. ${lib_path}/ ${${upperlib}_BIN_DIR}
+              NO_DEFAULT_PATH )
+  mark_as_advanced(QHULL_LIBRARY_DLL_${TYPE})
+  # message(STATUS "QHULL_LIBRARY_DLL_${TYPE}: ${QHULL_LIBRARY_DLL_${TYPE}}")
+
+endforeach()
+
+
