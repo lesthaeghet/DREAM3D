@@ -5,6 +5,5 @@
 <file>ThirdParty/Qt.txt</file>
 <file>ThirdParty/Qwt.txt</file>
 <file>ThirdParty/HDF5.txt</file>
-<file>ThirdParty/Qhull.txt</file>
 </qresource>
 </RCC>

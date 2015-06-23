@@ -28,6 +28,7 @@ set(_PublicFilters
   PhWriter
   SPParksTextReader
   SPParksWriter
+  SurfaceMeshToSolidModelIges
   SurfaceMeshToStl
   VisualizeGBCDGMT
   VisualizeGBCDPoleFigure

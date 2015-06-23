@@ -73,6 +73,7 @@ set(RegisterKnownFiltersFile ${${PLUGIN_NAME}_BINARY_DIR}/${PLUGIN_NAME}Filters/
 
 #--------------------------
 include_directories( ${HDF5_INCLUDE_DIR} )
+include_directories( ${QHULL_INCLUDE_DIR} )
 include_directories( ${PROJECT_CODE_DIR} )
 include_directories( ${QtSupportLib_BINARY_DIR} )
 include_directories( ${QtSupportLib_SOURCE_DIR} )
