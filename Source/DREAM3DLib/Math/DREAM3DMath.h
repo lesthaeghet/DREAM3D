@@ -234,6 +234,7 @@ class DREAM3DMath
      * @return
      */
     static DREAM3DLib_EXPORT std::vector<double> linspace(double, double, int);
+	static DREAM3DLib_EXPORT std::vector<float> linspace(float, float, int);
 
   protected:
     DREAM3DMath();

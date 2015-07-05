@@ -809,3 +809,21 @@ std::vector<double> DREAM3DMath::linspace(double minVal, double maxVal, int dim)
   }
   return result;
 }
+
+std::vector<float> DREAM3DMath::linspace(float minVal, float maxVal, int dim)
+{
+	std::vector<float> result;
+	if (dim == 1)
+	{
+		result.push_back(maxVal);
+	}
+	else if (dim > 1)
+	{
+		float spacing = (maxVal - minVal) / (dim - 1);
+		for (int i = 0; i < dim; i++)
+		{
+			result.push_back(minVal + spacing * i);
+		}
+	}
+	return result;
+}

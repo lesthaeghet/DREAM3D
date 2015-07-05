@@ -309,13 +309,30 @@ class DREAM3DLib_EXPORT MatrixMath
     static void CrossProduct(float a[3], float b[3], float c[3]);
 
 
+	/**
+	* @brief Calculates the Transformation Matrix to rotate from vector a to vector b and places the result in m
+	* @param a
+	* @param b
+	* @param m
+	*/
+
+	static void TransformationMatrixFromAToB(const float a[3], const float b[3], float m[3][3]) { TransformationMatrixFromAToB<float>(a, b, m); };
+	static void TransformationMatrixFromAToB(const double a[3], const double b[3], double m[3][3])
+	  { TransformationMatrixFromAToB<double>(a, b, m); };
+
+	
   protected:
     MatrixMath();
 
   private:
     MatrixMath(const MatrixMath&); // Copy Constructor Not Implemented
     void operator=(const MatrixMath&); // Operator '=' Not Implemented
+
+	template<typename T>
+	static void TransformationMatrixFromAToB(const T a[3], const T b[3], T m[3][3]);
 };
+
+
 
 #endif /* _MatrixMath_H_ */
 
