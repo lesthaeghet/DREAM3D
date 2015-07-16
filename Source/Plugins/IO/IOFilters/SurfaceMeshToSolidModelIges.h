@@ -77,6 +77,7 @@
 #include "DREAM3DLib/DREAM3DLib.h"
 #include "DREAM3DLib/Common/AbstractFilter.h"
 #include "DREAM3DLib/Common/DREAM3DSetGetMacros.h"
+#include <exception>
 
 /**
  * @brief The SurfaceMeshToSolidModelIges class. See [Filter documentation](@ref surfacemeshtosolidmodeliges) for details.
@@ -224,6 +225,28 @@ class SurfaceMeshToSolidModelIges : public AbstractFilter
      * @return Integer error value
      */
     int32_t writeNumTrianglesToFile(const QString& filename, int32_t triCount);
+
+	/** 
+	 * @brief RecurseOrderedEdges Recursively builds lists of unique edge loops
+	 * @param edgelist an unordered list of edge pairs
+     * @param orderededges QList of a QList of a QList of int64_t's to contain the ordered edge pairs
+	 * @param visitededges boolean QVector to track edge use or to mark bad points to be ignored
+	 * @param curborder the state of the current border
+	 * @param candidates the possible next candidates
+	 * @return Non-zero on error or zero on success
+	 */
+	int32_t RecurseOrderedEdges(QList<QList<int64_t>> edgelist, QList<QList<QList<int64_t>>> orderededges, QVector<bool> &visitededges, QList<QList<int64_t>> &curborder, QList<int64_t> candidates);
+
+	/**
+	 * @brief RecurseTrianglesOnSurface Finds all adjacent triangles on the same surface and grain
+	 * @param 
+	 * @param checkedtriangles is a boolean QVector listing the triangles that have been checked
+	 * @param t is an index to the starting triangle
+	 * @param grain is an index to the grain of interest
+	 * @param featurefacelabel is an index to the feature face label describing the surface
+	 * @return QList of indexes for the triangles on the surface
+	 */
+	QList<int32_t> RecurseTrianglesOnSurface(ElementDynamicList::Pointer m_TriangleNeighbors, QVector<bool> &checkedtriangles, int64_t t, int32_t grain, int32_t featurefacelabel);
 
 	SurfaceMeshToSolidModelIges(const SurfaceMeshToSolidModelIges&); // Copy Constructor Not Implemented
 	void operator=(const SurfaceMeshToSolidModelIges&); // Operator '=' Not Implemented

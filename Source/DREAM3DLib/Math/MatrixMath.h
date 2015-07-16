@@ -228,7 +228,7 @@ class DREAM3DLib_EXPORT MatrixMath
      * @brief Returns index of maximum value. Single Precision Variant
      * @param g
      */
-    static int FindIndexOfMaxVal3x1(float g[3]);
+    static int FindIndexOfMaxVal3x1(const float g[3]);
 
     /**
     * @brief Performs an "in place" normalization of the 3x1 vector. Double Precision Variant

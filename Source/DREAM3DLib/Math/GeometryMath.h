@@ -333,6 +333,17 @@ class DREAM3DLib_EXPORT GeometryMath
      */
     static char RayIntersectsPlane(const float* a, const float* b, const float* c, const float* q, const float* r, float* p, int& m);
 
+	/**
+	* @brief Determines if a segment between two points intersects a plane defined by 3 points
+	* @param q
+	* @param r
+	* @param n
+	* @param d
+	* @param p
+	* @return
+	*/
+	static char RayIntersectsPlane(const float* n, const float d, const float* q, const float* r, float* p, int& m);
+
   protected:
     GeometryMath();
 

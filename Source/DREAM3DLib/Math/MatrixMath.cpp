@@ -384,7 +384,7 @@ void MatrixMath::Normalize3x1(float g[3])
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-int MatrixMath::FindIndexOfMaxVal3x1(float g[3])
+int MatrixMath::FindIndexOfMaxVal3x1(const float g[3])
 {
   float a = fabs(g[0]);
   float b = fabs(g[1]);
