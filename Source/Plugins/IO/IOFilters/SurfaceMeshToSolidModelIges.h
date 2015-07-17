@@ -79,6 +79,16 @@
 #include "DREAM3DLib/Common/DREAM3DSetGetMacros.h"
 #include <exception>
 
+#define qh_dllimport 1
+
+extern "C" {
+#include <libqhull/libqhull.h>
+#include <libqhull/qset.h>
+#include <libqhull/geom.h>
+#include <libqhull/poly.h>
+#include <libqhull/io.h>
+}
+
 /**
  * @brief The SurfaceMeshToSolidModelIges class. See [Filter documentation](@ref surfacemeshtosolidmodeliges) for details.
  */

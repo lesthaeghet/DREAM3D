@@ -198,6 +198,7 @@ target_link_libraries(${PLUGIN_NAME}
                     Qt5::Gui Qt5::Widgets
                     QtSupportLib
                     DREAM3DWidgetsLib
+					${QHULL_LIBRARY}
                     )
 SET_TARGET_PROPERTIES(${PLUGIN_NAME} PROPERTIES FOLDER ${PLUGIN_NAME}Plugin)
 qt5_use_modules(${PROJECT_NAME} Core Gui Widgets)
