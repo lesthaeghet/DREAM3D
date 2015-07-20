@@ -258,6 +258,19 @@ class SurfaceMeshToSolidModelIges : public AbstractFilter
 	 */
 	QList<int32_t> RecurseTrianglesOnSurface(ElementDynamicList::Pointer m_TriangleNeighbors, QVector<bool> &checkedtriangles, int64_t t, int32_t grain, int32_t featurefacelabel);
 
+
+	/**
+	 * @brief RecurseExternalTrianglesOnSurface Finds all adjacent triangles on the same surface and grain
+	 * @param 
+	 * @param checkedtriangles is a boolean QVector listing the triangles that have been checked
+	 * @param t is an index to the starting triangle
+	 * @param grain is an index to the grain of interest
+	 * @param featurefacelabel is an index to the feature face label describing the surface
+	 * @param n0, n1, n2 are the normal for the current plane
+	 * @return QList of indexes for the triangles on the surface
+	 */
+	QList<int32_t> RecurseExternalTrianglesOnSurface(ElementDynamicList::Pointer m_TriangleNeighbors, QVector<bool> &checkedtriangles, int64_t t, int32_t grain, int32_t featurefacelabel, float n0, float n1, float n2);
+
 	SurfaceMeshToSolidModelIges(const SurfaceMeshToSolidModelIges&); // Copy Constructor Not Implemented
 	void operator=(const SurfaceMeshToSolidModelIges&); // Operator '=' Not Implemented
 };
