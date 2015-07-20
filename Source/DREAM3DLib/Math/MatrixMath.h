@@ -144,12 +144,26 @@ class DREAM3DLib_EXPORT MatrixMath
      */
     static void Multiply3x3withConstant(float g[3][3], float v);
 
+	/**
+	* @brief Multiplies each element of a 3x1 matrix by the value v.
+	* @param g Input Matrix
+	* @param v Value to mutliply each element by.
+	*/
+	static void Multiply3x3withConstant(double g[3][3], double v);
+
     /**
      * @brief Transposes the 3x3 matrix and places the result into outMat
      * @param g
      * @param outMat
      */
     static void Transpose3x3(float g[3][3], float outMat[3][3]);
+
+	/**
+	* @brief Transposes the 3x3 matrix and places the result into outMat
+	* @param g
+	* @param outMat
+	*/
+	static void Transpose3x3(double g[3][3], double outMat[3][3]);
 
     /**
      * @brief Inverts the 3x3 matrix and places the result into outMat
@@ -158,12 +172,26 @@ class DREAM3DLib_EXPORT MatrixMath
      */
     static void Invert3x3(float g[3][3], float outMat[3][3]);
 
+	/**
+	* @brief Inverts the 3x3 matrix and places the result into outMat
+	* @param g
+	* @param outMat
+	*/
+	static void Invert3x3(double g[3][3], double outMat[3][3]);
+
     /**
      * @brief Calculates the Adjoint matrix of the 3x3 matrix and places the result into outMat
      * @param g
      * @param outMat
      */
     static void Adjoint3x3(float g[3][3], float outMat[3][3]);
+
+	/**
+	* @brief Calculates the Adjoint matrix of the 3x3 matrix and places the result into outMat
+	* @param g
+	* @param outMat
+	*/
+	static void Adjoint3x3(double g[3][3], double outMat[3][3]);
 
     /**
      * @brief Calculates the cofactor matrix of the 3x3 matrix and places the result into outMat
@@ -172,6 +200,13 @@ class DREAM3DLib_EXPORT MatrixMath
      */
     static void Cofactor3x3(float g[3][3], float outMat[3][3]);
 
+	/**
+	* @brief Calculates the cofactor matrix of the 3x3 matrix and places the result into outMat
+	* @param g
+	* @param outMat
+	*/
+	static void Cofactor3x3(double g[3][3], double outMat[3][3]);
+
     /**
      * @brief Calculates the matrix of minors of the 3x3 matrix and places the result into outMat
      * @param g
@@ -179,12 +214,27 @@ class DREAM3DLib_EXPORT MatrixMath
      */
     static void Minors3x3(float g[3][3], float outMat[3][3]);
 
+	/**
+	* @brief Calculates the matrix of minors of the 3x3 matrix and places the result into outMat
+	* @param g
+	* @param outMat
+	*/
+	static void Minors3x3(double g[3][3], double outMat[3][3]);
+
     /**
      * @brief The determinant of a 3x3 matrix
      * @param g 3x3 Vector
      * @return
      */
     static float Determinant3x3(float g[3][3]);
+
+	/**
+	* @brief The determinant of a 3x3 matrix
+	* @param g 3x3 Vector
+	* @return
+	*/
+	static double Determinant3x3(double g[3][3]);
+
 
     /**
      * @brief Copies a 3x3 matrix into another 3x3 matrix

@@ -469,15 +469,15 @@ void SurfaceMeshToSolidModelIges::execute()
 
 			for (QList<int32_t>::iterator t = (*cursurf).begin(); t != (*cursurf).end(); ++t)
 			{
-				/*surfnorm[0] += m_SurfaceMeshTriangleNormals[3 * (*t) + 0];
+				surfnorm[0] += m_SurfaceMeshTriangleNormals[3 * (*t) + 0];
 				surfnorm[1] += m_SurfaceMeshTriangleNormals[3 * (*t) + 1];
-				surfnorm[2] += m_SurfaceMeshTriangleNormals[3 * (*t) + 2];*/
-				float a[3], b[3], c[3], n[3];
+				surfnorm[2] += m_SurfaceMeshTriangleNormals[3 * (*t) + 2];
+				/*float a[3], b[3], c[3], n[3];
 				triangleGeom->getVertCoordsAtTri(*t, a, b, c);
 				GeometryMath::FindPlaneNormalVector(a, b, c, n);
 				surfnorm[0] += n[0];
 				surfnorm[1] += n[1];
-				surfnorm[2] += n[2];
+				surfnorm[2] += n[2];*/
 			}
 			surfnorm[0] = surfnorm[0] / (*cursurf).size();
 			surfnorm[1] = surfnorm[1] / (*cursurf).size();
@@ -491,6 +491,13 @@ void SurfaceMeshToSolidModelIges::execute()
 			// We Need A Bounding Box - The code below is equivalent to the
 			// functionality of GeometryMath::FindBoundingBoxOfFaces without
 			// the need to create an Int32Int32DynamicListArray
+			// Matrix rotation will be used to find the actual optimal bounding
+			// box (i.e. we will rotate norm to [0, 0, 1] the xy plane).
+
+			// Calculate rotation matrix from surfnorm -> [0, 0, 1]
+			float rotmat[3][3];
+			float tovec[3] = { 0.0f, 0.0f, 1.0f };
+			MatrixMath::TransformationMatrixFromAToB(surfnorm, tovec, rotmat);
 
 
 			double ll[3], ur[3];
@@ -503,7 +510,7 @@ void SurfaceMeshToSolidModelIges::execute()
 			for (int i = 0; i < (*cursurf).size(); ++i)
 			{
 				float facell[3], faceur[3];
-				GeometryMath::FindBoundingBoxOfFace(triangleGeom, (*cursurf)[i], facell, faceur);
+				GeometryMath::FindBoundingBoxOfRotatedFace(triangleGeom, (*cursurf)[i], rotmat, facell, faceur);
 				if (facell[0] < ll[0])
 				{
 					ll[0] = facell[0];
@@ -724,13 +731,26 @@ void SurfaceMeshToSolidModelIges::execute()
 			QMap<int32_t, int32_t>::iterator curpt = pointindexmap.begin();			
 			for (int64_t i = 0; i < pointindexmap.size(); ++i)
 			{
+				float precoords[3];
 				float coords[3];
-				triangleGeom->getCoords(curpt.key(), coords);
-				pt_array[2 * i + 0] = coords[0];
-				pt_array[2 * i + 1] = coords[1];
-				pt_zarray[i] = coords[2];
+				triangleGeom->getCoords(curpt.key(), precoords);
+				MatrixMath::Multiply3x3with3x1(rotmat, precoords, coords);
+				pt_array[2 * i + 0] = (double)coords[0];
+				pt_array[2 * i + 1] = (double)coords[1];
+				pt_zarray[i] = (double)coords[2];
 				++curpt;
 			}
+
+			QString filename = getOutputIgesDirectory() + "/" + getOutputIgesPrefix();
+			filename = filename + QString("Grain") + QString::number(grain) + QString("_Surface") + QString::number(surfcnt) + QString("_RotatedRawPoints_Size") + QString::number(xcnt) + QString("x") + QString::number(ycnt) + ".csv";
+			FILE *f = fopen(filename.toLatin1().data(), "w");
+			for (int64_t i = 0; i < pointindexmap.size(); ++i)
+			{
+				char line[100];
+				int cnt = sprintf(line, "%f,%f,%f\n", pt_array[2 * i + 0], pt_array[2 * i + 1], pt_zarray[i]);
+				fwrite(line, sizeof(char), cnt, f);
+			}
+			fclose(f);
 
 			//*********************************************************
 			//*** Start Qhull Code Below Here                       ***
@@ -975,6 +995,620 @@ void SurfaceMeshToSolidModelIges::execute()
 				}
 			}
 
+
+
+
+
+			// Let's extrapolate the edges and unfilled points
+			for (int64_t i = 0; i < xcnt; ++i)
+			{
+				for (int64_t j = 0; j < ycnt; ++j)
+				{
+					// Is the current point unset
+					// Only need to check z component since there are no scenarios in which the three values could be changed separately
+					if (isnan(griddedsurf[2 + j * 3 + i * ycnt * 3]))
+					{
+						float x1[3] = { nanf(""), nanf(""), nanf("") };
+						int64_t x1idx = i;
+						float x2[3] = { nanf(""), nanf(""), nanf("") };
+						int64_t x2idx = i;
+						float y1[3] = { nanf(""), nanf(""), nanf("") };
+						int64_t y1idx = j;
+						float y2[3] = { nanf(""), nanf(""), nanf("") };
+						int64_t y2idx = j;
+
+						float xinterp[3] = { 0.0f, 0.0f, 0.0f };
+						float yinterp[3] = { 0.0f, 0.0f, 0.0f };
+
+						float xfrac = 0.0f;
+						float yfrac = 0.0f;
+
+						int64_t curidx = i;
+
+						// Let's find each component
+
+						// Left X Direction
+						while (true)
+						{
+							curidx -= 1;
+							if (curidx < 0)
+								break;
+							if (!isnan(griddedsurf[2 + j * 3 + curidx * ycnt * 3]))
+							{
+								x1idx = curidx;
+								x1[0] = griddedsurf[0 + j * 3 + curidx * ycnt * 3];
+								x1[1] = griddedsurf[1 + j * 3 + curidx * ycnt * 3];
+								x1[2] = griddedsurf[2 + j * 3 + curidx * ycnt * 3];
+							}
+						}
+						curidx = i;
+
+						// Right X Direction
+						while (true)
+						{
+							curidx += 1;
+							if (curidx == xcnt)
+								break;
+							if (!isnan(griddedsurf[2 + j * 3 + curidx * ycnt * 3]))
+							{
+								x2idx = curidx;
+								x2[0] = griddedsurf[0 + j * 3 + curidx * ycnt * 3];
+								x2[1] = griddedsurf[1 + j * 3 + curidx * ycnt * 3];
+								x2[2] = griddedsurf[2 + j * 3 + curidx * ycnt * 3];
+							}
+						}
+						curidx = j;
+
+						// Up Y Direction
+						while (true)
+						{
+							curidx -= 1;
+							if (curidx < 0)
+								break;
+							if (!isnan(griddedsurf[2 + curidx * 3 + i * ycnt * 3]))
+							{
+								y1idx = curidx;
+								y1[0] = griddedsurf[0 + curidx * 3 + i * ycnt * 3];
+								y1[1] = griddedsurf[1 + curidx * 3 + i * ycnt * 3];
+								y1[2] = griddedsurf[2 + curidx * 3 + i * ycnt * 3];
+							}
+						}
+						curidx = j;
+
+						// Down Y Direction
+						while (true)
+						{
+							curidx += 1;
+							if (curidx == ycnt)
+								break;
+							if (!isnan(griddedsurf[2 + curidx * 3 + i * ycnt * 3]))
+							{
+								y2idx = curidx;
+								y2[0] = griddedsurf[0 + curidx * 3 + i * ycnt * 3];
+								y2[1] = griddedsurf[1 + curidx * 3 + i * ycnt * 3];
+								y2[2] = griddedsurf[2 + curidx * 3 + i * ycnt * 3];
+							}
+						}
+
+
+						// Now, figure out which type of interpolation to use
+						if (x1idx == i && x2idx == i && y1idx == j && y2idx == j)
+						{
+							// we need to skip this point for now because it lies 
+							// at a point in which we don't yet know how to
+							// interpolate it.  We will need to loop through again
+							// and fix this.
+
+							continue;
+
+						}
+						else if (((x1idx != i) + (x2idx != i)) + ((y1idx != j) + (y2idx != j)) == 1)
+						{
+							// We know one value in one direction only.  This should
+							// happen at every point along the outside of the grid 
+							// except for the corners.  We just set this to be that
+							// one value.
+
+							double pt[3];
+
+							if (x1idx != i)
+							{
+								pt[0] = griddedsurf[0 + j * 3 + i * ycnt * 3];
+								pt[1] = griddedsurf[1 + j * 3 + i * ycnt * 3];
+								pt[2] = x1[2];
+							}
+							else if (x2idx != i)
+							{
+								pt[0] = griddedsurf[0 + j * 3 + i * ycnt * 3];
+								pt[1] = griddedsurf[1 + j * 3 + i * ycnt * 3];
+								pt[2] = x2[2];
+							}
+							else if (y1idx != j)
+							{
+								pt[0] = griddedsurf[0 + j * 3 + i * ycnt * 3];
+								pt[1] = griddedsurf[1 + j * 3 + i * ycnt * 3];
+								pt[2] = y1[2];
+							}
+							else if (y2idx != j)
+							{
+								pt[0] = griddedsurf[0 + j * 3 + i * ycnt * 3];
+								pt[1] = griddedsurf[1 + j * 3 + i * ycnt * 3];
+								pt[2] = y2[2];
+							}
+
+							//griddedsurf[0 + j * 3 + i * ycnt * 3] = pt[0];
+							//griddedsurf[1 + j * 3 + i * ycnt * 3] = pt[1];
+							griddedsurf[2 + j * 3 + i * ycnt * 3] = pt[2];
+						}
+						else if (((x1idx != i) ^ (x2idx != i)) && ((y1idx != j) ^ (y2idx != j)))
+						{
+							// We have one value in each direction - this should
+							// only happen during the second iteration to fill in
+							// the gaps described by the scenario above which occurs
+							// at the corners of the grid.
+
+							// If we find any of these on the first loop through, it
+							// means there is still a giant hole in the grid.  Let's
+							// skip it for now and see if we can improve the fit on
+							// the second loop through
+
+
+
+							if (x1idx != i)
+							{
+								xinterp[0] = griddedsurf[0 + j * 3 + i * ycnt * 3];
+								xinterp[1] = griddedsurf[1 + j * 3 + i * ycnt * 3];
+								xinterp[2] = x1[2];
+							}
+							else
+							{
+								xinterp[0] = griddedsurf[0 + j * 3 + i * ycnt * 3];
+								xinterp[1] = griddedsurf[1 + j * 3 + i * ycnt * 3];
+								xinterp[2] = x2[2];
+							}
+							if (y1idx != j)
+							{
+								yinterp[0] = griddedsurf[0 + j * 3 + i * ycnt * 3];
+								yinterp[1] = griddedsurf[1 + j * 3 + i * ycnt * 3];
+								yinterp[2] = y1[2];
+							}
+							else
+							{
+								yinterp[0] = griddedsurf[0 + j * 3 + i * ycnt * 3];
+								yinterp[1] = griddedsurf[1 + j * 3 + i * ycnt * 3];
+								yinterp[2] = y2[2];
+							}
+
+							//griddedsurf[0 + j * 3 + i * ycnt * 3] = (xinterp[0] + yinterp[0]) / 2;
+							//griddedsurf[1 + j * 3 + i * ycnt * 3] = (xinterp[1] + yinterp[1]) / 2;
+							griddedsurf[2 + j * 3 + i * ycnt * 3] = (xinterp[2] + yinterp[2]) / 2;
+
+
+						}
+						else if (x1idx != i && x2idx != i && y1idx == j && y2idx == j)
+						{
+							// We have two values in the x direction
+							// This suggests a an entire column that is missing
+							// Let's just average this between the adjacent columns
+							//griddedsurf[0 + j * 3 + i * ycnt * 3] = (x1[0] + x2[0]) / 2;
+							//griddedsurf[1 + j * 3 + i * ycnt * 3] = (x1[1] + x2[1]) / 2;
+							griddedsurf[2 + j * 3 + i * ycnt * 3] = (x1[2] + x2[2]) / 2;
+						}
+						else if (x1idx == i && x2idx == i && y1idx != j && y2idx != j)
+						{
+							// We have two values in the y direction
+							// This suggests a an entire row that is missing
+							// Let's just average this between the adjacent rows
+							//griddedsurf[0 + j * 3 + i * ycnt * 3] = (y1[0] + y2[0]) / 2;
+							//griddedsurf[1 + j * 3 + i * ycnt * 3] = (y1[1] + y2[1]) / 2;
+							griddedsurf[2 + j * 3 + i * ycnt * 3] = (y1[2] + y2[2]) / 2;
+						}
+						else if (x1idx == i && x2idx != i && y1idx != j && y2idx != j)
+						{
+							// We have values to the right, top, and bottom
+							// Let's do a blend between the single value of x
+							// and the linearly interpolated value of y
+							xinterp[0] = x2[0];
+							xinterp[1] = x2[1];
+							xinterp[2] = x2[2];
+
+							yfrac = (float)(j - y1idx) / (float)(y2idx - y1idx);
+
+							yinterp[0] = y1[0] + (y2[0] - y1[0])*yfrac;
+							yinterp[1] = y1[1] + (y2[1] - y1[1])*yfrac;
+							yinterp[2] = y1[2] + (y2[2] - y1[2])*yfrac;
+
+							//griddedsurf[0 + j * 3 + i * ycnt * 3] = (xinterp[0] + yinterp[0]) / 2;
+							//griddedsurf[1 + j * 3 + i * ycnt * 3] = (xinterp[1] + yinterp[1]) / 2;
+							griddedsurf[2 + j * 3 + i * ycnt * 3] = (xinterp[2] + yinterp[2]) / 2;
+						}
+						else if (x1idx != i && x2idx == i && y1idx != j && y2idx != j)
+						{
+							// We have values to the left, top, and bottom
+							// Let's do a blend between the single value of x
+							// and the linearly interpolated value of y
+							xinterp[0] = x1[0];
+							xinterp[1] = x1[1];
+							xinterp[2] = x1[2];
+
+							yfrac = (float)(j - y1idx) / (float)(y2idx - y1idx);
+
+							yinterp[0] = y1[0] + (y2[0] - y1[0])*yfrac;
+							yinterp[1] = y1[1] + (y2[1] - y1[1])*yfrac;
+							yinterp[2] = y1[2] + (y2[2] - y1[2])*yfrac;
+
+							//griddedsurf[0 + j * 3 + i * ycnt * 3] = (xinterp[0] + yinterp[0]) / 2;
+							//griddedsurf[1 + j * 3 + i * ycnt * 3] = (xinterp[1] + yinterp[1]) / 2;
+							griddedsurf[2 + j * 3 + i * ycnt * 3] = (xinterp[2] + yinterp[2]) / 2;
+						}
+						else if (x1idx != i && x2idx != i && y1idx == j && y2idx != j)
+						{
+							// We have values to the left, right, and bottom
+							yinterp[0] = y2[0];
+							yinterp[1] = y2[1];
+							yinterp[2] = y2[2];
+
+							xfrac = (float)(i - x1idx) / (float)(x2idx - x1idx);
+
+							xinterp[0] = x1[0] + (x2[0] - x1[0])*xfrac;
+							xinterp[1] = x1[1] + (x2[1] - x1[1])*xfrac;
+							xinterp[2] = x1[2] + (x2[2] - x1[2])*xfrac;
+
+							//griddedsurf[0 + j * 3 + i * ycnt * 3] = (xinterp[0] + yinterp[0]) / 2;
+							//griddedsurf[1 + j * 3 + i * ycnt * 3] = (xinterp[1] + yinterp[1]) / 2;
+							griddedsurf[2 + j * 3 + i * ycnt * 3] = (xinterp[2] + yinterp[2]) / 2;
+						}
+						else if (x1idx != i && x2idx != i && y1idx != j && y2idx == j)
+						{
+							// We have values to the left, right, and top
+							yinterp[0] = y1[0];
+							yinterp[1] = y1[1];
+							yinterp[2] = y1[2];
+
+							xfrac = (float)(i - x1idx) / (float)(x2idx - x1idx);
+
+							xinterp[0] = x1[0] + (x2[0] - x1[0])*xfrac;
+							xinterp[1] = x1[1] + (x2[1] - x1[1])*xfrac;
+							xinterp[2] = x1[2] + (x2[2] - x1[2])*xfrac;
+
+							//griddedsurf[0 + j * 3 + i * ycnt * 3] = (xinterp[0] + yinterp[0]) / 2;
+							//griddedsurf[1 + j * 3 + i * ycnt * 3] = (xinterp[1] + yinterp[1]) / 2;
+							griddedsurf[2 + j * 3 + i * ycnt * 3] = (xinterp[2] + yinterp[2]) / 2;
+						}
+						else if (x1idx != i && x2idx != i && y1idx != j && y2idx != j)
+						{
+							// We have four values - we can do bilinear interpolation
+							xfrac = (float)(i - x1idx) / (float)(x2idx - x1idx);
+
+							xinterp[0] = x1[0] + (x2[0] - x1[0])*xfrac;
+							xinterp[1] = x1[1] + (x2[1] - x1[1])*xfrac;
+							xinterp[2] = x1[2] + (x2[2] - x1[2])*xfrac;
+
+							yfrac = (float)(j - y1idx) / (float)(y2idx - y1idx);
+
+							yinterp[0] = y1[0] + (y2[0] - y1[0])*yfrac;
+							yinterp[1] = y1[1] + (y2[1] - y1[1])*yfrac;
+							yinterp[2] = y1[2] + (y2[2] - y1[2])*yfrac;
+
+							//griddedsurf[0 + j * 3 + i * ycnt * 3] = (xinterp[0] + yinterp[0]) / 2;
+							//griddedsurf[1 + j * 3 + i * ycnt * 3] = (xinterp[1] + yinterp[1]) / 2;
+							griddedsurf[2 + j * 3 + i * ycnt * 3] = (xinterp[2] + yinterp[2]) / 2;
+
+						}
+
+					}
+				}
+			}
+
+
+			for (int64_t i = 0; i < xcnt; ++i)
+			{
+				for (int64_t j = 0; j < ycnt; ++j)
+				{
+					// Is the current point unset
+					// Only need to check z component since there are no scenarios in which the three values could be changed separately
+					if (isnan(griddedsurf[2 + j * 3 + i * ycnt * 3]))
+					{
+						float x1[3] = { nanf(""), nanf(""), nanf("") };
+						int64_t x1idx = i;
+						float x2[3] = { nanf(""), nanf(""), nanf("") };
+						int64_t x2idx = i;
+						float y1[3] = { nanf(""), nanf(""), nanf("") };
+						int64_t y1idx = j;
+						float y2[3] = { nanf(""), nanf(""), nanf("") };
+						int64_t y2idx = j;
+
+						float xinterp[3] = { 0.0f, 0.0f, 0.0f };
+						float yinterp[3] = { 0.0f, 0.0f, 0.0f };
+
+						float xfrac = 0.0f;
+						float yfrac = 0.0f;
+
+						int64_t curidx = i;
+
+						// Let's find each component
+
+						// Left X Direction
+						while (true)
+						{
+							curidx -= 1;
+							if (curidx < 0)
+								break;
+							if (!isnan(griddedsurf[2 + j * 3 + curidx * ycnt * 3]))
+							{
+								x1idx = curidx;
+								x1[0] = griddedsurf[0 + j * 3 + curidx * ycnt * 3];
+								x1[1] = griddedsurf[1 + j * 3 + curidx * ycnt * 3];
+								x1[2] = griddedsurf[2 + j * 3 + curidx * ycnt * 3];
+							}
+						}
+						curidx = i;
+
+						// Right X Direction
+						while (true)
+						{
+							curidx += 1;
+							if (curidx == xcnt)
+								break;
+							if (!isnan(griddedsurf[2 + j * 3 + curidx * ycnt * 3]))
+							{
+								x2idx = curidx;
+								x2[0] = griddedsurf[0 + j * 3 + curidx * ycnt * 3];
+								x2[1] = griddedsurf[1 + j * 3 + curidx * ycnt * 3];
+								x2[2] = griddedsurf[2 + j * 3 + curidx * ycnt * 3];
+							}
+						}
+						curidx = j;
+
+						// Up Y Direction
+						while (true)
+						{
+							curidx -= 1;
+							if (curidx < 0)
+								break;
+							if (!isnan(griddedsurf[2 + curidx * 3 + i * ycnt * 3]))
+							{
+								y1idx = curidx;
+								y1[0] = griddedsurf[0 + curidx * 3 + i * ycnt * 3];
+								y1[1] = griddedsurf[1 + curidx * 3 + i * ycnt * 3];
+								y1[2] = griddedsurf[2 + curidx * 3 + i * ycnt * 3];
+							}
+						}
+						curidx = j;
+
+						// Down Y Direction
+						while (true)
+						{
+							curidx += 1;
+							if (curidx == ycnt)
+								break;
+							if (!isnan(griddedsurf[2 + curidx * 3 + i * ycnt * 3]))
+							{
+								y2idx = curidx;
+								y2[0] = griddedsurf[0 + curidx * 3 + i * ycnt * 3];
+								y2[1] = griddedsurf[1 + curidx * 3 + i * ycnt * 3];
+								y2[2] = griddedsurf[2 + curidx * 3 + i * ycnt * 3];
+							}
+						}
+
+
+						// Now, figure out which type of interpolation to use
+						if (x1idx == i && x2idx == i && y1idx == j && y2idx == j)
+						{
+							// we need to skip this point for now because it lies 
+							// at a point in which we don't yet know how to
+							// interpolate it.  We will need to loop through again
+							// and fix this.
+
+							assert(false);
+
+						}
+						else if (((x1idx != i) + (x2idx != i)) + ((y1idx != j) + (y2idx != j)) == 1)
+						{
+							// We know one value in one direction only.  This should
+							// happen at every point along the outside of the grid 
+							// except for the corners.  We just set this to be that
+							// one value.
+
+							double pt[3];
+
+							if (x1idx != i)
+							{
+								pt[0] = griddedsurf[0 + j * 3 + i * ycnt * 3];
+								pt[1] = griddedsurf[1 + j * 3 + i * ycnt * 3];
+								pt[2] = x1[2];
+							}
+							else if (x2idx != i)
+							{
+								pt[0] = griddedsurf[0 + j * 3 + i * ycnt * 3];
+								pt[1] = griddedsurf[1 + j * 3 + i * ycnt * 3];
+								pt[2] = x2[2];
+							}
+							else if (y1idx != j)
+							{
+								pt[0] = griddedsurf[0 + j * 3 + i * ycnt * 3];
+								pt[1] = griddedsurf[1 + j * 3 + i * ycnt * 3];
+								pt[2] = y1[2];
+							}
+							else if (y2idx != j)
+							{
+								pt[0] = griddedsurf[0 + j * 3 + i * ycnt * 3];
+								pt[1] = griddedsurf[1 + j * 3 + i * ycnt * 3];
+								pt[2] = y2[2];
+							}
+
+							//griddedsurf[0 + j * 3 + i * ycnt * 3] = pt[0];
+							//griddedsurf[1 + j * 3 + i * ycnt * 3] = pt[1];
+							griddedsurf[2 + j * 3 + i * ycnt * 3] = pt[2];
+						}
+						else if (((x1idx != i) ^ (x2idx != i)) && ((y1idx != j) ^ (y2idx != j)))
+						{
+							// We have one value in each direction - this should
+							// only happen during the second iteration to fill in
+							// the gaps described by the scenario above which occurs
+							// at the corners of the grid.
+
+							// If we find any of these on the first loop through, it
+							// means there is still a giant hole in the grid.  Let's
+							// skip it for now and see if we can improve the fit on
+							// the second loop through
+
+
+
+							if (x1idx != i)
+							{
+								xinterp[0] = griddedsurf[0 + j * 3 + i * ycnt * 3];
+								xinterp[1] = griddedsurf[1 + j * 3 + i * ycnt * 3];
+								xinterp[2] = x1[2];
+							}
+							else
+							{
+								xinterp[0] = griddedsurf[0 + j * 3 + i * ycnt * 3];
+								xinterp[1] = griddedsurf[1 + j * 3 + i * ycnt * 3];
+								xinterp[2] = x2[2];
+							}
+							if (y1idx != j)
+							{
+								yinterp[0] = griddedsurf[0 + j * 3 + i * ycnt * 3];
+								yinterp[1] = griddedsurf[1 + j * 3 + i * ycnt * 3];
+								yinterp[2] = y1[2];
+							}
+							else
+							{
+								yinterp[0] = griddedsurf[0 + j * 3 + i * ycnt * 3];
+								yinterp[1] = griddedsurf[1 + j * 3 + i * ycnt * 3];
+								yinterp[2] = y2[2];
+							}
+
+							//griddedsurf[0 + j * 3 + i * ycnt * 3] = (xinterp[0] + yinterp[0]) / 2;
+							//griddedsurf[1 + j * 3 + i * ycnt * 3] = (xinterp[1] + yinterp[1]) / 2;
+							griddedsurf[2 + j * 3 + i * ycnt * 3] = (xinterp[2] + yinterp[2]) / 2;
+
+
+						}
+						else if (x1idx != i && x2idx != i && y1idx == j && y2idx == j)
+						{
+							// We have two values in the x direction
+							// This suggests a an entire column that is missing
+							// Let's just average this between the adjacent columns
+							//griddedsurf[0 + j * 3 + i * ycnt * 3] = (x1[0] + x2[0]) / 2;
+							//griddedsurf[1 + j * 3 + i * ycnt * 3] = (x1[1] + x2[1]) / 2;
+							griddedsurf[2 + j * 3 + i * ycnt * 3] = (x1[2] + x2[2]) / 2;
+						}
+						else if (x1idx == i && x2idx == i && y1idx != j && y2idx != j)
+						{
+							// We have two values in the y direction
+							// This suggests a an entire row that is missing
+							// Let's just average this between the adjacent rows
+							//griddedsurf[0 + j * 3 + i * ycnt * 3] = (y1[0] + y2[0]) / 2;
+							//griddedsurf[1 + j * 3 + i * ycnt * 3] = (y1[1] + y2[1]) / 2;
+							griddedsurf[2 + j * 3 + i * ycnt * 3] = (y1[2] + y2[2]) / 2;
+						}
+						else if (x1idx == i && x2idx != i && y1idx != j && y2idx != j)
+						{
+							// We have values to the right, top, and bottom
+							// Let's do a blend between the single value of x
+							// and the linearly interpolated value of y
+							xinterp[0] = x2[0];
+							xinterp[1] = x2[1];
+							xinterp[2] = x2[2];
+
+							yfrac = (float)(j - y1idx) / (float)(y2idx - y1idx);
+
+							yinterp[0] = y1[0] + (y2[0] - y1[0])*yfrac;
+							yinterp[1] = y1[1] + (y2[1] - y1[1])*yfrac;
+							yinterp[2] = y1[2] + (y2[2] - y1[2])*yfrac;
+
+							//griddedsurf[0 + j * 3 + i * ycnt * 3] = (xinterp[0] + yinterp[0]) / 2;
+							//griddedsurf[1 + j * 3 + i * ycnt * 3] = (xinterp[1] + yinterp[1]) / 2;
+							griddedsurf[2 + j * 3 + i * ycnt * 3] = (xinterp[2] + yinterp[2]) / 2;
+						}
+						else if (x1idx != i && x2idx == i && y1idx != j && y2idx != j)
+						{
+							// We have values to the left, top, and bottom
+							// Let's do a blend between the single value of x
+							// and the linearly interpolated value of y
+							xinterp[0] = x1[0];
+							xinterp[1] = x1[1];
+							xinterp[2] = x1[2];
+
+							yfrac = (float)(j - y1idx) / (float)(y2idx - y1idx);
+
+							yinterp[0] = y1[0] + (y2[0] - y1[0])*yfrac;
+							yinterp[1] = y1[1] + (y2[1] - y1[1])*yfrac;
+							yinterp[2] = y1[2] + (y2[2] - y1[2])*yfrac;
+
+							//griddedsurf[0 + j * 3 + i * ycnt * 3] = (xinterp[0] + yinterp[0]) / 2;
+							//griddedsurf[1 + j * 3 + i * ycnt * 3] = (xinterp[1] + yinterp[1]) / 2;
+							griddedsurf[2 + j * 3 + i * ycnt * 3] = (xinterp[2] + yinterp[2]) / 2;
+						}
+						else if (x1idx != i && x2idx != i && y1idx == j && y2idx != j)
+						{
+							// We have values to the left, right, and bottom
+							yinterp[0] = y2[0];
+							yinterp[1] = y2[1];
+							yinterp[2] = y2[2];
+
+							xfrac = (float)(i - x1idx) / (float)(x2idx - x1idx);
+
+							xinterp[0] = x1[0] + (x2[0] - x1[0])*xfrac;
+							xinterp[1] = x1[1] + (x2[1] - x1[1])*xfrac;
+							xinterp[2] = x1[2] + (x2[2] - x1[2])*xfrac;
+
+							//griddedsurf[0 + j * 3 + i * ycnt * 3] = (xinterp[0] + yinterp[0]) / 2;
+							//griddedsurf[1 + j * 3 + i * ycnt * 3] = (xinterp[1] + yinterp[1]) / 2;
+							griddedsurf[2 + j * 3 + i * ycnt * 3] = (xinterp[2] + yinterp[2]) / 2;
+						}
+						else if (x1idx != i && x2idx != i && y1idx != j && y2idx == j)
+						{
+							// We have values to the left, right, and top
+							yinterp[0] = y1[0];
+							yinterp[1] = y1[1];
+							yinterp[2] = y1[2];
+
+							xfrac = (float)(i - x1idx) / (float)(x2idx - x1idx);
+
+							xinterp[0] = x1[0] + (x2[0] - x1[0])*xfrac;
+							xinterp[1] = x1[1] + (x2[1] - x1[1])*xfrac;
+							xinterp[2] = x1[2] + (x2[2] - x1[2])*xfrac;
+
+							//griddedsurf[0 + j * 3 + i * ycnt * 3] = (xinterp[0] + yinterp[0]) / 2;
+							//griddedsurf[1 + j * 3 + i * ycnt * 3] = (xinterp[1] + yinterp[1]) / 2;
+							griddedsurf[2 + j * 3 + i * ycnt * 3] = (xinterp[2] + yinterp[2]) / 2;
+						}
+						else if (x1idx != i && x2idx != i && y1idx != j && y2idx != j)
+						{
+							// We have four values - we can do bilinear interpolation
+							xfrac = (float)(i - x1idx) / (float)(x2idx - x1idx);
+
+							xinterp[0] = x1[0] + (x2[0] - x1[0])*xfrac;
+							xinterp[1] = x1[1] + (x2[1] - x1[1])*xfrac;
+							xinterp[2] = x1[2] + (x2[2] - x1[2])*xfrac;
+
+							yfrac = (float)(j - y1idx) / (float)(y2idx - y1idx);
+
+							yinterp[0] = y1[0] + (y2[0] - y1[0])*yfrac;
+							yinterp[1] = y1[1] + (y2[1] - y1[1])*yfrac;
+							yinterp[2] = y1[2] + (y2[2] - y1[2])*yfrac;
+
+							//griddedsurf[0 + j * 3 + i * ycnt * 3] = (xinterp[0] + yinterp[0]) / 2;
+							//griddedsurf[1 + j * 3 + i * ycnt * 3] = (xinterp[1] + yinterp[1]) / 2;
+							griddedsurf[2 + j * 3 + i * ycnt * 3] = (xinterp[2] + yinterp[2]) / 2;
+
+						}
+
+					}
+				}
+			}
+
+
+
+
+
+
+
+
+
 			// Free memory on the heap
 			delete[] minx;
 			delete[] miny;
@@ -984,12 +1618,45 @@ void SurfaceMeshToSolidModelIges::execute()
 			delete[] pt_array;
 			delete[] pt_zarray;
 
+			// Rotate back
+			MatrixMath::TransformationMatrixFromAToB(surfnorm, tovec, rotmat);
+			double dblrotmat[3][3];
+			dblrotmat[0][0] = (double)rotmat[0][0];
+			dblrotmat[0][1] = (double)rotmat[0][1];
+			dblrotmat[0][2] = (double)rotmat[0][2];
+			dblrotmat[1][0] = (double)rotmat[1][0];
+			dblrotmat[1][1] = (double)rotmat[1][1];
+			dblrotmat[1][2] = (double)rotmat[1][2];
+			dblrotmat[2][0] = (double)rotmat[2][0];
+			dblrotmat[2][1] = (double)rotmat[2][1];
+			dblrotmat[2][2] = (double)rotmat[2][2];
+			double invmat[3][3];
+			MatrixMath::Invert3x3(dblrotmat, invmat);
+			MatrixMath::Transpose3x3(invmat, dblrotmat);
+			
+			for (int64_t i = 0; i < xcnt; ++i)
+			{
+				for (int64_t j = 0; j < ycnt; ++j)
+				{
+					double prerot[3], postrot[3];
+					prerot[0] = griddedsurf[0 + 3 * j + i * ycnt * 3];
+					prerot[1] = griddedsurf[1 + 3 * j + i * ycnt * 3];
+					prerot[2] = griddedsurf[2 + 3 * j + i * ycnt * 3];
+					MatrixMath::Multiply3x3with3x1(dblrotmat, prerot, postrot);
+					griddedsurf[0 + 3 * j + i * ycnt * 3] = postrot[0];
+					griddedsurf[1 + 3 * j + i * ycnt * 3] = postrot[1];
+					griddedsurf[2 + 3 * j + i * ycnt * 3] = postrot[2];
+				}
+			}
+
+
+
 			
 
 			// Temporary surface output
-			QString filename = getOutputIgesDirectory() + "/" + getOutputIgesPrefix();
+			filename = getOutputIgesDirectory() + "/" + getOutputIgesPrefix();
 			filename = filename + QString("Grain") + QString::number(grain) + QString("_Surface") + QString::number(surfcnt) + QString("_Gridded_Size") + QString::number(xcnt) + QString("x") + QString::number(ycnt) + ".csv";
-			FILE *f = fopen(filename.toLatin1().data(), "w");
+			f = fopen(filename.toLatin1().data(), "w");
 			for (int32_t i = 0; i < xcnt; i++)
 			{
 				for (int32_t j = 0; j < ycnt; j++)
