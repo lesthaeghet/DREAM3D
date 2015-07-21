@@ -1043,7 +1043,12 @@ void SurfaceMeshToSolidModelIges::execute()
 			}
 
 
-
+			struct neighbor {
+				int64_t x;
+				int64_t y;
+				int64_t z;
+				float d;
+			}
 
 
 			// Let's extrapolate the edges and unfilled points
@@ -1051,30 +1056,176 @@ void SurfaceMeshToSolidModelIges::execute()
 			{
 				for (int64_t j = 0; j < ycnt; ++j)
 				{
-					// At each point, we need to find the nearest neighbors and perform
-					// a weighted average based on distance.  We will find the neighbors
-					// by dividing up the grid into quadrants.  We will progress radially
-					// outward in each quadrant until we find a radius that results in
-					// us finding the first neighbor in that quadrant.  We will take all
-					// neighbors on that radius in that quadrant.  We repeat this process
-					// for each quadrant.  Each quadrant will include the first axes from
-					// the standard perspective.  The second axes will be included with the
-					// subsequent quadrant.
 
-					int64_t curradius = 1;
-
-					// First quadrant
-					while (true)
+					if (isnan(griddedsurf[2 + 3*j + i * ycnt * 3]))
 					{
-						// 
-						//
-						// | - - |  (0,1), (1,1), (1,0)
-						// | / / |  (0,2), (1,2), (2,2), (2,1), (2,0)
-						// | / / |  
-						// o - - -
+						// At each point, we need to find the nearest neighbors and perform
+						// a weighted average based on distance.  We will find the neighbors
+						// by dividing up the grid into quadrants.  We will progress radially
+						// outward in each quadrant until we find a radius that results in
+						// us finding the first neighbor in that quadrant.  We will take all
+						// neighbors on that radius in that quadrant.  We repeat this process
+						// for each quadrant.  Each quadrant will include the first axes from
+						// the standard perspective.  The second axes will be included with the
+						// subsequent quadrant.
+	
 						
+
+						int64_t x=i; y=j;
+						int64_t curradius = 1;						
+						QList<neighbor> curpointneighbors;
+						int64_t curncount = 0;
+						int64_t curmaxradius = (xcnt-1-i) > (ycnt-1-j) ? (xcnt-1-i) : (ycnt-1-j);
+	
+						// First quadrant
+						while (true)
+						{
+							if (x<i+curradius && y==j)
+								++x;
+							else if (x==i+curradius && y < j + curradius)
+								++y;
+							else if (x>i && y==j+curradius)
+								--x;
+							else
+								if (curncount > 0 || curradius >= curmaxradius)
+									break;
+								else
+									++curradius;
+							
+							if (x >= xcnt || x < 0 || y >= ycnt || y < 0)
+								continue; 
+							
+							if (!isnan(griddedsurf[2 + 3*y + x*ycnt*3 ]))
+							{
+								neighbor n
+								n.x = x;
+								n.y = y;
+								n.z = griddedsurf[2 + 3*y + x*ycnt*3 ];
+								n.d = sqrt(abs(x-i) * abs(x-i) + abs(y-j) * abs(y-j));
+								curpointneighbors << n;
+								++curncount;
+							}
+						}
+
+
+
+						x=i; y=j;
+						curradius = 1;						
+						curncount = 0;
+						curmaxradius = (i) > (ycnt-1-j) ? (i) : (ycnt-1-j);
+	
+						// Second quadrant
+						while (true)
+						{
+							if (x==i && y < j + curradius)
+								++y;
+							else if (x>i-curradius && y==j+curradius)
+								--x;
+							else if (x==i-curradius && y > j)
+								--y;
+							else
+								if (curncount > 0 || curradius >= curmaxradius)
+									break;
+								else
+									++curradius;
+							
+							if (x >= xcnt || x < 0 || y >= ycnt || y < 0)
+								continue; 
+							
+							if (!isnan(griddedsurf[2 + 3*y + x*ycnt*3 ]))
+							{
+								neighbor n
+								n.x = x;
+								n.y = y;
+								n.z = griddedsurf[2 + 3*y + x*ycnt*3 ];
+								n.d = sqrt(abs(x-i) * abs(x-i) + abs(y-j) * abs(y-j));
+								curpointneighbors << n;
+								++curncount;
+							}
+						}
+
+						x=i; y=j;
+						curradius = 1;						
+						curncount = 0;
+						curmaxradius = (i) > (j) ? (i) : (j);
+	
+						// Third quadrant
+						while (true)
+						{
+							if (x > i - curradius && y == j)
+								--x;
+							else if (x== i-curradius && y > j-curradius)
+								--y;
+							else if (x < i && y == j-curradius)
+								++x;
+							else
+								if (curncount > 0 || curradius >= curmaxradius)
+									break;
+								else
+									++curradius;
+							
+							if (x >= xcnt || x < 0 || y >= ycnt || y < 0)
+								continue; 
+							
+							if (!isnan(griddedsurf[2 + 3*y + x*ycnt*3 ]))
+							{
+								neighbor n
+								n.x = x;
+								n.y = y;
+								n.z = griddedsurf[2 + 3*y + x*ycnt*3 ];
+								n.d = sqrt(abs(x-i) * abs(x-i) + abs(y-j) * abs(y-j));
+								curpointneighbors << n;
+								++curncount;
+							}
+						}
+
+						x=i; y=j;
+						curradius = 1;						
+						curncount = 0;
+						curmaxradius = (xcnt - 1 - i) > (j) ? (xcnt - 1 - i) : (j);
+	
+						// Fourth quadrant
+						while (true)
+						{
+							if (x == i && y > j - curradius)
+								--y;
+							else if (x < i+curradius && y == j - curradius )
+								++x;
+							else if (x == i+curradius && y < j)
+								++y;
+							else
+								if (curncount > 0 || curradius >= curmaxradius)
+									break;
+								else
+									++curradius;
+							
+							if (x >= xcnt || x < 0 || y >= ycnt || y < 0)
+								continue; 
+							
+							if (!isnan(griddedsurf[2 + 3*y + x*ycnt*3 ]))
+							{
+								neighbor n
+								n.x = x;
+								n.y = y;
+								n.z = griddedsurf[2 + 3*y + x*ycnt*3 ];
+								n.d = sqrt(abs(x-i) * abs(x-i) + abs(y-j) * abs(y-j));
+								curpointneighbors << n;
+								++curncount;
+							}
+						}
+
+
+						float totaldistance = 0.0f;
+						for (int64_t i = 0; i < curpointneighbors.size(); ++i)
+						{
+							totaldistance+=curpointneighbors[i].d;
+						}
+
 						
-						if (!isnan(griddedsurf[2 + 3*l + k*ycnt*3 ]))
+
+
+
+					
 						
 					}
 				}
