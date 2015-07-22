@@ -1285,6 +1285,10 @@ void SurfaceMeshToSolidModelIges::execute()
 
 
 
+			
+
+
+
 
 
 
@@ -1663,6 +1667,244 @@ int32_t SurfaceMeshToSolidModelIges::RecurseOrderedEdges(QList<QList<int64_t>> e
 	// return good status
 	return 0;
 }
+
+
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+int64_t SurfMeshParams(const int64_t n, const int64_t m, const double *Q, double &uk, double &vl)
+{
+	// This code adapted from The NURBS Handbook, 2nd Ed. ISBN 3-540-61545-8 p377-378
+
+	// Calculate uk
+	int64_t num = m;
+	uk[0] = 0.0f;	uk[n-1] = 1.0f;
+	double *cds = new double[n];
+	for (int64_t k=1; k<(n-1); ++k) uk[k] = 0.0f;
+	for (int64_t l=0; l<m; ++l)
+	{
+		double total = 0.0f;
+		for (int64_t k=1; k<n; ++k)
+		{
+			cds[k-1] = Distance3D(k,l,k-1,l,n,m,Q);
+			total += cds[k-1];
+		}
+		if ( total <= DBL_EPSILON ) --num;
+		else
+		{
+			double d = 0.0f;
+			for (int64_t k=1; k<(n-1); ++k)
+			{
+				d += cds[k-1];
+				uk[k-1] += d/total;
+			}
+		}
+	}
+	if (num == 0) return -1;
+	for (int64_t k=1; k<(n-1); ++k) uk[k] = uk[k]/num;
+
+	// Calculate vl
+	num = n;
+	vl[0] = 0.0f; vl[m-1] = 1.0f;
+	delete[] cds;
+	cds = new double[m];
+	for (int64_t l=1; l<(m-1); ++l) vl[l] = 0.0f;
+	for (int64_t k=0; k<n; ++k)
+	{
+		double total = 0.0f;
+		for (int64_t l=1; l<m; ++l)
+		{
+			cds[l-1] = Distance3D(k,l,k,l-1,n,m,Q);
+			total += cds[l-1];
+		}
+		if (total <= DBL_EPSILON) --num;
+		else
+		{
+			double d = 0.0f;
+			for (int64_t l=1; l<(m-1); ++l)
+			{
+				d += cds[l-1];
+				uk[l-1] += d/total;
+			}
+		}
+	}
+	if (num == 0) return -1;
+	for (int64_t l=1; l<(m-1); ++l) vl[l] = vl[l]/num;
+
+	delete[] cds;
+
+	return 0;	
+}
+
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+double Distance3D(const int64_t xa, const int64_t ya, const int64_t xb, const int64_t yb, const int64_t n, const int64_t m, const double *Q)
+{
+	const double ax = Q[0 + 3 * ya + xa * (n) * 3];
+	const double ay = Q[1 + 3 * ya + xa * (n) * 3];
+	const double az = Q[2 + 3 * ya + xa * (n) * 3];
+	const double bx = Q[0 + 3 * yb + xb * (n) * 3];
+	const double by = Q[1 + 3 * yb + xb * (n) * 3];
+	const double bz = Q[2 + 3 * yb + xb * (n) * 3];
+
+	double retval = sqrt( (ax-bx)*(ax-bx) + (ay-by)*(ay-by) + (az-bz)*(az-bz) );
+	
+}
+
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+int64_t GlobalCurveInterp(int64_t n, double *Q, int64_t r, int64_t p, int64_t &m, double &U, double &P)
+{
+	// This code adapted from The NURBS Handbook, 2nd Ed. ISBN 3-540-61545-8 p369-370
+
+	m = n + p + 1;
+
+	
+
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+int64_t FindSpan(int64_t n, int64_t p, double u, double *U)
+{
+	if (u == U[n+1]) return(n);
+
+	int64_t low = p; int64_t high = n+1;
+
+	int64_t mid = (low+high)/2;
+
+	while (u < U[mid] || u >= U[mid+1])
+	{
+		if (u<U[mid]) high = mid;
+		else	low = mid;
+		mid = (low+high)/2;
+	}
+	return(mid);
+	
+}
+
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void BasisFunction(int64_t i, double u, int64_t p, double *U, double *N)
+{
+
+	N[0] = 1.0;
+	double left[p+1];
+	double right[p+1];
+	double saved;
+
+
+	for (int64_t j = 1; j<=p; j++)
+	{
+		left[j] = u-U[i+1-j];
+		right[j] = U[i+j]-u;
+		saved = 0.0;
+		for (int64_t r=0; r<j; r++)
+		{
+			double temp = N[r]/(right[r+1] + left[j-r]);
+			N[r] = saved + right[r+1] * temp;
+			saved = left[j-r]*temp;
+		}
+		N[j} = saved;
+	}
+
+}
+
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+
+#define SWAP(a,b) {dum=(a);((a)=(b);(b)=dum;}
+#define TINY 1.0e-20
+
+void bandec(double **a, int64_t n, int64_t m1, int64_t m2, double **al, int64_t indx[], double *d)
+{
+	int64_t i,j,k,l;
+	int64_t mm;
+	double dum;	
+	
+	mm = m1 + m2 + 1;
+	l = m1;
+	for (i=1;i<=m1;i++)
+	{
+		for (j=m1+2-i;j<=mm;j++) a[i][j-l]=a[i][j];
+		--l;
+		for (j=mm-l;j<=mm;j++) a[i][j] = 0.0f;
+	}
+	*d=1.0;
+	l = m1;
+	for (k=1;k<=n;k++)
+	{
+		dum=a[k][1];
+		i=k;
+		if (l<n) l++;
+		for (j=k+1; j<=l; j++)
+		{
+			if(abs(a[j][1]) > abs(dum))
+			{
+				dum=a[j][1];
+				i=j;
+			}
+		}
+		indx[k] = i;
+		if (dum==0.0) a[k][1]=TINY;
+		if(i!=k) 
+		{
+			*d = -(*d);
+			for (j=1; j<=mm; j++) SWAP(a[k][j], a[i][j])
+		}
+		for (i=k+1;i<=l;i++)
+		{
+			dum=a[i][1]/a[k][1];
+			al[k][i-k]=dum;
+			for (j=2; j<=mm; j++) a[i][j-1]=a[i][j]-dum*a[k][j];
+			a[i][mm] = 0.0;
+		}
+	}
+
+}
+
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void banbks(double **a, int64_t n, int64_t m1, int64_t m2, double **al, int64_t indx[], double b[])
+{
+	int64_t i,k,l;
+	int64_t mm;
+	double dum;
+
+	mm = m1+m2+1;
+	l = m1;
+
+	for (k=1; k<=n; k++) 
+	{
+		i = indx[k];
+		if (i != k) SWAP(b[k], b[i])
+		if (l < n) l++;
+		for (i = k+1; i<=l; i++) b[i] -= al[k][i-k]*b[k];
+	}
+
+	l=1;
+
+	for (i=n; i>=1; i--)
+	{
+		dum = b[i];
+		for (k=2; k<=l; k++) dum -= a[i][k]*b[k+i-1];
+		b[i] = dum/a[i][1];
+		if (l<mm) l++;
+	}
+}
+
 
 // -----------------------------------------------------------------------------
 //
