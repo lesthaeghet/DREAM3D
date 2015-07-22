@@ -435,7 +435,7 @@ void SurfaceMeshToSolidModelIges::execute()
 							m_SurfaceMeshTriangleNormals[3 * t + 2] == uniqueExternalSurfaceNormals[3 * i + 2])
 						{
 							// We found it - store the triangle id
-							externalSurfaceTriangles[i] << t;
+							tmpExternalSurfaceTriangles[i] << t;
 							// Break out of the loop
 							found = true;
 							break;
@@ -1048,7 +1048,7 @@ void SurfaceMeshToSolidModelIges::execute()
 				int64_t y;
 				int64_t z;
 				float d;
-			}
+			};
 
 
 			// Let's extrapolate the edges and unfilled points
@@ -1067,11 +1067,9 @@ void SurfaceMeshToSolidModelIges::execute()
 						// neighbors on that radius in that quadrant.  We repeat this process
 						// for each quadrant.  Each quadrant will include the first axes from
 						// the standard perspective.  The second axes will be included with the
-						// subsequent quadrant.
-	
-						
+						// subsequent quadrant.						
 
-						int64_t x=i; y=j;
+						int64_t x=i, y=j;
 						int64_t curradius = 1;						
 						QList<neighbor> curpointneighbors;
 						int64_t curncount = 0;
@@ -1080,6 +1078,7 @@ void SurfaceMeshToSolidModelIges::execute()
 						// First quadrant
 						while (true)
 						{
+
 							if (x<i+curradius && y==j)
 								++x;
 							else if (x==i+curradius && y < j + curradius)
@@ -1090,14 +1089,14 @@ void SurfaceMeshToSolidModelIges::execute()
 								if (curncount > 0 || curradius >= curmaxradius)
 									break;
 								else
-									++curradius;
+									{ ++curradius; x = i; y = j; continue; }
 							
 							if (x >= xcnt || x < 0 || y >= ycnt || y < 0)
 								continue; 
 							
 							if (!isnan(griddedsurf[2 + 3*y + x*ycnt*3 ]))
 							{
-								neighbor n
+								neighbor n;
 								n.x = x;
 								n.y = y;
 								n.z = griddedsurf[2 + 3*y + x*ycnt*3 ];
@@ -1117,6 +1116,7 @@ void SurfaceMeshToSolidModelIges::execute()
 						// Second quadrant
 						while (true)
 						{
+
 							if (x==i && y < j + curradius)
 								++y;
 							else if (x>i-curradius && y==j+curradius)
@@ -1127,14 +1127,14 @@ void SurfaceMeshToSolidModelIges::execute()
 								if (curncount > 0 || curradius >= curmaxradius)
 									break;
 								else
-									++curradius;
+									{ ++curradius; x = i; y = j; continue; }
 							
 							if (x >= xcnt || x < 0 || y >= ycnt || y < 0)
 								continue; 
 							
 							if (!isnan(griddedsurf[2 + 3*y + x*ycnt*3 ]))
 							{
-								neighbor n
+								neighbor n;
 								n.x = x;
 								n.y = y;
 								n.z = griddedsurf[2 + 3*y + x*ycnt*3 ];
@@ -1152,6 +1152,7 @@ void SurfaceMeshToSolidModelIges::execute()
 						// Third quadrant
 						while (true)
 						{
+
 							if (x > i - curradius && y == j)
 								--x;
 							else if (x== i-curradius && y > j-curradius)
@@ -1162,14 +1163,14 @@ void SurfaceMeshToSolidModelIges::execute()
 								if (curncount > 0 || curradius >= curmaxradius)
 									break;
 								else
-									++curradius;
+									{ ++curradius; x = i; y = j; continue; }
 							
 							if (x >= xcnt || x < 0 || y >= ycnt || y < 0)
 								continue; 
 							
 							if (!isnan(griddedsurf[2 + 3*y + x*ycnt*3 ]))
 							{
-								neighbor n
+								neighbor n;
 								n.x = x;
 								n.y = y;
 								n.z = griddedsurf[2 + 3*y + x*ycnt*3 ];
@@ -1187,6 +1188,7 @@ void SurfaceMeshToSolidModelIges::execute()
 						// Fourth quadrant
 						while (true)
 						{
+
 							if (x == i && y > j - curradius)
 								--y;
 							else if (x < i+curradius && y == j - curradius )
@@ -1197,14 +1199,14 @@ void SurfaceMeshToSolidModelIges::execute()
 								if (curncount > 0 || curradius >= curmaxradius)
 									break;
 								else
-									++curradius;
+									{ ++curradius; x = i; y = j; continue; }
 							
 							if (x >= xcnt || x < 0 || y >= ycnt || y < 0)
 								continue; 
 							
 							if (!isnan(griddedsurf[2 + 3*y + x*ycnt*3 ]))
 							{
-								neighbor n
+								neighbor n;
 								n.x = x;
 								n.y = y;
 								n.z = griddedsurf[2 + 3*y + x*ycnt*3 ];
@@ -1215,17 +1217,20 @@ void SurfaceMeshToSolidModelIges::execute()
 						}
 
 
-						float totaldistance = 0.0f;
-						for (int64_t i = 0; i < curpointneighbors.size(); ++i)
+						float totalweight = 0.0f;
+						for (int64_t q = 0; q < curpointneighbors.size(); ++q)
 						{
-							totaldistance+=curpointneighbors[i].d;
+							totalweight += 1 / (curpointneighbors[q].d * curpointneighbors[q].d);
 						}
 
-						
+						float interpvalue = 0.0f;
+						for (int64_t q = 0; q < curpointneighbors.size(); ++q)
+						{
+							interpvalue += curpointneighbors[q].z * ((1 / (curpointneighbors[q].d * curpointneighbors[q].d)) / totalweight);
+						}
 
 
-
-					
+						griddedsurf[2 + 3 * j + i * ycnt * 3] = interpvalue;
 						
 					}
 				}
@@ -1277,6 +1282,10 @@ void SurfaceMeshToSolidModelIges::execute()
 					griddedsurf[2 + 3 * j + i * ycnt * 3] = postrot[2];
 				}
 			}
+
+
+
+
 
 
 
@@ -1730,7 +1739,7 @@ QList<int32_t> SurfaceMeshToSolidModelIges::RecurseExternalTrianglesOnSurface(El
 		for (int64_t i = 0; i < neighborcount; ++i)
 		{
 			// Is this neighbor on the same surface and not already on the list
-			if if (checkedtriangles[t] == false && m_SurfaceMeshFeatureFaceIds[t] == featurefacelabel && (m_SurfaceMeshFaceLabels[2*t] == grain || m_SurfaceMeshFaceLabels[2*t+1] == grain) && 
+			if (checkedtriangles[t] == false && m_SurfaceMeshFeatureFaceIds[t] == featurefacelabel && (m_SurfaceMeshFaceLabels[2*t] == grain || m_SurfaceMeshFaceLabels[2*t+1] == grain) && 
 				m_SurfaceMeshTriangleNormals[3*t] == n0 && 
 				m_SurfaceMeshTriangleNormals[3*t+1] == n1 &&
 				m_SurfaceMeshTriangleNormals[3*t+2] == n2)
