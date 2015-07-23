@@ -1673,64 +1673,64 @@ int32_t SurfaceMeshToSolidModelIges::RecurseOrderedEdges(QList<QList<int64_t>> e
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-int64_t SurfMeshParams(const int64_t n, const int64_t m, const double *Q, double &uk, double &vl)
+int64_t SurfaceMeshToSolidModelIges::SurfMeshParams(const int64_t n, const int64_t m, const double *Q, double *uk, double *vl)
 {
 	// This code adapted from The NURBS Handbook, 2nd Ed. ISBN 3-540-61545-8 p377-378
 
 	// Calculate uk
-	int64_t num = m;
-	uk[0] = 0.0f;	uk[n-1] = 1.0f;
+	int64_t num = m+1;
+	uk[0] = 0.0f;	uk[n] = 1.0f;
 	double *cds = new double[n];
-	for (int64_t k=1; k<(n-1); ++k) uk[k] = 0.0f;
-	for (int64_t l=0; l<m; ++l)
+	for (int64_t k=1; k<n; ++k) uk[k] = 0.0f;
+	for (int64_t l=0; l<=m; ++l)
 	{
 		double total = 0.0f;
-		for (int64_t k=1; k<n; ++k)
+		for (int64_t k=1; k<=n; ++k)
 		{
-			cds[k-1] = Distance3D(k,l,k-1,l,n,m,Q);
-			total += cds[k-1];
+			cds[k] = Distance3D(k,l,k-1,l,n,m,Q);
+			total += cds[k];
 		}
 		if ( total <= DBL_EPSILON ) --num;
 		else
 		{
 			double d = 0.0f;
-			for (int64_t k=1; k<(n-1); ++k)
+			for (int64_t k=1; k<n; ++k)
 			{
-				d += cds[k-1];
-				uk[k-1] += d/total;
+				d += cds[k];
+				uk[k] += d/total;
 			}
 		}
 	}
 	if (num == 0) return -1;
-	for (int64_t k=1; k<(n-1); ++k) uk[k] = uk[k]/num;
+	for (int64_t k=1; k<n; ++k) uk[k] = uk[k]/num;
 
 	// Calculate vl
-	num = n;
-	vl[0] = 0.0f; vl[m-1] = 1.0f;
+	num = n+1;
+	vl[0] = 0.0f; vl[m] = 1.0f;
 	delete[] cds;
 	cds = new double[m];
-	for (int64_t l=1; l<(m-1); ++l) vl[l] = 0.0f;
-	for (int64_t k=0; k<n; ++k)
+	for (int64_t l=1; l<m; ++l) vl[l] = 0.0f;
+	for (int64_t k=0; k<=n; ++k)
 	{
 		double total = 0.0f;
-		for (int64_t l=1; l<m; ++l)
+		for (int64_t l=1; l<=m; ++l)
 		{
-			cds[l-1] = Distance3D(k,l,k,l-1,n,m,Q);
-			total += cds[l-1];
+			cds[l] = Distance3D(k,l,k,l-1,n,m,Q);
+			total += cds[l];
 		}
 		if (total <= DBL_EPSILON) --num;
 		else
 		{
 			double d = 0.0f;
-			for (int64_t l=1; l<(m-1); ++l)
+			for (int64_t l=1; l<m; ++l)
 			{
-				d += cds[l-1];
-				uk[l-1] += d/total;
+				d += cds[l];
+				uk[l] += d/total;
 			}
 		}
 	}
 	if (num == 0) return -1;
-	for (int64_t l=1; l<(m-1); ++l) vl[l] = vl[l]/num;
+	for (int64_t l=1; l<m; ++l) vl[l] = vl[l]/num;
 
 	delete[] cds;
 
@@ -1741,37 +1741,106 @@ int64_t SurfMeshParams(const int64_t n, const int64_t m, const double *Q, double
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-double Distance3D(const int64_t xa, const int64_t ya, const int64_t xb, const int64_t yb, const int64_t n, const int64_t m, const double *Q)
+double SurfaceMeshToSolidModelIges::Distance3D(const int64_t xa, const int64_t ya, const int64_t xb, const int64_t yb, const int64_t n, const int64_t m, const double *Q)
 {
-	const double ax = Q[0 + 3 * ya + xa * (n) * 3];
-	const double ay = Q[1 + 3 * ya + xa * (n) * 3];
-	const double az = Q[2 + 3 * ya + xa * (n) * 3];
-	const double bx = Q[0 + 3 * yb + xb * (n) * 3];
-	const double by = Q[1 + 3 * yb + xb * (n) * 3];
-	const double bz = Q[2 + 3 * yb + xb * (n) * 3];
+	const double ax = Q[0 + 3 * ya + xa * (n + 1) * 3];
+	const double ay = Q[1 + 3 * ya + xa * (n + 1) * 3];
+	const double az = Q[2 + 3 * ya + xa * (n + 1) * 3];
+	const double bx = Q[0 + 3 * yb + xb * (n + 1) * 3];
+	const double by = Q[1 + 3 * yb + xb * (n + 1) * 3];
+	const double bz = Q[2 + 3 * yb + xb * (n + 1) * 3];
 
 	double retval = sqrt( (ax-bx)*(ax-bx) + (ay-by)*(ay-by) + (az-bz)*(az-bz) );
 	
+	return retval;
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+double SurfaceMeshToSolidModelIges::Distance3D(const int64_t a, const int64_t b, const double *Q)
+{
+	const double ax = Q[0 + 3 * a];
+	const double ay = Q[1 + 3 * a];
+	const double az = Q[2 + 3 * a];
+	const double bx = Q[0 + 3 * b];
+	const double by = Q[1 + 3 * b];
+	const double bz = Q[2 + 3 * b];
+
+	double retval = sqrt((ax - bx)*(ax - bx) + (ay - by)*(ay - by) + (az - bz)*(az - bz));
+
+	return retval;
 }
 
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-int64_t GlobalCurveInterp(int64_t n, double *Q, int64_t r, int64_t p, int64_t &m, double &U, double &P)
+void SurfaceMeshToSolidModelIges::GlobalCurveInterp(int64_t n, double *Q, int64_t r, int64_t p, int64_t &m, double *U, double *P)
 {
 	// This code adapted from The NURBS Handbook, 2nd Ed. ISBN 3-540-61545-8 p369-370
 
 	m = n + p + 1;
 
+	double *uk = new double[n+1];
+	uk[0] = 0.0f;  uk[n] = 1.0f;
+	double *cds = new double[n];
+	for (int64_t k = 1; k<n; ++k) uk[k] = 0.0f;
+	double d = 0.0f;
+	for (int64_t k = 1; k <= n; ++k)
+	{
+		cds[k] = sqrt(Distance3D(k, k - 1, Q));
+		d += cds[k];
+	}
+	for (int64_t k = 1; k<n; ++k)
+	{
+		uk[k] = uk[k-1] + (cds[k]/d);
+	}
+		
+	for (int64_t k = 0; k <= p; k++) U[k] = 0.0f;
+	for (int64_t k = m-p;k <= p; k++) U[k] = 1.0f;
+
 	
+	for (int64_t j = 1; j <= n - p; j++)
+	{
+		double total = 0.0f;
+		for (int64_t i = j; i <= j + p - 1; ++i) total += uk[i];
+		U[j + p] = total / p;
+	}
+
+	delete[] cds;
+
+	double *A = new double[(n + 1)*(n+1)];
+	double *Al = new double[(n + 1)*(n + 1)];
+	int64_t *indx = new int64_t[n+1];
+	double lud = 0.0f;
+	for (int64_t i = 0; i < (n + 1)*(n + 1); ++i) A[i] = 0.0f;
+
+	for (int64_t i = 0; i <= n; ++i)
+	{
+		int64_t span = FindSpan(n, p, uk[i], U);
+		BasisFunction(span, uk[i], p, U, &A[(i)*(n + 1) + (span-p)]);
+	}
+	bandec(&A, n + 1, p - 1, p - 1, &Al, indx, &d);
+	double *rhs = new double[n+1];
+	for (int64_t i = 0; i < r; i++)
+	{
+		for (int64_t j = 0; j <= n; j++) rhs[j] = Q[(j)*(n + 1) + (i)];
+		banbks(&A, n + 1, p - 1, p - 1, &Al, indx, rhs);
+		for (int64_t j = 0; j <= n; j++) P[(j)*(n + 1) + (i)] = rhs[j];
+	}
+	
+	delete[] A;
+	delete[] Al;
+	delete[] indx;
+	delete[] uk;
 
 }
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-int64_t FindSpan(int64_t n, int64_t p, double u, double *U)
+int64_t SurfaceMeshToSolidModelIges::FindSpan(int64_t n, int64_t p, double u, double *U)
 {
 	if (u == U[n+1]) return(n);
 
@@ -1793,12 +1862,12 @@ int64_t FindSpan(int64_t n, int64_t p, double u, double *U)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void BasisFunction(int64_t i, double u, int64_t p, double *U, double *N)
+void SurfaceMeshToSolidModelIges::BasisFunction(int64_t i, double u, int64_t p, double *U, double *N)
 {
 
 	N[0] = 1.0;
-	double left[p+1];
-	double right[p+1];
+	double *left = new double[p+1];
+	double *right = new double[p+1];
 	double saved;
 
 
@@ -1813,8 +1882,11 @@ void BasisFunction(int64_t i, double u, int64_t p, double *U, double *N)
 			N[r] = saved + right[r+1] * temp;
 			saved = left[j-r]*temp;
 		}
-		N[j} = saved;
+		N[j] = saved;
 	}
+
+	delete[] left;
+	delete[] right;
 
 }
 
@@ -1823,10 +1895,10 @@ void BasisFunction(int64_t i, double u, int64_t p, double *U, double *N)
 //
 // -----------------------------------------------------------------------------
 
-#define SWAP(a,b) {dum=(a);((a)=(b);(b)=dum;}
+#define SWAP(a,b) {dum=(a);(a)=(b);(b)=dum;}
 #define TINY 1.0e-20
 
-void bandec(double **a, int64_t n, int64_t m1, int64_t m2, double **al, int64_t indx[], double *d)
+void SurfaceMeshToSolidModelIges::bandec(double **a, int64_t n, int64_t m1, int64_t m2, double **al, int64_t indx[], double *d)
 {
 	int64_t i,j,k,l;
 	int64_t mm;
@@ -1877,7 +1949,7 @@ void bandec(double **a, int64_t n, int64_t m1, int64_t m2, double **al, int64_t 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void banbks(double **a, int64_t n, int64_t m1, int64_t m2, double **al, int64_t indx[], double b[])
+void SurfaceMeshToSolidModelIges::banbks(double **a, int64_t n, int64_t m1, int64_t m2, double **al, int64_t indx[], double b[])
 {
 	int64_t i,k,l;
 	int64_t mm;

@@ -271,6 +271,15 @@ class SurfaceMeshToSolidModelIges : public AbstractFilter
 	 */
 	QList<int32_t> RecurseExternalTrianglesOnSurface(ElementDynamicList::Pointer m_TriangleNeighbors, QVector<bool> &checkedtriangles, int64_t t, int32_t grain, int32_t featurefacelabel, float n0, float n1, float n2);
 
+	int64_t SurfMeshParams(const int64_t n, const int64_t m, const double *Q, double *uk, double *vl);
+	double Distance3D(const int64_t xa, const int64_t ya, const int64_t xb, const int64_t yb, const int64_t n, const int64_t m, const double *Q);
+	double Distance3D(const int64_t a, const int64_t b, const double *Q);
+	void GlobalCurveInterp(int64_t n, double *Q, int64_t r, int64_t p, int64_t &m, double *U, double *P);
+	int64_t FindSpan(int64_t n, int64_t p, double u, double *U);
+	void BasisFunction(int64_t i, double u, int64_t p, double *U, double *N);
+	void bandec(double **a, int64_t n, int64_t m1, int64_t m2, double **al, int64_t indx[], double *d);
+	void banbks(double **a, int64_t n, int64_t m1, int64_t m2, double **al, int64_t indx[], double b[]);
+
 	SurfaceMeshToSolidModelIges(const SurfaceMeshToSolidModelIges&); // Copy Constructor Not Implemented
 	void operator=(const SurfaceMeshToSolidModelIges&); // Operator '=' Not Implemented
 };
