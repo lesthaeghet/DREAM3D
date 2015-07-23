@@ -272,6 +272,7 @@ class SurfaceMeshToSolidModelIges : public AbstractFilter
 	QList<int32_t> RecurseExternalTrianglesOnSurface(ElementDynamicList::Pointer m_TriangleNeighbors, QVector<bool> &checkedtriangles, int64_t t, int32_t grain, int32_t featurefacelabel, float n0, float n1, float n2);
 
 	int64_t SurfMeshParams(const int64_t n, const int64_t m, const double *Q, double *uk, double *vl);
+	void GlobalSurfInterp(int64_t n, int64_t m, double **Q, int64_t p, int64_t q, double *U, double *V, double **P);
 	double Distance3D(const int64_t xa, const int64_t ya, const int64_t xb, const int64_t yb, const int64_t n, const int64_t m, const double *Q);
 	double Distance3D(const int64_t a, const int64_t b, const double *Q);
 	void GlobalCurveInterp(int64_t n, double *Q, int64_t r, int64_t p, int64_t &m, double *U, double *P);
