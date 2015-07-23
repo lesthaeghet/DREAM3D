@@ -1772,6 +1772,107 @@ double SurfaceMeshToSolidModelIges::Distance3D(const int64_t a, const int64_t b,
 	return retval;
 }
 
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void SurfaceMeshToSolidModelIges::GlobalSurfInterp(int64_t n, int64_t m, double **Q, int64_t p, int64_t q, double *U, double *V, double **P)
+{
+	double *uk = new double[n+1];
+	double *vl = new double[n+1];
+	
+	SurfMeshParams(n,m,Q,uk,vl);
+
+	// Compute U
+	for (int64_t k = 0; k <= p; k++) U[k] = 0.0f;
+	for (int64_t k = n+1;k <= n+p+1; k++) U[k] = 1.0f;
+	for (int64_t j = 1; j <= n - p; j++)
+	{
+		double total = 0.0f;
+		for (int64_t i = j; i <= j + p - 1; ++i) total += uk[i];
+		U[j + p] = total / p;
+	}
+
+	// Compute V
+	for (int64_t k = 0; k <= q; k++) U[k] = 0.0f;
+	for (int64_t k = m+1;k <= m+q+1; k++) U[k] = 1.0f;
+	for (int64_t j = 1; j <= m - q; j++)
+	{
+		double total = 0.0f;
+		for (int64_t i = j; i <= j + q - 1; ++i) total += uk[i];
+		U[j + q] = total / p;
+	}
+
+
+	double *A = new double[(n + 1)*(n + 1)];
+	double *Al = new double[(n + 1)*(n + 1)];
+	double *R = new double[(n+1)*(m+1)*3];
+	int64_t *indx = new int64_t[n+1];
+	double d = 0.0f;
+	double lud = 0.0f;
+	for (int64_t i = 0; i < (n + 1)*(n + 1); ++i) A[i] = 0.0f;
+
+	for (int64_t i = 0; i <= n; ++i)
+	{
+		int64_t span = FindSpan(n, p, uk[i], U);
+		BasisFunction(span, uk[i], p, U, &A[(i)*(n + 1) + (span-p)]);
+	}
+	bandec(&A, n + 1, p - 1, p - 1, &Al, indx, &d);
+	double *rhs = new double[n+1];
+
+	for (int64_t l=0; l<=m; l++)
+	{
+
+		for (int64_t i = 0; i < 3; i++)
+		{
+			for (int64_t j = 0; j <= n; j++) rhs[j] = Q[(m+1)*3*j + 3*(l) + (i)];
+			banbks(&A, n + 1, p - 1, p - 1, &Al, indx, rhs);
+			for (int64_t j = 0; j <= n; j++) R[(m+1)*3*j + 3*(l) + (i)] = rhs[j];
+		}
+
+	}
+	
+	delete[] A;
+	delete[] Al;
+	delete[] indx;
+
+
+	d = 0.0f;
+	A = new double[(m + 1)*(m + 1)];
+	Al = new double[(m + 1)*(m + 1)];
+	indx = new int64_t[m+1];
+	lud = 0.0f;
+	for (int64_t i = 0; i < (m + 1)*(m + 1); ++i) A[i] = 0.0f;
+
+	for (int64_t i = 0; i <= m; ++i)
+	{
+		int64_t span = FindSpan(m, q, vl[i], V);
+		BasisFunction(span, vl[i], q, V, &A[(i)*(m + 1) + (span-q)]);
+	}
+	bandec(&A, m + 1, q - 1, q - 1, &Al, indx, &d);
+	double *rhs = new double[m+1];
+
+	for (int64_t l=0; l<=n; l++)
+	{
+
+		for (int64_t i = 0; i < 3; i++)
+		{
+			for (int64_t j = 0; j <= m; j++) rhs[j] = R[(m+1)*3*l + 3*(m) + (i)];
+			banbks(&A, m + 1, q - 1, q - 1, &Al, indx, rhs);
+			for (int64_t j = 0; j <= n; j++) P[(m+1)*3*l + 3*(m) + (i)] = rhs[j];
+		}
+
+	}
+
+
+	delete[] R;
+
+	delete[] A;
+	delete[] Al;
+	delete[] indx;
+
+	
+}
+
 
 // -----------------------------------------------------------------------------
 //
@@ -1798,7 +1899,7 @@ void SurfaceMeshToSolidModelIges::GlobalCurveInterp(int64_t n, double *Q, int64_
 	}
 		
 	for (int64_t k = 0; k <= p; k++) U[k] = 0.0f;
-	for (int64_t k = m-p;k <= p; k++) U[k] = 1.0f;
+	for (int64_t k = m-p;k <= m; k++) U[k] = 1.0f;
 
 	
 	for (int64_t j = 1; j <= n - p; j++)
