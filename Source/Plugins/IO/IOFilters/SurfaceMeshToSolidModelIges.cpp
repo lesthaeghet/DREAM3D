@@ -89,8 +89,19 @@
 
 #include "IO/IOConstants.h"
 #include <stdexcept>
+#include <ctime>
 
-
+// Structure
+struct surfdata {
+	double *U;
+	double *V;
+	double *P;
+	double *UE;
+	double *PE;
+	int64_t xcnt;
+	int64_t ycnt;
+	int64_t edgecnt;
+};
 
 inline double max(double a, double b, double c)
 {
@@ -501,6 +512,8 @@ void SurfaceMeshToSolidModelIges::execute()
 				}
 			}			
 		}
+
+		QList<surfdata> interpsurfaces;
 
 
 		// We are now ready to start looping over each surface and building up a NURBS representation
@@ -1284,19 +1297,44 @@ void SurfaceMeshToSolidModelIges::execute()
 			}
 
 
+			// Get Edge List Ready
+			double *A = new double[orderededges[0].size() * 3];
+			for (QList<QList<int64_t>>::iterator i = orderededges[0].begin(); i != orderededges[0].end(); ++i)
+			{
+				float a = static_cast<float>(nodes[(*i)[0] * 3]);
+				float b = static_cast<float>(nodes[(*i)[0] * 3 + 1]);
+				float c = static_cast<float>(nodes[(*i)[0] * 3 + 2]);
+				int64_t cnt = i - orderededges[0].begin();
+				A[3 * (cnt) + 0] = a;
+				A[3 * (cnt) + 1] = b;
+				A[3 * (cnt) + 2] = c;
+			}
+
+			double *U = new double[xcnt+3];
+			double *V = new double[ycnt+3];
+			double *P = new double[xcnt*ycnt*3];
+			double *UE = new double[orderededges[0].size() + 1];
+			double *PE = new double[orderededges[0].size() * 3];
+			int64_t m;
+
+			GlobalSurfInterp(xcnt - 1, ycnt - 1, griddedsurf, 3, 3, U, V, P);
+			GlobalCurveInterp(orderededges[0].size() - 1, A, 3, 1, m, UE, PE);
 
 			
+			surfdata thissurf;
+			thissurf.P = P;
+			thissurf.U = U;
+			thissurf.V = V;
+			thissurf.xcnt = xcnt;
+			thissurf.ycnt = ycnt;
+			thissurf.PE = PE;
+			thissurf.UE = UE;
+			thissurf.edgecnt = orderededges[0].size();
 
-
-
-
-
-
-
-			
+			interpsurfaces << thissurf;		
 
 			// Temporary surface output
-			filename = getOutputIgesDirectory() + "/" + getOutputIgesPrefix();
+			/*filename = getOutputIgesDirectory() + "/" + getOutputIgesPrefix();
 			filename = filename + QString("Grain") + QString::number(grain) + QString("_Surface") + QString::number(surfcnt) + QString("_Gridded_Size") + QString::number(xcnt) + QString("x") + QString::number(ycnt) + ".csv";
 			f = fopen(filename.toLatin1().data(), "w");
 			for (int32_t i = 0; i < xcnt; i++)
@@ -1345,37 +1383,146 @@ void SurfaceMeshToSolidModelIges::execute()
 			}
 			fclose(f);
 
+			*/
 
 
-
-			delete[] griddedsurf;
-		
-
-			
-			
+			delete[] griddedsurf;		
 
 		}
 
+		// We are now ready to write out this file
+		QString filename = getOutputIgesDirectory() + "/" + getOutputIgesPrefix();
+		filename = filename + QString("_Grain") + QString::number(grain) + ".igs";
+		FILE *f = fopen(filename.toLatin1().data(), "w");
+		char line[100];
+		int64_t cnt;
 
-
-
+		cnt = sprintf(line, "DREAM3D Surface Mesh to Solid Model IGES File                           S0000001\n");
+		fwrite(line, sizeof(char), cnt, f);
 		
- 
+		QString paramsect = "";
+
+		paramsect += "1H,,";										// Parameter Separator
+		paramsect += "1H;,";										// Record Separator
+		paramsect += "7HDREAM3D,";									// Product Identifier
+
+		// Filename
+		paramsect.sprintf("%s%dH%s,", paramsect.toLatin1().data(), filename.size(), filename.toLatin1().data());
+
+		paramsect += "7HDREAM3D,";									// System Identifier
+		paramsect += "7HDREAM3D,";									// Preprocessor Identifier
+		paramsect += "64,";											// Integer Size
+		paramsect += "38,";											// Single Float Size
+		paramsect += "6,";											// Single Precision
+		paramsect += "308,";										// Double Float Size
+		paramsect += "15,";											// Double Precision
+		paramsect += "7HDREAM3D,";									// Receiving Identifier
+		paramsect += "1.,";											// Scale Factor
+		paramsect += "9,";											// Unit flag for um
+		paramsect += "2HUM,";										// Unit name
+		paramsect += "1,";											// Max Num Line Weight Graduations
+		paramsect += "0.125,";										// Width of Max Line
+
+		// Timestamp
+		time_t t = time(0);   // get time now
+		struct tm * now = localtime(&t);
+		paramsect += "15H" + QString::number(now->tm_year + 1900)
+			+ ((now->tm_mon + 1 < 10) ? ("0" + QString::number(now->tm_mon + 1)) : (QString::number(now->tm_mon + 1)))
+			+ ((now->tm_mday < 10) ? ("0" + QString::number(now->tm_mon)) : (QString::number(now->tm_mon)))
+			+ "." + ((now->tm_hour + 1 < 10) ? ("0" + QString::number(now->tm_hour + 1)) : (QString::number(now->tm_hour + 1)))
+			+ ((now->tm_min + 1 < 10) ? ("0" + QString::number(now->tm_min + 1)) : (QString::number(now->tm_min + 1)))
+			+ ((now->tm_sec + 1 < 10) ? ("0" + QString::number(now->tm_sec + 1)) : (QString::number(now->tm_sec + 1)))
+			+ ",";
+
+		paramsect += "1E-008,";										// Tolerance
+		paramsect += "20000,";										// Max Value
+		paramsect += "7HDREAM3D,";									// Author
+		paramsect += "7HDREAM3D,";									// Org
+		paramsect += "10,";											// Version 5.2
+		paramsect += "0,";											// No Drafting Standard
+
+		// Timestamp
+		paramsect += "15H" + QString::number(now->tm_year + 1900)
+			+ ((now->tm_mon + 1 < 10) ? ("0" + QString::number(now->tm_mon + 1)) : (QString::number(now->tm_mon + 1)))
+			+ ((now->tm_mday < 10) ? ("0" + QString::number(now->tm_mon)) : (QString::number(now->tm_mon)))
+			+ "." + ((now->tm_hour + 1 < 10) ? ("0" + QString::number(now->tm_hour + 1)) : (QString::number(now->tm_hour + 1)))
+			+ ((now->tm_min + 1 < 10) ? ("0" + QString::number(now->tm_min + 1)) : (QString::number(now->tm_min + 1)))
+			+ ((now->tm_sec + 1 < 10) ? ("0" + QString::number(now->tm_sec + 1)) : (QString::number(now->tm_sec + 1)))
+			+ ";";
+
+		//char *paramstr = paramsect.toLatin1().data();
+		char padstr[8] = "0000000";
+		int64_t i = 0;
+		int64_t curcnt = 1;
+		while (i < paramsect.size())
+		{
+			for (int64_t curline = 0; curline < 72; ++curline)
+			{
+				if (i < paramsect.size())
+				{
+					char val = paramsect.at(i).toLatin1();
+					fwrite(&val, sizeof(char), 1, f);
+					++i;
+				}
+				else
+				{
+					fwrite(" ", sizeof(char), 1, f);
+				}
+			}
+			fwrite("G", sizeof(char), 1, f);
+			//for (int64_t j = 0; j < 7; j++)	padstr[j] = "0";
+			QString curval = QString::number(curcnt);
+			int64_t thissize = curval.size();
+			for (int64_t j = 0; j < thissize; ++j)
+			{
+				char val = curval.at(j).toLatin1();
+				padstr[7 - thissize + j] = val;
+			}
+			++curcnt;
+			fwrite(padstr, sizeof(char), 7, f);
+			fwrite("\n", sizeof(char), 1, f);
+		}
+
+		QList<int64_t> dirlinecnt;
+		QList<int64_t> paramlinecnt;
+
+		int64_t curdirline = 1;
+		int64_t curparamline = 1;
+
+		int64_t curcharcnt = 0;
+		char buf[1000];
+		int64_t curcnt = 0;
+
+		for (QList<surfdata>::iterator cursurf = interpsurfaces.begin(); cursurf != interpsurfaces.end(); ++cursurf)
+		{
+			// 128
+			dirlinecnt << curdirline;
+			curdirline += 2;
+			curcharcnt = 4;
+			curcharcnt += sprintf(buf, "%d,", (*cursurf).xcnt);
+			curcharcnt += sprintf(buf, "%d,", (*cursurf).ycnt);
 
 
+			// 126
+			dirlinecnt << curdirline;
+			curdirline += 2;
+
+			// 141
+			dirlinecnt << curdirline;
+			curdirline += 2;
+
+			// 143
+			dirlinecnt << curdirline;
+			curdirline += 2;
+
+
+		}
+
+		fclose(f);
+		
 	}
-
-
 	
-	// Loop Over Each Surface
-	// Get List of XYZ Points
-	// Get List of Points on Border of Surface
-	// Fit NURBS Curve to Border Points
-	// Use griddata/qhull to get (u,v) surface
-	// Fit surface with global interpoloation algorithm
-	// Temporarily store NURBS constants
-	// Write IGES File for this Grain
-
+	
 
 
 	/*---------------------------------------------------------------------------------------------*/
@@ -1503,6 +1650,12 @@ void SurfaceMeshToSolidModelIges::execute()
   return;
 }
 
+QString SurfaceMeshToSolidModelIges::Build128(surfdata surf)
+{
+	QString output;
+
+
+}
 
 // -----------------------------------------------------------------------------
 //
@@ -1680,7 +1833,7 @@ int64_t SurfaceMeshToSolidModelIges::SurfMeshParams(const int64_t n, const int64
 	// Calculate uk
 	int64_t num = m+1;
 	uk[0] = 0.0f;	uk[n] = 1.0f;
-	double *cds = new double[n];
+	double *cds = new double[n+1];
 	for (int64_t k=1; k<n; ++k) uk[k] = 0.0f;
 	for (int64_t l=0; l<=m; ++l)
 	{
@@ -1708,7 +1861,7 @@ int64_t SurfaceMeshToSolidModelIges::SurfMeshParams(const int64_t n, const int64
 	num = n+1;
 	vl[0] = 0.0f; vl[m] = 1.0f;
 	delete[] cds;
-	cds = new double[m];
+	cds = new double[m+1];
 	for (int64_t l=1; l<m; ++l) vl[l] = 0.0f;
 	for (int64_t k=0; k<=n; ++k)
 	{
@@ -1725,7 +1878,7 @@ int64_t SurfaceMeshToSolidModelIges::SurfMeshParams(const int64_t n, const int64
 			for (int64_t l=1; l<m; ++l)
 			{
 				d += cds[l];
-				uk[l] += d/total;
+				vl[l] += d/total;
 			}
 		}
 	}
@@ -1743,12 +1896,12 @@ int64_t SurfaceMeshToSolidModelIges::SurfMeshParams(const int64_t n, const int64
 // -----------------------------------------------------------------------------
 double SurfaceMeshToSolidModelIges::Distance3D(const int64_t xa, const int64_t ya, const int64_t xb, const int64_t yb, const int64_t n, const int64_t m, const double *Q)
 {
-	const double ax = Q[0 + 3 * ya + xa * (n + 1) * 3];
-	const double ay = Q[1 + 3 * ya + xa * (n + 1) * 3];
-	const double az = Q[2 + 3 * ya + xa * (n + 1) * 3];
-	const double bx = Q[0 + 3 * yb + xb * (n + 1) * 3];
-	const double by = Q[1 + 3 * yb + xb * (n + 1) * 3];
-	const double bz = Q[2 + 3 * yb + xb * (n + 1) * 3];
+	const double ax = Q[0 + 3 * ya + xa * (m + 1) * 3];
+	const double ay = Q[1 + 3 * ya + xa * (m + 1) * 3];
+	const double az = Q[2 + 3 * ya + xa * (m + 1) * 3];
+	const double bx = Q[0 + 3 * yb + xb * (m + 1) * 3];
+	const double by = Q[1 + 3 * yb + xb * (m + 1) * 3];
+	const double bz = Q[2 + 3 * yb + xb * (m + 1) * 3];
 
 	double retval = sqrt( (ax-bx)*(ax-bx) + (ay-by)*(ay-by) + (az-bz)*(az-bz) );
 	
@@ -1775,10 +1928,10 @@ double SurfaceMeshToSolidModelIges::Distance3D(const int64_t a, const int64_t b,
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void SurfaceMeshToSolidModelIges::GlobalSurfInterp(int64_t n, int64_t m, double **Q, int64_t p, int64_t q, double *U, double *V, double **P)
+void SurfaceMeshToSolidModelIges::GlobalSurfInterp(int64_t n, int64_t m, const double *Q, int64_t p, int64_t q, double *U, double *V, double *P)
 {
 	double *uk = new double[n+1];
-	double *vl = new double[n+1];
+	double *vl = new double[m+1];
 	
 	SurfMeshParams(n,m,Q,uk,vl);
 
@@ -1793,18 +1946,17 @@ void SurfaceMeshToSolidModelIges::GlobalSurfInterp(int64_t n, int64_t m, double 
 	}
 
 	// Compute V
-	for (int64_t k = 0; k <= q; k++) U[k] = 0.0f;
-	for (int64_t k = m+1;k <= m+q+1; k++) U[k] = 1.0f;
+	for (int64_t k = 0; k <= q; k++) V[k] = 0.0f;
+	for (int64_t k = m+1;k <= m+q+1; k++) V[k] = 1.0f;
 	for (int64_t j = 1; j <= m - q; j++)
 	{
 		double total = 0.0f;
-		for (int64_t i = j; i <= j + q - 1; ++i) total += uk[i];
-		U[j + q] = total / p;
+		for (int64_t i = j; i <= j + q - 1; ++i) total += vl[i];
+		V[j + q] = total / q;
 	}
 
 
 	double *A = new double[(n + 1)*(n + 1)];
-	double *Al = new double[(n + 1)*(n + 1)];
 	double *R = new double[(n+1)*(m+1)*3];
 	int64_t *indx = new int64_t[n+1];
 	double d = 0.0f;
@@ -1816,7 +1968,7 @@ void SurfaceMeshToSolidModelIges::GlobalSurfInterp(int64_t n, int64_t m, double 
 		int64_t span = FindSpan(n, p, uk[i], U);
 		BasisFunction(span, uk[i], p, U, &A[(i)*(n + 1) + (span-p)]);
 	}
-	bandec(&A, n + 1, p - 1, p - 1, &Al, indx, &d);
+	ludcmp(A, n+1, indx, &d);
 	double *rhs = new double[n+1];
 
 	for (int64_t l=0; l<=m; l++)
@@ -1825,20 +1977,19 @@ void SurfaceMeshToSolidModelIges::GlobalSurfInterp(int64_t n, int64_t m, double 
 		for (int64_t i = 0; i < 3; i++)
 		{
 			for (int64_t j = 0; j <= n; j++) rhs[j] = Q[(m+1)*3*j + 3*(l) + (i)];
-			banbks(&A, n + 1, p - 1, p - 1, &Al, indx, rhs);
+			lubksb(A, n + 1, indx, rhs);
 			for (int64_t j = 0; j <= n; j++) R[(m+1)*3*j + 3*(l) + (i)] = rhs[j];
 		}
 
 	}
 	
 	delete[] A;
-	delete[] Al;
 	delete[] indx;
+	delete[] rhs;
 
 
 	d = 0.0f;
 	A = new double[(m + 1)*(m + 1)];
-	Al = new double[(m + 1)*(m + 1)];
 	indx = new int64_t[m+1];
 	lud = 0.0f;
 	for (int64_t i = 0; i < (m + 1)*(m + 1); ++i) A[i] = 0.0f;
@@ -1848,8 +1999,8 @@ void SurfaceMeshToSolidModelIges::GlobalSurfInterp(int64_t n, int64_t m, double 
 		int64_t span = FindSpan(m, q, vl[i], V);
 		BasisFunction(span, vl[i], q, V, &A[(i)*(m + 1) + (span-q)]);
 	}
-	bandec(&A, m + 1, q - 1, q - 1, &Al, indx, &d);
-	double *rhs = new double[m+1];
+	ludcmp(A, m + 1, indx, &d);
+	rhs = new double[m+1];
 
 	for (int64_t l=0; l<=n; l++)
 	{
@@ -1857,7 +2008,7 @@ void SurfaceMeshToSolidModelIges::GlobalSurfInterp(int64_t n, int64_t m, double 
 		for (int64_t i = 0; i < 3; i++)
 		{
 			for (int64_t j = 0; j <= m; j++) rhs[j] = R[(m+1)*3*l + 3*(m) + (i)];
-			banbks(&A, m + 1, q - 1, q - 1, &Al, indx, rhs);
+			lubksb(A, m + 1, indx, rhs);
 			for (int64_t j = 0; j <= n; j++) P[(m+1)*3*l + 3*(m) + (i)] = rhs[j];
 		}
 
@@ -1867,8 +2018,8 @@ void SurfaceMeshToSolidModelIges::GlobalSurfInterp(int64_t n, int64_t m, double 
 	delete[] R;
 
 	delete[] A;
-	delete[] Al;
 	delete[] indx;
+	delete[] rhs;
 
 	
 }
@@ -1885,12 +2036,12 @@ void SurfaceMeshToSolidModelIges::GlobalCurveInterp(int64_t n, double *Q, int64_
 
 	double *uk = new double[n+1];
 	uk[0] = 0.0f;  uk[n] = 1.0f;
-	double *cds = new double[n];
+	double *cds = new double[n+1];
 	for (int64_t k = 1; k<n; ++k) uk[k] = 0.0f;
 	double d = 0.0f;
 	for (int64_t k = 1; k <= n; ++k)
 	{
-		cds[k] = sqrt(Distance3D(k, k - 1, Q));
+		cds[k] = Distance3D(k, k - 1, Q);
 		d += cds[k];
 	}
 	for (int64_t k = 1; k<n; ++k)
@@ -1912,7 +2063,6 @@ void SurfaceMeshToSolidModelIges::GlobalCurveInterp(int64_t n, double *Q, int64_
 	delete[] cds;
 
 	double *A = new double[(n + 1)*(n+1)];
-	double *Al = new double[(n + 1)*(n + 1)];
 	int64_t *indx = new int64_t[n+1];
 	double lud = 0.0f;
 	for (int64_t i = 0; i < (n + 1)*(n + 1); ++i) A[i] = 0.0f;
@@ -1922,17 +2072,16 @@ void SurfaceMeshToSolidModelIges::GlobalCurveInterp(int64_t n, double *Q, int64_
 		int64_t span = FindSpan(n, p, uk[i], U);
 		BasisFunction(span, uk[i], p, U, &A[(i)*(n + 1) + (span-p)]);
 	}
-	bandec(&A, n + 1, p - 1, p - 1, &Al, indx, &d);
+	ludcmp(A, n + 1, indx, &d);
 	double *rhs = new double[n+1];
 	for (int64_t i = 0; i < r; i++)
 	{
-		for (int64_t j = 0; j <= n; j++) rhs[j] = Q[(j)*(n + 1) + (i)];
-		banbks(&A, n + 1, p - 1, p - 1, &Al, indx, rhs);
-		for (int64_t j = 0; j <= n; j++) P[(j)*(n + 1) + (i)] = rhs[j];
+		for (int64_t j = 0; j <= n; j++) rhs[j] = Q[(j)*(r) + (i)];
+		lubksb(A, n + 1, indx, rhs);
+		for (int64_t j = 0; j <= n; j++) P[(j)*(r) + (i)] = rhs[j];
 	}
 	
 	delete[] A;
-	delete[] Al;
 	delete[] indx;
 	delete[] uk;
 
@@ -1999,7 +2148,7 @@ void SurfaceMeshToSolidModelIges::BasisFunction(int64_t i, double u, int64_t p, 
 #define SWAP(a,b) {dum=(a);(a)=(b);(b)=dum;}
 #define TINY 1.0e-20
 
-void SurfaceMeshToSolidModelIges::bandec(double **a, int64_t n, int64_t m1, int64_t m2, double **al, int64_t indx[], double *d)
+void SurfaceMeshToSolidModelIges::bandec(double *a, int64_t n, int64_t m1, int64_t m2, double *al, int64_t indx[], double *d)
 {
 	int64_t i,j,k,l;
 	int64_t mm;
@@ -2009,38 +2158,38 @@ void SurfaceMeshToSolidModelIges::bandec(double **a, int64_t n, int64_t m1, int6
 	l = m1;
 	for (i=1;i<=m1;i++)
 	{
-		for (j=m1+2-i;j<=mm;j++) a[i][j-l]=a[i][j];
+		for (j=m1+2-i;j<=mm;j++) a[n*(i)+(j-l)]=a[n*(i)+(j)];
 		--l;
-		for (j=mm-l;j<=mm;j++) a[i][j] = 0.0f;
+		for (j = mm - l; j <= mm; j++) a[n*(i) + (j)] = 0.0f;
 	}
 	*d=1.0;
 	l = m1;
 	for (k=1;k<=n;k++)
 	{
-		dum=a[k][1];
+		dum = a[n*(k) + (1)];
 		i=k;
 		if (l<n) l++;
 		for (j=k+1; j<=l; j++)
 		{
-			if(abs(a[j][1]) > abs(dum))
+			if (abs(a[n*(j) + (1)]) > abs(dum))
 			{
-				dum=a[j][1];
+				dum = a[n*(j) + (1)];
 				i=j;
 			}
 		}
 		indx[k] = i;
-		if (dum==0.0) a[k][1]=TINY;
+		if (dum == 0.0) a[n*(k) + (1)] = TINY;
 		if(i!=k) 
 		{
 			*d = -(*d);
-			for (j=1; j<=mm; j++) SWAP(a[k][j], a[i][j])
+			for (j = 1; j <= mm; j++) SWAP(a[n*(k)+(j)], a[n*(i) + (j)])
 		}
 		for (i=k+1;i<=l;i++)
 		{
-			dum=a[i][1]/a[k][1];
-			al[k][i-k]=dum;
-			for (j=2; j<=mm; j++) a[i][j-1]=a[i][j]-dum*a[k][j];
-			a[i][mm] = 0.0;
+			dum = a[n*(i)+(1)] / a[n*(k) + (1)];
+			al[n*(k) + (i-k)] = dum;
+			for (j = 2; j <= mm; j++) a[n*(i)+(j - 1)] = a[n*(i)+(j)] - dum*a[n*(k) + (j)];
+			a[n*(i) + (mm)] = 0.0;
 		}
 	}
 
@@ -2050,7 +2199,7 @@ void SurfaceMeshToSolidModelIges::bandec(double **a, int64_t n, int64_t m1, int6
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void SurfaceMeshToSolidModelIges::banbks(double **a, int64_t n, int64_t m1, int64_t m2, double **al, int64_t indx[], double b[])
+void SurfaceMeshToSolidModelIges::banbks(double *a, int64_t n, int64_t m1, int64_t m2, double *al, int64_t indx[], double b[])
 {
 	int64_t i,k,l;
 	int64_t mm;
@@ -2064,7 +2213,7 @@ void SurfaceMeshToSolidModelIges::banbks(double **a, int64_t n, int64_t m1, int6
 		i = indx[k];
 		if (i != k) SWAP(b[k], b[i])
 		if (l < n) l++;
-		for (i = k+1; i<=l; i++) b[i] -= al[k][i-k]*b[k];
+		for (i = k + 1; i <= l; i++) b[i] -= al[n*(k) + (i-k)] * b[k];
 	}
 
 	l=1;
@@ -2072,11 +2221,100 @@ void SurfaceMeshToSolidModelIges::banbks(double **a, int64_t n, int64_t m1, int6
 	for (i=n; i>=1; i--)
 	{
 		dum = b[i];
-		for (k=2; k<=l; k++) dum -= a[i][k]*b[k+i-1];
-		b[i] = dum/a[i][1];
+		for (k = 2; k <= l; k++) dum -= a[n*(i) + (k)] * b[k + i - 1];
+		b[i] = dum / a[n*(i) + (1)];
 		if (l<mm) l++;
 	}
 }
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void SurfaceMeshToSolidModelIges::ludcmp(double *a, int64_t n, int64_t *indx, double *d)
+{
+	int64_t i, imax, j, k;
+	double big, dum, sum, temp;
+	double *vv;
+
+	vv = new double[n];
+	*d = 1.0f;
+	for (i = 0; i < n; i++)
+	{
+		big = 0.0f;
+		for (j = 0; j < n; j++)
+			if ((temp = fabs(a[n*i + j]))>big) big = temp;
+		if (big == 0.0) assert(false);
+		vv[i] = 1.0 / big;
+	}
+	for (j = 0; j < n; j++)
+	{
+		for (i = 0; i < j - 1; i++)
+		{
+			sum = a[n*i + j];
+			for (k = 0; k < j - 1; k++)	sum -= a[n*i + k] * a[n*k + j];
+			a[n*i + j] = sum;
+		}
+		big = 0.0;
+		for (i = j; i < n; i++) {
+			sum = a[n*i + j];
+			for (k = 0; k < j; k++)
+				sum -= a[n*i + k] * a[n*k + j];
+			a[n*i + j] = sum;
+			if ((dum = vv[i] * fabs(sum)) >= big)
+			{
+				big = dum;
+				imax = i;
+			}
+		}
+		if (j != imax) {
+			for (k = 0; k < n; k++)
+			{
+				dum = a[n*imax + k];
+				a[n*imax + k] = a[n*j + k];
+				a[n*j + k] = dum;
+			}
+			*d = -(*d);
+			vv[imax] = vv[j];
+		}
+		indx[j] = imax;
+		if (a[n*j + j] == 0.0) a[n*j + j] = TINY;
+		if (j != n) {
+			dum = 1.0 / (a[n*j + j]);
+			for (i = j; i < n; i++) a[n*i + j] *= dum;
+		}
+	}
+	delete[] vv;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void SurfaceMeshToSolidModelIges::lubksb(double *a, int64_t n, int64_t *indx, double *b)
+{
+	int64_t i, ii = 0, ip, j;
+	double sum;
+
+	for (i = 0; i < n; i++)
+	{
+		ip = indx[i];
+		sum = b[ip];
+		b[ip] = b[i];
+		if (ii)
+			for (j = ii; j <= i - 1; j++) sum -= a[n*i + j] * b[j];
+		else if (sum) ii = i;
+		b[i] = sum;
+	}
+	for (i = n-1; i >= 0; i--)
+	{
+		sum = b[i];
+		for (j = i; j < n; j++) sum -= a[n*i + j] * b[j];
+		b[i] = sum / a[n*i + i];
+	}
+}
+
+
 
 
 // -----------------------------------------------------------------------------
